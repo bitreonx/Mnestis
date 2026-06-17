@@ -72,6 +72,7 @@ import {
   uninstallHooks,
   getHookStatus,
   ALL_PLATFORMS,
+  FABLE_DATASET_URL,
   buildMcpSetupMarkdown,
   MNEMOS_VERSION,
   MnemosRuntime,
@@ -855,9 +856,70 @@ program
       console.log(chalk.dim('  · skipped (exists): ') + f);
     }
     console.log('');
+    console.log(chalk.bold('Claude Code'));
+    console.log(chalk.cyan('  mnemos setup --platform claude') + chalk.dim('  — skill + CLAUDE.md (recommended)'));
+    console.log(chalk.cyan('  mnemos mcp') + chalk.dim('                 — 15 MCP tools for Claude Code'));
+    console.log(chalk.cyan('  mnemos wrap -- <cmd>') + chalk.dim('       — compress command output for agents'));
+    console.log('');
     console.log(chalk.bold('Platforms'));
     console.log(chalk.dim(`  Available: ${ALL_PLATFORMS.join(', ')}, all`));
     console.log(chalk.dim(`  Uninstall: mnemos setup --uninstall`));
+  });
+
+program
+  .command('discipline')
+  .description('Study Fable 5 agent habits and compare against your local Opus sessions')
+  .option('--sample <n>', 'Profile N events from the public Fable dataset (smoke test)')
+  .option('--opus', 'Also scan local claude-opus-4-8 sessions and print the delta')
+  .option('--guide', 'Print the discipline guide without running Python')
+  .action(async (options) => {
+    const findScriptsDir = (): string | null => {
+      let dir = process.cwd();
+      for (let i = 0; i < 10; i++) {
+        const script = path.join(dir, 'scripts', 'discipline', 'fable_dataset_delta.py');
+        if (existsSync(script)) return path.join(dir, 'scripts', 'discipline');
+        const parent = path.dirname(dir);
+        if (parent === dir) break;
+        dir = parent;
+      }
+      return null;
+    };
+
+    console.log('');
+    console.log(chalk.bold('Agent discipline — Fable 5 research kit'));
+    console.log(chalk.dim(`Dataset: ${FABLE_DATASET_URL}`));
+    console.log('');
+    console.log(chalk.bold('Install rules in your repo'));
+    console.log(chalk.dim('  npx mnemos . && mnemos setup --platform cursor'));
+    console.log(chalk.dim('  Writes .cursor/rules/mnemos-discipline.mdc + fable-mindset.md'));
+    console.log('');
+    console.log(chalk.bold('Docs'));
+    console.log(chalk.dim('  docs/research/fable-5-dataset.md'));
+    console.log(chalk.dim('  .mnemos/integrations/fable-mindset.md (after build)'));
+    console.log('');
+
+    if (options.guide) return;
+
+    const scriptsDir = findScriptsDir();
+    if (!scriptsDir) {
+      console.log(chalk.yellow('scripts/discipline/ not found — clone the Mnemos repo to run analysis.'));
+      console.log(chalk.dim('  python3 scripts/discipline/fable_dataset_delta.py --sample 400'));
+      return;
+    }
+
+    const args = [path.join(scriptsDir, 'fable_dataset_delta.py')];
+    if (options.sample) args.push('--sample', String(options.sample));
+    if (options.opus) args.push('--opus');
+
+    const child = spawn('python3', args, { stdio: 'inherit', shell: process.platform === 'win32' });
+    await new Promise<void>((resolve, reject) => {
+      child.on('error', reject);
+      child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`exit ${code}`))));
+    }).catch((err) => {
+      console.error(chalk.red(String(err)));
+      console.log(chalk.dim('Requires Python 3 and optionally: pip install datasets pyarrow huggingface_hub'));
+      process.exit(1);
+    });
   });
 
 program

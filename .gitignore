@@ -28,3 +28,7 @@ packages/core/debug-parse.mjs
 
 # Local workspace config — copy mnemos.workspace.example.json to create your own
 packages/ui/mnemos.workspace.json
+
+# Private notes — never commit
+secret for us/
+secret*/

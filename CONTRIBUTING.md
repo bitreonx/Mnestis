@@ -204,3 +204,18 @@ Before merging user-facing changes, check that:
 - REST and MCP still tell the same story
 - local-first and zero-key workflows remain intact
 - setup output is copy-pasteable
+
+## Developing with Claude Code
+
+We dogfood Claude Code on this repository. Recommended maintainer flow:
+
+```bash
+npx mnemos .
+mnemos setup --platform claude   # .claude/skills/mnemos + CLAUDE.md
+mnemos mcp                       # MCP tools in Claude Code
+mnemos sync                      # keep .mnemos/ fresh while editing
+```
+
+When polishing the dashboard (preview), tag issues `[dashboard]`. Report and CLI are stable surfaces — prefer changes there for first contributions.
+
+Applying to the [Claude for Open Source program](https://claude.com/contact-sales/claude-for-oss)? See [docs/claude-oss-application.md](docs/claude-oss-application.md) for a ready-to-paste impact statement.

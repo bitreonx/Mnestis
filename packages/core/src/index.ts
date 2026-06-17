@@ -118,6 +118,7 @@ export {
   buildSuggestedPrompts,
   buildContextFiles,
 } from './ai-toolkit.js';
+export { buildDisciplineCursorRule } from './discipline/agent-discipline.js';
 export type { AiToolkit } from './ai-toolkit.js';
 export { writeAiToolkit, installAiIntegrations, uninstallAiIntegrations, ALL_PLATFORMS, PLATFORM_FILES } from './ai-toolkit-io.js';
 export type { SetupOptions, SetupResult, Platform } from './ai-toolkit-io.js';
@@ -130,8 +131,14 @@ export {
   buildGeminiMd,
   buildClaudeMdSection,
 } from './ai-toolkit.js';
-export { startMemoryServer } from './serve.js';
+export {
+  buildAgentDisciplineRules,
+  buildDisciplineSkillSection,
+  FABLE_DATASET_URL,
+} from './discipline/agent-discipline.js';
+export { loadFableMindsetMd } from './discipline/fable-mindset.js';
 export type { ServeOptions, ServeHandle } from './serve.js';
+export { startMemoryServer } from './serve.js';
 export { startMcpServer } from './mcp-server.js';
 export type { McpServerOptions } from './mcp-server.js';
 export { MnemosRuntime, MNEMOS_VERSION, MNEMOS_MCP_URI, MnemosAgentError, envelopeToMcpContent, errorToMcpContent, invalidateMnemosRuntime } from './agent-runtime.js';

@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ecf8e.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-6366f1.svg)](package.json)
 [![AI Pack](https://img.shields.io/badge/AI%20Pack-v1.0.0-f59e0b.svg)](docs/ai-pack.md)
+[![Status](https://img.shields.io/badge/status-polishing%20core-6366f1.svg)](#project-status)
 
 [Documentation](docs/architecture.md) · [Graphs](docs/GRAPHS.md) · [Languages](docs/LANGUAGES.md) · [AI Pack v1](docs/ai-pack.md) · [Modes](docs/modes.md) · [Benchmarks](mnemos-bench/) · [Contributing](docs/contributing.md)
 
@@ -13,6 +14,23 @@ npx mnemos .
 ```
 
 Local-first. No cloud. No API keys. No guesswork.
+
+---
+
+## Project status
+
+Mnemos is **pre-launch OSS** — we are polishing before growth, not pretending to be finished.
+
+| Surface | Status | Notes |
+|---------|--------|-------|
+| **CLI** | Stable | `npx mnemos .`, `sync`, `wrap`, `pack`, `serve`, `mcp` |
+| **HTML report** | Stable | Dashboard-aligned design, offline shareable |
+| **AI Pack v1 + MCP** | Stable | Built for Claude Code, Cursor, Codex |
+| **Dashboard** | Preview | Cockpits work; layout & panels still refining — [help welcome](CONTRIBUTING.md) |
+
+We dogfood Mnemos on this repo. Creator marketing comes **after** dashboard polish — not before.
+
+**Claude Code first:** `mnemos setup --platform claude` → skill + `CLAUDE.md` context. See [Claude OSS application brief](docs/claude-oss-application.md) if you are evaluating ecosystem impact.
 
 ---
 
@@ -137,9 +155,11 @@ curl -s localhost:4000/copilot/pack/local?section=score | jq .version
 **Claude / Cursor / Trae recipe:**
 
 1. Run `npx mnemos .`
-2. Paste `npx mnemos pack --section=summary --mode=ai` output, **or**
-3. Point the agent at `http://localhost:4000/copilot/pack/local`, **or**
-4. Open `http://localhost:5173/json/local` and click **Copy AI Pack v1**
+2. Run `npx mnemos setup --platform claude` (Claude Code skill + `CLAUDE.md`)
+3. Paste `npx mnemos pack --section=summary --mode=ai` output, **or**
+4. Point the agent at `http://localhost:4000/copilot/pack/local`, **or**
+5. Open `http://localhost:5173/json/local` and click **Copy AI Pack v1**
+6. Use `mnemos wrap -- npm test` to feed token-compressed output back to the agent
 
 Full spec: [docs/ai-pack.md](docs/ai-pack.md)
 
@@ -191,9 +211,11 @@ Details: [docs/architecture.md](docs/architecture.md)
 | `mnemos serve` | REST API (`localhost:4000`) |
 | `mnemos mcp` | MCP stdio server for IDEs |
 | `mnemos pack` | Print AI Pack v1 (`--section`, `--mode`, `-o`) |
-| `mnemos report` | Generate `report/index.html` (`--report-path report.html`) |
+| `mnemos report` | Generate `report/index.html` (`--report-path report.html`, `--open`) |
+| `mnemos sync` | Auto-rebuild graph on file changes (local index) |
+| `mnemos wrap -- <cmd>` | Token-compressed command output for AI agents |
 | `mnemos ask "…"` | Architecture copilot |
-| `mnemos setup` | Install AGENTS.md + Cursor rules |
+| `mnemos setup` | Install AGENTS.md, Cursor rules, **Claude Code skill** |
 | `mnemos explain` | Plain-language repo summary |
 | `mnemos score` | Health score breakdown |
 | `mnemos flows` | List execution flows |
