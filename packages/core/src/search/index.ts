@@ -8,7 +8,9 @@ export type SearchEntityKind =
   | 'journey'
   | 'api'
   | 'critical_path'
-  | 'smell';
+  | 'smell'
+  | 'file'
+  | 'symbol';
 
 export interface SearchDocument {
   id: string;
@@ -56,10 +58,25 @@ const BM25_B = 0.75;
 
 export interface MemorySearchIndex {
   documents: SearchDocument[];
+  docById: Map<string, SearchDocument>;
   avgDocLength: number;
   docFreq: Map<string, number>;
   termFreq: Map<string, Map<string, number>>;
   docLength: Map<string, number>;
+  postings: Map<string, Set<string>>;
+  idf: Map<string, number>;
+}
+
+export interface SerializableSearchIndex {
+  version: 2;
+  builtAt: string;
+  documents: SearchDocument[];
+  avgDocLength: number;
+  docFreq: Array<[string, number]>;
+  termFreq: Array<[string, Array<[string, number]>]>;
+  docLength: Array<[string, number]>;
+  postings: Array<[string, string[]]>;
+  idf: Array<[string, number]>;
 }
 
 export function tokenize(text: string): string[] {
@@ -92,6 +109,26 @@ export function buildSearchIndex(memory: MemoryModel): MemorySearchIndex {
       path: s.path,
       tags: ['service', s.domain ?? ''],
     });
+
+    documents.push({
+      id: `file:${s.path}`,
+      kind: 'file',
+      title: s.path,
+      body: [s.name, s.domain ?? '', s.exports.join(' '), s.dependencies.join(' ')].join(' '),
+      path: s.path,
+      tags: ['file', 'service', s.domain ?? ''],
+    });
+
+    for (const exp of s.exports.slice(0, 40)) {
+      documents.push({
+        id: `symbol:${s.path}:${exp}`,
+        kind: 'symbol',
+        title: exp,
+        body: [s.name, s.path, s.domain ?? '', 'export symbol function class'].join(' '),
+        path: s.path,
+        tags: ['symbol', 'export', s.name.toLowerCase()],
+      });
+    }
   }
 
   for (const f of memory.flows) {
@@ -173,9 +210,12 @@ export function buildSearchIndex(memory: MemoryModel): MemorySearchIndex {
   const termFreq = new Map<string, Map<string, number>>();
   const docLength = new Map<string, number>();
   const docFreq = new Map<string, number>();
+  const postings = new Map<string, Set<string>>();
+  const docById = new Map<string, SearchDocument>();
   let totalLength = 0;
 
   for (const doc of documents) {
+    docById.set(doc.id, doc);
     const text = `${doc.title} ${doc.body} ${doc.tags.join(' ')}`;
     const terms = tokenize(text);
     docLength.set(doc.id, terms.length);
@@ -184,6 +224,8 @@ export function buildSearchIndex(memory: MemoryModel): MemorySearchIndex {
     const tf = new Map<string, number>();
     for (const term of terms) {
       tf.set(term, (tf.get(term) ?? 0) + 1);
+      if (!postings.has(term)) postings.set(term, new Set());
+      postings.get(term)!.add(doc.id);
     }
     termFreq.set(doc.id, tf);
 
@@ -192,20 +234,86 @@ export function buildSearchIndex(memory: MemoryModel): MemorySearchIndex {
     }
   }
 
+  const nDocs = documents.length;
+  const idf = new Map<string, number>();
+  for (const [term, df] of docFreq) {
+    idf.set(term, Math.log(1 + (nDocs - df + 0.5) / (df + 0.5)));
+  }
+
   return {
     documents,
+    docById,
     avgDocLength: documents.length > 0 ? totalLength / documents.length : 0,
     docFreq,
     termFreq,
     docLength,
+    postings,
+    idf,
   };
+}
+
+export function serializeSearchIndex(index: MemorySearchIndex): SerializableSearchIndex {
+  return {
+    version: 2,
+    builtAt: new Date().toISOString(),
+    documents: index.documents,
+    avgDocLength: index.avgDocLength,
+    docFreq: [...index.docFreq.entries()],
+    termFreq: [...index.termFreq.entries()].map(([docId, tf]) => [docId, [...tf.entries()]]),
+    docLength: [...index.docLength.entries()],
+    postings: [...index.postings.entries()].map(([term, ids]) => [term, [...ids]]),
+    idf: [...index.idf.entries()],
+  };
+}
+
+export function deserializeSearchIndex(data: SerializableSearchIndex): MemorySearchIndex {
+  const docById = new Map<string, SearchDocument>();
+  for (const doc of data.documents) docById.set(doc.id, doc);
+
+  return {
+    documents: data.documents,
+    docById,
+    avgDocLength: data.avgDocLength,
+    docFreq: new Map(data.docFreq),
+    termFreq: new Map(data.termFreq.map(([docId, entries]) => [docId, new Map(entries)])),
+    docLength: new Map(data.docLength),
+    postings: new Map(data.postings.map(([term, ids]) => [term, new Set(ids)])),
+    idf: new Map(data.idf),
+  };
+}
+
+export async function loadPersistedSearchIndex(outputDir: string): Promise<MemorySearchIndex | null> {
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const pathMod = await import('node:path');
+    const raw = await readFile(pathMod.join(outputDir, 'search-index.json'), 'utf-8');
+    const parsed = JSON.parse(raw) as SerializableSearchIndex | { documentCount?: number };
+    if (parsed && 'version' in parsed && parsed.version === 2 && Array.isArray(parsed.documents)) {
+      return deserializeSearchIndex(parsed);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function loadOrBuildSearchIndex(
+  memory: MemoryModel,
+  outputDir?: string,
+): Promise<MemorySearchIndex> {
+  if (outputDir) {
+    const cached = await loadPersistedSearchIndex(outputDir);
+    if (cached && cached.documents.length > 0) {
+      return cached;
+    }
+  }
+  return buildSearchIndex(memory);
 }
 
 function bm25Score(
   index: MemorySearchIndex,
   docId: string,
   queryTerms: string[],
-  nDocs: number,
 ): number {
   const docLen = index.docLength.get(docId) ?? 0;
   const tfMap = index.termFreq.get(docId);
@@ -216,8 +324,7 @@ function bm25Score(
     const tf = tfMap.get(term) ?? 0;
     if (tf === 0) continue;
 
-    const df = index.docFreq.get(term) ?? 0;
-    const idf = Math.log(1 + (nDocs - df + 0.5) / (df + 0.5));
+    const idf = index.idf.get(term) ?? 0;
     const numerator = tf * (BM25_K1 + 1);
     const denominator = tf + BM25_K1 * (1 - BM25_B + BM25_B * (docLen / (index.avgDocLength || 1)));
     score += idf * (numerator / denominator);
@@ -252,13 +359,28 @@ export function searchMemory(
     return { query, hits: [], tookMs: Date.now() - start };
   }
 
-  const nDocs = index.documents.length;
+  const candidateIds = new Set<string>();
+  for (const term of queryTerms) {
+    index.postings.get(term)?.forEach((id) => candidateIds.add(id));
+  }
+
+  if (candidateIds.size === 0) {
+    for (const doc of index.documents) {
+      const titleLower = doc.title.toLowerCase();
+      if (queryTerms.some((t) => titleLower.includes(t) || doc.path?.toLowerCase().includes(t))) {
+        candidateIds.add(doc.id);
+      }
+    }
+  }
+
   const hits: SearchHit[] = [];
 
-  for (const doc of index.documents) {
+  for (const docId of candidateIds) {
+    const doc = index.docById.get(docId);
+    if (!doc) continue;
     if (options.kinds && !options.kinds.includes(doc.kind)) continue;
 
-    let score = bm25Score(index, doc.id, queryTerms, nDocs);
+    let score = bm25Score(index, docId, queryTerms);
 
     const titleLower = doc.title.toLowerCase();
     for (const term of queryTerms) {
@@ -301,6 +423,7 @@ export type CopilotIntent =
   | 'search'
   | 'critical'
   | 'smell'
+  | 'start'
   | 'unknown';
 
 export interface IntentClassification {
@@ -311,6 +434,7 @@ export interface IntentClassification {
 
 const INTENT_PATTERNS: Array<{ intent: CopilotIntent; patterns: RegExp[]; weight: number }> = [
   { intent: 'overview', patterns: [/what is this/, /what does this/, /overview/, /summary/, /about this repo/], weight: 0.95 },
+  { intent: 'start', patterns: [/where (do i|should i) start/, /get started/, /onboard/, /new (dev|developer)/, /how (do i|to) navigate/], weight: 0.93 },
   { intent: 'flow', patterns: [/how does .* work/, /how .* work/, /explain .* flow/, /show .* flow/, /^how\s+(does|do)\s+/], weight: 0.9 },
   { intent: 'health', patterns: [/health/, /score/, /risk/, /debt/, /quality/], weight: 0.92 },
   { intent: 'impact', patterns: [/what breaks/, /what happens if/, /impact of/, /blast/, /affected by/, /dependents of/], weight: 0.97 },
@@ -353,6 +477,7 @@ function extractIntentTarget(q: string, intent: CopilotIntent): string | undefin
     search: [/^find\s+/i, /^where is\s+/i, /^locate\s+/i, /^search\s+/i],
     critical: [/why is\s+/i, /why are\s+/i, /most critical\s+/i],
     smell: [],
+    start: [/where (do i|should i) start/i, /get started/i, /onboard/i],
     unknown: [],
   };
 

@@ -52,6 +52,7 @@ export function CopilotView({ onAsk }: CopilotViewProps) {
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && submit()}
           placeholder="Ask Mnemos: How does login work?"
+          aria-label="Ask the Architecture Copilot"
           className="flex-1 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[var(--color-accent)]"
         />
         <button

@@ -1,4 +1,17 @@
 import type { GraphData, HealthScore, HeatmapEntry, MemoryModel } from '../types';
+import { deserializeSearchIndex, type MemorySearchIndex } from '@mnemos/core/search';
+
+export function hydrateSearchIndex(
+  raw: Record<string, unknown> | null,
+  memory: MemoryModel,
+): MemorySearchIndex | null {
+  if (!raw || raw.version !== 2 || !Array.isArray(raw.documents)) return null;
+  try {
+    return deserializeSearchIndex(raw as unknown as Parameters<typeof deserializeSearchIndex>[0]);
+  } catch {
+    return null;
+  }
+}
 
 export interface WorkspaceRepo {
   id: string;
@@ -66,6 +79,7 @@ export interface AskResponse {
   ok: boolean;
   answer: string;
   confidence: number;
+  tookMs?: number;
   raw?: string;
 }
 
@@ -132,15 +146,17 @@ export async function fetchRepoMemory(repoId: string): Promise<{
   heatmap: HeatmapEntry[];
   dna: Record<string, unknown> | null;
   suggestedPrompts: string[];
+  searchIndex: Record<string, unknown> | null;
 }> {
   const base = repoId === 'local' ? '/.mnemos' : `/.mnemos/${repoId}`;
-  const [memRes, graphRes, healthRes, heatRes, dnaRes, promptsRes] = await Promise.all([
+  const [memRes, graphRes, healthRes, heatRes, dnaRes, promptsRes, searchRes] = await Promise.all([
     fetch(`${base}/memory.json`),
     fetch(`${base}/graph.json`),
     fetch(`${base}/health-score.json`),
     fetch(`${base}/heatmap.json`),
     fetch(`${base}/project.dna.json`),
     fetch(`${base}/integrations/suggested-prompts.json`),
+    fetch(`${base}/search-index.json`),
   ]);
   if (!memRes.ok) throw new Error('Memory not found');
   const memory = (await memRes.json()) as MemoryModel;
@@ -153,7 +169,8 @@ export async function fetchRepoMemory(repoId: string): Promise<{
     const prompts = (await promptsRes.json()) as { prompts?: string[] } | string[];
     suggestedPrompts = Array.isArray(prompts) ? prompts : prompts.prompts ?? [];
   }
-  return { memory, graph, healthScore, heatmap, dna, suggestedPrompts };
+  const searchIndex = searchRes.ok ? ((await searchRes.json()) as Record<string, unknown>) : null;
+  return { memory, graph, healthScore, heatmap, dna, suggestedPrompts, searchIndex };
 }
 
 export async function fetchContextDoc(repoId: string, doc: string): Promise<string | null> {

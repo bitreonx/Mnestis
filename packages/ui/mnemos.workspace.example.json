@@ -1,0 +1,14 @@
+{
+  "name": "Example Platform",
+  "root": ".",
+  "repos": [
+    {
+      "id": "app",
+      "name": "App",
+      "label": "Primary App",
+      "path": "./",
+      "description": "Describe what this repository does.",
+      "accent": "#3ecf8e"
+    }
+  ]
+}

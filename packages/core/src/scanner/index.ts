@@ -2,6 +2,12 @@ import fg from 'fast-glob';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { ScanResult } from '../types.js';
+import {
+  ALL_SOURCE_EXTENSIONS,
+  SOURCE_GLOB_PATTERN,
+  inferLanguage,
+  isSupportedSourceFile,
+} from '../languages/index.js';
 
 const DEFAULT_IGNORE = [
   '**/node_modules/**',
@@ -18,18 +24,14 @@ const DEFAULT_IGNORE = [
   '**/ios/**',
 ];
 
-const SOURCE_EXTENSIONS = new Set([
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.cjs',
-  '.py',
-  '.go',
-  '.rs',
-  '.java',
-]);
+/** Extensionless infra files detected by basename (Dockerfile, Makefile, …). */
+const BASENAME_GLOB_PATTERNS = [
+  '**/Dockerfile',
+  '**/Dockerfile.*',
+  '**/Makefile',
+  '**/GNUmakefile',
+  '**/CMakeLists.txt',
+];
 
 export async function scanRepository(
   root: string,
@@ -37,7 +39,7 @@ export async function scanRepository(
   maxFiles = 50_000,
 ): Promise<ScanResult> {
   const normalizedRoot = path.resolve(root);
-  const patterns = ['**/*.{ts,tsx,js,jsx,mjs,cjs,py,go,rs,java}'];
+  const patterns = [SOURCE_GLOB_PATTERN, ...BASENAME_GLOB_PATTERNS];
 
   const files = await fg(patterns, {
     cwd: normalizedRoot,
@@ -45,9 +47,16 @@ export async function scanRepository(
     ignore: [...DEFAULT_IGNORE, ...extraIgnore],
     onlyFiles: true,
     followSymbolicLinks: false,
+    caseSensitiveMatch: false,
   });
 
-  const limited = files.slice(0, maxFiles);
+  const limited = files
+    .filter((f) => {
+      const ext = path.extname(f).toLowerCase();
+      return ALL_SOURCE_EXTENSIONS.has(ext) || isSupportedSourceFile(f);
+    })
+    .slice(0, maxFiles);
+
   const packages = await detectPackages(normalizedRoot);
 
   let rootPackageName: string | undefined;
@@ -59,7 +68,7 @@ export async function scanRepository(
   }
 
   return {
-    files: limited.filter((f) => SOURCE_EXTENSIONS.has(path.extname(f).toLowerCase())),
+    files: limited,
     packages,
     rootPackageName,
   };
@@ -79,29 +88,20 @@ async function detectPackages(root: string): Promise<string[]> {
     .sort((a, b) => a.localeCompare(b));
 }
 
-export function inferLanguage(filePath: string): string {
-  const ext = path.extname(filePath).toLowerCase();
-  const map: Record<string, string> = {
-    '.ts': 'typescript',
-    '.tsx': 'typescript',
-    '.js': 'javascript',
-    '.jsx': 'javascript',
-    '.mjs': 'javascript',
-    '.cjs': 'javascript',
-    '.py': 'python',
-    '.go': 'go',
-    '.rs': 'rust',
-    '.java': 'java',
-  };
-  return map[ext] ?? 'unknown';
-}
+export { inferLanguage } from '../languages/index.js';
 
 export function isTestFile(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, '/').toLowerCase();
   return (
-    relativePath.includes('__tests__') ||
-    relativePath.includes('/test/') ||
-    relativePath.includes('/tests/') ||
-    /\.(test|spec)\.[tj]sx?$/.test(relativePath)
+    normalized.includes('__tests__') ||
+    normalized.includes('/test/') ||
+    normalized.includes('/tests/') ||
+    normalized.includes('/spec/') ||
+    normalized.includes('/specs/') ||
+    /\.(test|spec)\.[a-z0-9]+$/i.test(normalized) ||
+    /_test\.(go|rs|py|rb|java|kt|swift|cs)$/i.test(normalized) ||
+    /test_[a-z0-9_]+\.py$/i.test(normalized) ||
+    /^test_[a-z0-9_]+\.py$/i.test(path.basename(normalized))
   );
 }
 

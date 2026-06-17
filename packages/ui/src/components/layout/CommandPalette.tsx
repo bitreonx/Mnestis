@@ -128,6 +128,7 @@ export function CommandPalette({
           className="cmd-input"
           autoFocus
           placeholder="Search commands, repos, AI tasks…"
+          aria-label="Search commands, repositories, and AI tasks"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

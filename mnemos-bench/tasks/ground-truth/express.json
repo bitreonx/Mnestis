@@ -1,5 +1,4 @@
 {
-  "$schema": "mnemos-bench/ground-truth/v1",
   "repo": "express",
   "verified_at": "2026-06-15",
   "verification_method": "Manual grep + Mnemos build on expressjs/express @ depth 1",

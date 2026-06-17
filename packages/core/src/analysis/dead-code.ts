@@ -20,9 +20,16 @@ const ENTRY_POINT_PATTERNS = [
 ];
 
 function isEntryPoint(attrs: GraphNode): boolean {
-  if (attrs.metadata?.isRoute || attrs.metadata?.hasUseServer) return true;
+  if (attrs.metadata?.isRoute || attrs.metadata?.hasUseServer || attrs.metadata?.isEntryPoint) return true;
   const p = attrs.path ?? attrs.name;
   return ENTRY_POINT_PATTERNS.some((re) => re.test(p));
+}
+
+const BARREL_FILE_RE = /(?:^|[/\\])index\.(tsx?|jsx?|mjs|cjs)$/i;
+
+function isBarrelFile(attrs: GraphNode): boolean {
+  const p = attrs.path ?? attrs.name;
+  return BARREL_FILE_RE.test(p.replace(/\\/g, '/'));
 }
 
 export function detectDeadCode(graph: MnemosGraph): DeadCodeEntry[] {
@@ -49,6 +56,8 @@ export function detectDeadCode(graph: MnemosGraph): DeadCodeEntry[] {
     }
 
     if (isExported && !hasIncomingCalls && !hasIncomingImports && inDegree <= 1) {
+      const filePath = (attrs.path ?? '').split(':')[0] ?? '';
+      if (filePath && BARREL_FILE_RE.test(filePath.replace(/\\/g, '/'))) return;
       dead.push({
         nodeId: id,
         name: attrs.name,
@@ -63,6 +72,7 @@ export function detectDeadCode(graph: MnemosGraph): DeadCodeEntry[] {
   graph.forEachNode((id: string, attrs: GraphNode) => {
     if (attrs.kind !== 'file') return;
     if (attrs.metadata?.isRoute || attrs.metadata?.isTest || isEntryPoint(attrs)) return;
+    if (isBarrelFile(attrs)) return;
 
     const importers = graph.inNeighbors(id).filter((n: string) =>
       graph.inEdges(n, id).some((edgeKey) => (graph.getEdgeAttributes(edgeKey) as GraphEdge).kind === 'IMPORTS'),

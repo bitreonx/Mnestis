@@ -6,7 +6,27 @@ import ora from 'ora';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
+import { openInBrowser } from './lib/browser.js';
+import {
+  printCheck,
+  printArtifactLegend,
+  printReaderModes,
+  printReportPaths,
+  printDashboardPreviewNote,
+  printPrimaryNextSteps,
+  printBuildSummary,
+  printContextDocs,
+} from './output/format.js';
+import {
+  printMnemosBanner,
+  printSection,
+  printMetricRow,
+  printKeyValueTable,
+  printCompressStats,
+  printSuccessLine,
+  printInfoLine,
+} from './output/terminal.js';
 import {
   build,
   loadMemoryModel,
@@ -37,27 +57,39 @@ import {
   computeAiReadiness,
   buildAiToolkit,
   installAiIntegrations,
-  fromSerializable,
+  uninstallAiIntegrations,
+  loadPersistedGraph,
+  loadOrBuildSearchIndex,
+  getNodeQueryIndex,
+  queryGraph,
+  findGraphPath,
+  explainNode,
+  formatPathResult,
+  formatNodeExplain,
+  startMcpServer,
+  runExport,
+  installHooks,
+  uninstallHooks,
+  getHookStatus,
+  ALL_PLATFORMS,
+  buildMcpSetupMarkdown,
+  MNEMOS_VERSION,
+  MnemosRuntime,
+  buildAiPack,
+  aiPackToJson,
+  startGraphSync,
+  compressCommandOutput,
+  type AiPackSection,
+  type Mode as AiPackMode,
 } from '@mnemos/core';
+import type { MnemosGraph } from '@mnemos/core';
 
 const program = new Command();
 
-function openInBrowser(filePath: string): void {
-  try {
-    const opener =
-      process.platform === 'win32'
-        ? `start "" "${filePath}"`
-        : process.platform === 'darwin'
-          ? `open "${filePath}"`
-          : `xdg-open "${filePath}"`;
-    spawn(opener, { shell: true, stdio: 'ignore', detached: true });
-  } catch {
-    /* ignore */
-  }
-}
-
-function printCheck(label: string): void {
-  console.log(chalk.green('✓') + ' ' + label);
+async function loadGraphFromMemory(outputDir: string): Promise<MnemosGraph | undefined> {
+  const graph = await loadPersistedGraph(outputDir);
+  if (graph) getNodeQueryIndex(graph);
+  return graph;
 }
 
 program
@@ -70,6 +102,8 @@ program
   .description('Build a complete mental model of a repository')
   .option('-v, --verbose', 'Show detailed progress')
   .option('-o, --output <dir>', 'Output directory', '.mnemos')
+  .option('--incremental', 'Use incremental cache when rebuilding', true)
+  .option('--no-incremental', 'Force full rebuild')
   .option('--watch', 'Re-build when source files change', false)
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(targetPath);
@@ -119,29 +153,26 @@ program
     }
   });
 
-async function runBuildOnce(root: string, outputDir: string, options: { verbose?: boolean }) {
+async function runBuildOnce(root: string, outputDir: string, options: { verbose?: boolean; incremental?: boolean }) {
   const spinner = ora(`Building memory model for ${root}`).start();
   try {
     const result = await build({
       root,
       outputDir,
       verbose: options.verbose,
+      incremental: options.incremental !== false,
     });
     spinner.succeed(chalk.green('Memory model built successfully'));
 
     const { stats } = result.memory;
     console.log('');
-    console.log(chalk.bold('Results'));
-    console.log(`  Files scanned:  ${chalk.cyan(stats.filesScanned.toLocaleString())}`);
-    console.log(`  Graph nodes:    ${chalk.cyan(stats.nodesCreated.toLocaleString())}`);
-    console.log(`  Graph edges:    ${chalk.cyan(stats.edgesCreated.toLocaleString())}`);
-    console.log(`  Domains:        ${chalk.cyan(stats.domainsFound)}`);
-    console.log(`  Flows:          ${chalk.cyan(stats.flowsFound)}`);
-    console.log(`  Duration:       ${chalk.cyan((stats.durationMs / 1000).toFixed(1) + 's')}`);
+    printBuildSummary(stats);
+    console.log('');
+    printContextDocs();
     console.log('');
     console.log(`  Output: ${chalk.dim(outputDir)}`);
     console.log(`  DNA:    ${chalk.dim(path.join(outputDir, 'project.dna.json'))}`);
-    console.log(`  Context: ${chalk.dim(path.join(outputDir, 'context'))}`);
+    console.log(`  Graphs: ${chalk.dim(path.join(outputDir, 'context', 'graphs.md'))}`);
   } catch (err) {
     spinner.fail(chalk.red('Build failed'));
     console.error(err);
@@ -300,6 +331,7 @@ program
   .description('Generate a self-contained HTML intelligence report')
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('-o, --output <dir>', 'Output directory', 'report')
+  .option('--report-path <file>', 'Also write report HTML at this path (e.g. report.html at repo root)')
   .option('--open', 'Open the report in the default browser after generation', false)
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
@@ -320,29 +352,22 @@ program
       const indexPath = path.join(outputDir, 'index.html');
       const html = generateReport(loaded.memory);
       await writeFile(indexPath, html, 'utf-8');
+      if (options.reportPath) {
+        const extraPath = path.isAbsolute(options.reportPath)
+          ? options.reportPath
+          : path.join(loaded.outputDir, options.reportPath);
+        await writeFile(extraPath, html, 'utf-8');
+      }
       spinner.succeed(chalk.green('Report generated'));
 
-      console.log('');
-      console.log(chalk.bold('Intelligence Report'));
-      console.log(`  Mode A (Vibe):      ${chalk.cyan('human-readable narrative')}`);
-      console.log(`  Mode B (Developer): ${chalk.cyan('dense technical breakdown')}`);
-      console.log(`  Toggle in the top-right of the page.`);
-      console.log('');
-      console.log(`  Open:   ${chalk.cyan(`file:///${indexPath.replace(/\\/g, '/')}`)}`);
-      console.log(`  Folder: ${chalk.dim(outputDir)}`);
+      printArtifactLegend();
+      printReaderModes();
+      printReportPaths(indexPath, outputDir);
+      printPrimaryNextSteps();
+      printDashboardPreviewNote();
 
       if (options.open) {
-        try {
-          const opener =
-            process.platform === 'win32'
-              ? `start "" "${indexPath}"`
-              : process.platform === 'darwin'
-                ? `open "${indexPath}"`
-                : `xdg-open "${indexPath}"`;
-          spawn(opener, { shell: true, stdio: 'ignore', detached: true });
-        } catch {
-          /* ignore open failures */
-        }
+        openInBrowser(indexPath);
       }
     } catch (err) {
       spinner.fail(chalk.red('Report generation failed'));
@@ -380,37 +405,63 @@ program
     const { outputDir } = loaded;
     console.log('');
     console.log(chalk.bold('AI Context Protocol'));
-    console.log(`  ${chalk.cyan('repository.dna.json')}`);
+    console.log(`  ${chalk.cyan('project.dna.json')}`);
+    console.log(`  ${chalk.cyan('agent_context.json')}`);
+    console.log(`  ${chalk.cyan('context/README.md')}       — start here`);
+    console.log(`  ${chalk.cyan('context/graphs.md')}       — Mermaid architecture charts`);
+    console.log(`  ${chalk.cyan('context/languages.md')}    — language pie + pipeline`);
     console.log(`  ${chalk.cyan('context/architecture.md')}`);
     console.log(`  ${chalk.cyan('context/flows.md')}`);
     console.log(`  ${chalk.cyan('context/critical_paths.md')}`);
-    console.log(`  ${chalk.cyan('agent-context.json')}`);
     console.log('');
     console.log(`  Path: ${chalk.dim(outputDir)}`);
     console.log(chalk.dim('  Point AI agents at repository.dna.json first.'));
   });
 
 program
-  .command('explain [path]')
-  .description('Explain what this repository does in plain language')
-  .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
+  .command('explain [target]')
+  .description('Explain repository (path) or a specific node/service (name)')
+  .option('-p, --path <path>', 'Repository path', '.')
   .option('--json', 'Output as JSON')
-  .action(async (targetPath = '.', options) => {
-    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const loaded = await loadMemoryModel(root);
+  .action(async (target, options) => {
+    const repoRoot = path.resolve(options.path);
+    const isRepoTarget =
+      !target ||
+      target === '.' ||
+      (existsSync(path.resolve(target)) && statSync(path.resolve(target)).isDirectory());
 
+    if (isRepoTarget) {
+      const root = path.resolve(target && target !== '.' ? target : repoRoot);
+      const loaded = await loadMemoryModel(root);
+
+      if (!loaded) {
+        console.log(chalk.yellow('No memory model found. Run `mnemos build .` first.'));
+        process.exit(1);
+      }
+
+      const result = explainRepository(loaded.memory);
+      if (options.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(formatExplainReport(result, loaded.memory));
+      return;
+    }
+
+    const root = repoRoot;
+    const loaded = await loadMemoryModel(root);
     if (!loaded) {
       console.log(chalk.yellow('No memory model found. Run `mnemos build .` first.'));
       process.exit(1);
     }
 
-    const result = explainRepository(loaded.memory);
+    const graph = await loadGraphFromMemory(loaded.outputDir);
+    const result = explainNode(loaded.memory, target, graph);
     if (options.json) {
       console.log(JSON.stringify(result, null, 2));
       return;
     }
-
-    console.log(formatExplainReport(result, loaded.memory));
+    console.log(formatNodeExplain(result));
   });
 
 program
@@ -580,6 +631,63 @@ program
   });
 
 program
+  .command('query <question>')
+  .description('Graph-aware architecture query with traversal output')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .action(async (question, options) => {
+    const root = path.resolve(options.path);
+    const loaded = await loadMemoryModel(root);
+
+    if (!loaded) {
+      console.log(chalk.yellow('No memory model found. Run `mnemos build .` first.'));
+      process.exit(1);
+    }
+
+    const graph = await loadGraphFromMemory(loaded.outputDir);
+    const result = queryGraph(loaded.memory, question, graph);
+
+    console.log('');
+    console.log(chalk.bold('Mnemos Graph Query'));
+    console.log(chalk.dim(`Confidence: ${(result.confidence * 100).toFixed(0)}%`));
+    console.log('');
+    console.log(result.answer);
+    if (result.relatedNodes && result.relatedNodes.length > 0) {
+      console.log('');
+      console.log(chalk.dim(`Related nodes: ${result.relatedNodes.join(', ')}`));
+    }
+  });
+
+program
+  .command('path <from> <to>')
+  .description('Find shortest path between two nodes in the knowledge graph')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--json', 'Output as JSON')
+  .action(async (from, to, options) => {
+    const root = path.resolve(options.path);
+    const loaded = await loadMemoryModel(root);
+
+    if (!loaded) {
+      console.log(chalk.yellow('No memory model found. Run `mnemos build .` first.'));
+      process.exit(1);
+    }
+
+    const graph = await loadGraphFromMemory(loaded.outputDir);
+    if (!graph) {
+      console.log(chalk.red('Could not load knowledge graph.'));
+      process.exit(1);
+    }
+
+    const result = findGraphPath(graph, from, to);
+    if (options.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    console.log('');
+    console.log(formatPathResult(result));
+  });
+
+program
   .command('ask <question>')
   .description('Architecture copilot — ask questions about the repository')
   .option('-p, --path <path>', 'Repository path', '.')
@@ -592,19 +700,15 @@ program
       process.exit(1);
     }
 
-    const { readFile } = await import('node:fs/promises');
-    let graph;
-    try {
-      const raw = await readFile(path.join(loaded.outputDir, 'graph.json'), 'utf-8');
-      graph = fromSerializable(JSON.parse(raw));
-    } catch {
-      graph = undefined;
-    }
+    const [graph, searchIndex] = await Promise.all([
+      loadGraphFromMemory(loaded.outputDir),
+      loadOrBuildSearchIndex(loaded.memory, loaded.outputDir),
+    ]);
 
-    const answer = askCopilot(loaded.memory, question, { graph });
+    const answer = askCopilot(loaded.memory, question, { graph, searchIndex });
     console.log('');
     console.log(chalk.bold('Mnemos Copilot'));
-    console.log(chalk.dim(`Confidence: ${(answer.confidence * 100).toFixed(0)}%`));
+    console.log(chalk.dim(`Confidence: ${(answer.confidence * 100).toFixed(0)}%${answer.tookMs != null ? ` · ${answer.tookMs}ms` : ''}`));
     console.log('');
     console.log(answer.answer);
     if (answer.relatedTopics.length > 0) {
@@ -614,16 +718,106 @@ program
   });
 
 program
-  .command('setup [path]')
-  .description('Install AGENTS.md and Cursor rules for Claude/Cursor/Codex')
-  .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
-  .option('-f, --force', 'Overwrite existing integration files')
+  .command('focus <task>')
+  .description('Compile a minimal task-scoped context pack for an edit (token-budget aware)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--budget <n>', 'Token budget', '8000')
+  .option('--json', 'Output JSON only')
+  .action(async (task, options) => {
+    const root = path.resolve(options.path);
+    const runtime = new MnemosRuntime(root);
+    try {
+      const envelope = await runtime.compileFocus(task, Number(options.budget));
+      if (options.json) {
+        console.log(JSON.stringify(envelope.data, null, 2));
+        return;
+      }
+      console.log('');
+      console.log(chalk.bold('Mnemos Focus Pack'));
+      console.log(chalk.dim(envelope.summary));
+      console.log('');
+      console.log(envelope.markdown);
+    } catch (err) {
+      console.error(chalk.red(String(err)));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('diff [path]')
+  .description('Show DNA structural diff since last build (regression guard)')
+  .option('-p, --path <path>', 'Repository path', '.')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const runtime = new MnemosRuntime(root);
+    try {
+      const envelope = await runtime.getDnaDiff();
+      console.log('');
+      console.log(chalk.bold('Mnemos DNA Diff'));
+      if (envelope.data && typeof envelope.data === 'object' && 'regressionRisk' in envelope.data) {
+        const risk = String((envelope.data as { regressionRisk: string }).regressionRisk);
+        const color = risk === 'high' ? chalk.red : risk === 'medium' ? chalk.yellow : chalk.green;
+        console.log(color(`Risk: ${risk}`));
+      }
+      console.log('');
+      console.log(envelope.markdown);
+    } catch (err) {
+      console.error(chalk.red(String(err)));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('hotspots [path]')
+  .description('Git churn hotspots mapped to architecture (local git, no API)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--limit <n>', 'Max files', '20')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const runtime = new MnemosRuntime(root);
+    try {
+      const envelope = await runtime.getGitHotspots(Number(options.limit));
+      console.log('');
+      console.log(envelope.markdown);
+    } catch (err) {
+      console.error(chalk.red(String(err)));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('setup [path]')
+  .description('Install AI editor integrations (Cursor, Claude, Codex, Kiro, VS Code, and more)')
+  .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
+  .option('--platform <name>', `Platform: ${ALL_PLATFORMS.join(', ')}, or all`, 'cursor')
+  .option('-f, --force', 'Overwrite existing integration files')
+  .option('--uninstall', 'Remove all Mnemos platform integration files')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+
+    if (options.uninstall) {
+      const result = await uninstallAiIntegrations(root);
+      console.log('');
+      console.log(chalk.bold('AI integrations removed'));
+      for (const f of result.removed) {
+        console.log(chalk.green('  ✓ removed') + ' ' + f);
+      }
+      for (const f of result.skipped) {
+        console.log(chalk.dim('  · not found: ') + f);
+      }
+      return;
+    }
+
     const loaded = await loadMemoryModel(root);
 
     if (!loaded) {
       console.log(chalk.yellow('No memory model found. Run `npx mnemos .` first.'));
+      process.exit(1);
+    }
+
+    const platform = options.platform as string;
+    if (platform !== 'all' && !ALL_PLATFORMS.includes(platform as (typeof ALL_PLATFORMS)[number])) {
+      console.log(chalk.red(`Unknown platform "${platform}". Valid: ${ALL_PLATFORMS.join(', ')}, all`));
       process.exit(1);
     }
 
@@ -645,11 +839,14 @@ program
       root,
       outputDir: loaded.outputDir,
       toolkit,
+      memory: loaded.memory,
+      context: exports.context,
+      platform: platform as (typeof ALL_PLATFORMS)[number] | 'all',
       force: options.force,
     });
 
     console.log('');
-    console.log(chalk.bold('AI integrations installed'));
+    console.log(chalk.bold(`AI integrations installed (${platform})`));
     for (const f of result.written) {
       console.log(chalk.green('  ✓') + ' ' + f);
     }
@@ -657,12 +854,9 @@ program
       console.log(chalk.dim('  · skipped (exists): ') + f);
     }
     console.log('');
-    console.log(chalk.bold('Next steps'));
-    console.log('  1. In Cursor: rules auto-load from .cursor/rules/mnemos-architecture.mdc');
-    console.log('  2. In Claude: add .mnemos/project.dna.json to project knowledge');
-    console.log('  3. Run ' + chalk.cyan('mnemos serve') + ' for live agent queries at :4000');
-    console.log('  4. Copy a starter prompt: ' + chalk.cyan('mnemos prompt'));
-    console.log('');
+    console.log(chalk.bold('Platforms'));
+    console.log(chalk.dim(`  Available: ${ALL_PLATFORMS.join(', ')}, all`));
+    console.log(chalk.dim(`  Uninstall: mnemos setup --uninstall`));
   });
 
 program
@@ -702,6 +896,7 @@ program
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('--port <port>', 'Port number', '4000')
   .option('--host <host>', 'Host', '127.0.0.1')
+  .option('--mcp', 'Start MCP stdio server instead of REST API')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
     const loaded = await loadMemoryModel(root);
@@ -711,29 +906,246 @@ program
       process.exit(1);
     }
 
+    if (options.mcp) {
+      console.error(chalk.bold(`Mnemos MCP v${MNEMOS_VERSION} (stdio)`));
+      console.error(chalk.dim(`Repository: ${root}`));
+      console.error(chalk.dim('Tools: query_graph · get_dna · impact_analysis · shortest_path · search · review_diff'));
+      console.error(chalk.dim('Resources: mnemos://repository/dna · summary · domains · flows'));
+      await startMcpServer({ root, verbose: true });
+      return;
+    }
+
     const handle = await startMemoryServer({
       root,
       port: parseInt(options.port, 10),
       host: options.host,
     });
 
-    console.log(chalk.bold('\nMnemos Memory Server'));
+    console.log(chalk.bold(`\nMnemos Memory Server v${MNEMOS_VERSION}`));
     console.log(chalk.green(`  http://${options.host}:${handle.port}`));
     console.log('');
-    console.log('  Endpoints:');
-    console.log(`    GET  /dna          — repository DNA`);
-    console.log(`    GET  /explain       — human summary`);
-    console.log(`    GET  /copilot?q=    — ask questions`);
-    console.log(`    GET  /prompts       — vibe-coder starter prompts`);
-    console.log(`    GET  /impact/:node  — blast radius`);
-    console.log(`    GET  /search?q=     — search domains/services`);
-    console.log(`    GET  /heatmap       — technical debt heatmap`);
-    console.log(`    POST /review        — PR diff review`);
+    console.log('  Core endpoints:');
+    console.log(`    GET  /status · /health     — server + memory status`);
+    console.log(`    GET  /dna                  — repository DNA (JSON)`);
+    console.log(`    GET  /query?q= · /copilot  — graph-aware architecture Q&A`);
+    console.log(`    GET  /node/:name           — explain a service or file`);
+    console.log(`    GET  /path/:from/:to       — shortest graph path`);
+    console.log(`    GET  /impact/:node         — blast radius analysis`);
+    console.log(`    GET  /search?q=            — BM25 search`);
+    console.log(`    GET  /domains · /flows · /capabilities · /health`);
+    console.log(`    POST /review { diff }      — PR diff review`);
+    console.log(`    GET  /mcp-setup            — Cursor MCP config instructions`);
     console.log('');
-    console.log(chalk.dim('  Connect Cursor, Claude, or Codex to query Mnemos instead of reading files.'));
+    console.log(chalk.dim('  MCP (Cursor/VS Code):  mnemos mcp'));
+    console.log(chalk.dim('  Setup:                 mnemos setup --platform cursor'));
     console.log(chalk.dim('  Press Ctrl+C to stop.\n'));
 
     await new Promise(() => {});
+  });
+
+program
+  .command('mcp [path]')
+  .description('Start production MCP stdio server for Cursor, VS Code, Claude Desktop')
+  .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
+  .option('--setup', 'Print MCP config for Cursor and exit')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+
+    if (options.setup) {
+      console.log(buildMcpSetupMarkdown(root));
+      return;
+    }
+
+    const loaded = await loadMemoryModel(root);
+
+    if (!loaded) {
+      console.error(chalk.yellow('No memory model found. Run `mnemos build .` first.'));
+      process.exit(1);
+    }
+
+    console.error(chalk.bold(`Mnemos MCP v${MNEMOS_VERSION}`));
+    console.error(chalk.dim(`Repository: ${loaded.memory.repository}`));
+    console.error(chalk.dim(`${loaded.memory.stats.nodesCreated} nodes · ${loaded.memory.domains.length} domains · ${loaded.memory.flows.length} flows`));
+    console.error(chalk.dim('Run `mnemos mcp --setup` to print MCP client config'));
+    await startMcpServer({ root });
+  });
+
+const exportCmd = program
+  .command('export')
+  .description('Export knowledge graph in various formats');
+
+exportCmd
+  .command('svg [path]')
+  .description('Export knowledge graph as static SVG')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-o, --output <dir>', 'Output directory')
+  .action(async (targetPath = '.', options) => {
+    await runExportCommand('svg', targetPath, options);
+  });
+
+exportCmd
+  .command('graphml [path]')
+  .description('Export knowledge graph as GraphML (Gephi/yEd)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-o, --output <dir>', 'Output directory')
+  .action(async (targetPath = '.', options) => {
+    await runExportCommand('graphml', targetPath, options);
+  });
+
+exportCmd
+  .command('callflow [path]')
+  .description('Generate Mermaid call-flow architecture HTML')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-o, --output <dir>', 'Output directory')
+  .action(async (targetPath = '.', options) => {
+    await runExportCommand('callflow', targetPath, options);
+  });
+
+exportCmd
+  .command('wiki [path]')
+  .description('Export crawlable markdown wiki pages per domain/service')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-o, --output <dir>', 'Output directory')
+  .action(async (targetPath = '.', options) => {
+    await runExportCommand('wiki', targetPath, options);
+  });
+
+program
+  .command('pack [path]')
+  .description('Print the AI Pack v1 (JSON) for the repository — designed for Claude, Cursor, Trae')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--section <section>', 'Limit to: all|summary|score|issues|graph|flows|smells|dna', 'all')
+  .option('--mode <mode>', 'Lens: vibe|ai|coder', 'coder')
+  .option('--repo-id <id>', 'Override the repository id used in the pack')
+  .option('-o, --output <file>', 'Write to file instead of stdout')
+  .option('--pretty', 'Pretty-print JSON (default on)', true)
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path ?? targetPath);
+    const loaded = await loadMemoryModel(root);
+    if (!loaded) {
+      console.error(chalk.red('✗ No Mnemos memory model found.'));
+      console.error(chalk.dim('  Run `mnemos build` first.'));
+      process.exit(1);
+    }
+    const section = String(options.section ?? 'all') as AiPackSection;
+    const mode = String(options.mode ?? 'coder') as AiPackMode;
+    const graph = await loadGraphFromMemory(loaded.outputDir);
+    const dna = await readFile(path.join(loaded.outputDir, 'project.dna.json'), 'utf-8')
+      .then((raw) => JSON.parse(raw) as Record<string, unknown>)
+      .catch(() => null);
+    const pack = buildAiPack(loaded.memory, {
+      mode,
+      section,
+      repoId: options.repoId,
+      root,
+      dna,
+      graph: graph
+        ? {
+            nodes: graph
+              .mapNodes((id, attrs) => ({ id, kind: attrs.kind, name: attrs.name, path: attrs.path }))
+              .map((n) => ({ id: String(n.id), kind: String(n.kind), name: String(n.name), path: n.path as string | undefined })),
+            edges: graph
+              .mapEdges((id, attrs, source, target) => ({ id, source, target, kind: attrs.kind }))
+              .map((e) => ({
+                id: String(e.id),
+                source: String(e.source),
+                target: String(e.target),
+                kind: String(e.kind),
+              })),
+          }
+        : null,
+    });
+    const json = options.pretty === false ? JSON.stringify(pack) : aiPackToJson(pack);
+    if (options.output) {
+      const file = path.resolve(options.output);
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, json, 'utf-8');
+      console.log(chalk.green('✓') + ' AI Pack v1 written to ' + chalk.cyan(file));
+      console.log(chalk.dim(`  Section: ${section} · Mode: ${mode} · Bytes: ${json.length}`));
+    } else {
+      process.stdout.write(json + '\n');
+    }
+  });
+
+async function runExportCommand(
+  format: 'svg' | 'graphml' | 'callflow' | 'wiki',
+  targetPath: string,
+  options: { path?: string; output?: string },
+): Promise<void> {
+  const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+  const loaded = await loadMemoryModel(root);
+
+  if (!loaded) {
+    console.log(chalk.yellow('No memory model found. Run `mnemos build .` first.'));
+    process.exit(1);
+  }
+
+  const outputDir = options.output
+    ? path.isAbsolute(options.output)
+      ? options.output
+      : path.join(root, options.output)
+    : loaded.outputDir;
+
+  const spinner = ora(`Exporting ${format}...`).start();
+
+  try {
+    const graph =
+      format === 'svg' || format === 'graphml'
+        ? await loadGraphFromMemory(loaded.outputDir)
+        : undefined;
+    const result = await runExport(format, loaded.memory, outputDir, graph);
+    spinner.succeed(chalk.green(`${format} export complete`));
+    console.log(`  Output: ${chalk.cyan(Array.isArray(result) ? result.join(', ') : result)}`);
+  } catch (err) {
+    spinner.fail(chalk.red('Export failed'));
+    console.error(err);
+    process.exit(1);
+  }
+}
+
+const hookCmd = program.command('hook').description('Git hooks for auto-rebuild');
+
+hookCmd
+  .command('install [path]')
+  .description('Install post-commit and post-checkout hooks')
+  .action(async (targetPath = '.') => {
+    const root = path.resolve(targetPath);
+    const result = await installHooks(root);
+    console.log('');
+    console.log(chalk.bold('Git hooks'));
+    for (const h of result.installed) {
+      console.log(chalk.green('  ✓') + ' ' + h);
+    }
+    for (const e of result.errors) {
+      console.log(chalk.red('  ✗') + ' ' + e);
+    }
+  });
+
+hookCmd
+  .command('uninstall [path]')
+  .description('Remove Mnemos git hooks')
+  .action(async (targetPath = '.') => {
+    const root = path.resolve(targetPath);
+    const result = await uninstallHooks(root);
+    console.log('');
+    console.log(chalk.bold('Git hooks removed'));
+    for (const h of result.removed) {
+      console.log(chalk.green('  ✓') + ' ' + h);
+    }
+  });
+
+hookCmd
+  .command('status [path]')
+  .description('Show git hook installation state')
+  .action(async (targetPath = '.') => {
+    const root = path.resolve(targetPath);
+    const status = getHookStatus(root);
+    console.log('');
+    console.log(chalk.bold('Git hook status'));
+    console.log(`  Git dir:      ${status.gitDir || chalk.dim('not found')}`);
+    console.log(`  Installed:    ${status.installed ? chalk.green('yes') : chalk.dim('no')}`);
+    console.log(`  post-commit:  ${status.postCommit ? chalk.green('yes') : 'no'}`);
+    console.log(`  post-checkout:${status.postCheckout ? chalk.green(' yes') : ' no'}`);
   });
 
 program
@@ -795,12 +1207,14 @@ program
       ? path.resolve(options.workspace)
       : path.join(uiDir, 'dabt.workspace.json');
 
-    console.log(chalk.bold('Starting Mnemos UI...'));
+    console.log(chalk.bold('Starting Mnemos UI (preview)...'));
     if (options.workspace || existsSync(workspaceFile)) {
       console.log(chalk.dim(`Workspace mode: ${workspaceFile}`));
     } else {
       console.log(chalk.dim(`Serving memory from: ${path.join(root, '.mnemos')}`));
     }
+    printDashboardPreviewNote();
+    console.log(chalk.dim(`  Stable surfaces: mnemos report --open · mnemos pack · mnemos serve`));
 
     const env: Record<string, string> = { ...process.env as Record<string, string> };
     if (options.workspace || existsSync(workspaceFile)) {
@@ -829,8 +1243,9 @@ async function runDefaultExperience(
   const root = path.resolve(targetPath);
   const outputDir = path.join(root, '.mnemos');
 
-  console.log('');
-  const spinner = ora(`Analyzing ${root}`).start();
+  printMnemosBanner('Analyze · report · AI Pack v1');
+
+  const spinner = ora(`  Analyzing ${root}`).start();
 
   let result;
   try {
@@ -866,50 +1281,130 @@ async function runDefaultExperience(
   const snapResult = await generateSnapshots(memory, outputDir);
 
   // 30-second wow summary
-  console.log('');
-  console.log(chalk.bold('  This repository contains'));
-  console.log('');
-  console.log(`    ${chalk.cyan.bold(String(dna.metrics.domains))} ${chalk.dim('domains')}`);
-  console.log(`    ${chalk.cyan.bold(String(dna.metrics.flows))} ${chalk.dim('flows')}`);
-  console.log(`    ${chalk.cyan.bold(String(dna.metrics.apis))} ${chalk.dim('APIs')}`);
-  console.log(`    ${chalk.cyan.bold(String(dna.metrics.capabilities))} ${chalk.dim('capabilities')}`);
-  console.log('');
-  console.log(chalk.bold('  Most critical domain:'));
-  console.log(`    ${chalk.cyan(dna.mostCriticalDomain)}`);
-  console.log('');
-  console.log(chalk.bold('  Highest risk domain:'));
-  console.log(`    ${chalk.yellow(dna.highestRiskDomain)}`);
-  console.log('');
+  printSection('Repository snapshot');
+  printMetricRow('Domains', dna.metrics.domains);
+  printMetricRow('Flows', dna.metrics.flows);
+  printMetricRow('APIs', dna.metrics.apis);
+  printMetricRow('Capabilities', dna.metrics.capabilities);
+  printMetricRow('Critical domain', dna.mostCriticalDomain);
+  printMetricRow('Highest risk', dna.highestRiskDomain, 'domain');
 
-  console.log(chalk.bold('Artifacts'));
-  console.log(`  ${chalk.cyan('project.dna.json')}    ${chalk.dim(path.join(outputDir, 'project.dna.json'))}`);
-  console.log(`  ${chalk.cyan('integrations/')}       ${chalk.dim(path.join(outputDir, 'integrations'))}`);
-  console.log(`  ${chalk.cyan('report/index.html')}  ${chalk.dim(indexPath)}`);
-  console.log(`  ${chalk.cyan('snapshots/*.svg')}    ${chalk.dim(snapResult.outputDir)}`);
-  console.log('');
+  printSection('Artifacts');
+  printKeyValueTable([
+    { key: 'report/index.html', value: 'stable', hint: indexPath },
+    { key: 'project.dna.json', value: path.join(outputDir, 'project.dna.json') },
+    { key: 'snapshots/*.svg', value: snapResult.outputDir },
+    { key: 'Health / AI ready', value: `${score.overall}/100 · ${ai.score}/100` },
+  ]);
 
-  console.log(chalk.bold('For Cursor / Claude / vibe-coders'));
-  console.log(`  ${chalk.cyan('mnemos setup')}       ${chalk.dim('— install AGENTS.md + Cursor rules')}`);
-  console.log(`  ${chalk.cyan('mnemos prompt')}      ${chalk.dim('— copy-paste starter prompt')}`);
-  console.log(`  ${chalk.cyan('mnemos serve')}       ${chalk.dim('— live memory server for agents')}`);
-  console.log('');
+  printArtifactLegend();
+  printReaderModes();
+  printPrimaryNextSteps();
+  printDashboardPreviewNote();
 
   if (options.open !== false) {
-    console.log(chalk.dim('Opening browser...'));
+    printInfoLine('Opening report in browser…');
     openInBrowser(indexPath);
   }
-
-  console.log('');
-  console.log(chalk.dim('Try:'));
-  console.log(chalk.cyan('  mnemos dna') + chalk.dim('        — viral one-glance summary'));
-  console.log(chalk.cyan('  mnemos explain') + chalk.dim('    — plain-language description'));
-  console.log(chalk.cyan('  mnemos story') + chalk.dim('      — architecture narrative'));
-  console.log(chalk.cyan('  mnemos snapshot') + chalk.dim('  — screenshot-ready SVG cards'));
-  console.log(chalk.cyan('  mnemos setup') + chalk.dim('      — Cursor rules + AGENTS.md'));
-  console.log(chalk.cyan('  mnemos prompt') + chalk.dim('     — copy-paste AI prompt'));
-  console.log(chalk.cyan('  mnemos serve') + chalk.dim('     — memory server for AI agents'));
-  console.log('');
 }
+
+program
+  .command('sync [path]')
+  .description('Keep the knowledge graph in sync on file changes (codegraph-style)')
+  .option('-o, --output <dir>', 'Output directory', '.mnemos')
+  .option('-v, --verbose', 'Show detailed progress')
+  .option('--no-incremental', 'Force full rebuild on each change')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(targetPath);
+    const outputDir = path.join(root, options.output);
+
+    printMnemosBanner('Graph sync — local index, auto-rebuild');
+    printInfoLine(`Watching ${root}`);
+    printInfoLine('Press Ctrl+C to stop');
+
+    const handle = await startGraphSync({
+      root,
+      outputDir,
+      incremental: options.incremental !== false,
+      verbose: options.verbose,
+      onStart: () => {
+        const t = new Date().toLocaleTimeString();
+        console.log(chalk.dim(`\n  [${t}] Rebuilding graph…`));
+      },
+      onSuccess: (result) => {
+        const { stats } = result.memory;
+        printSuccessLine(
+          `${stats.filesScanned.toLocaleString()} files · ${stats.domainsFound} domains · ${stats.flowsFound} flows · ${(stats.durationMs / 1000).toFixed(1)}s`,
+        );
+      },
+      onError: (err) => {
+        console.error(chalk.red('  ✗ Sync rebuild failed:'), err);
+      },
+    });
+
+    process.on('SIGINT', () => {
+      handle.stop();
+      console.log(chalk.dim('\n  Sync stopped.'));
+      process.exit(0);
+    });
+  });
+
+program
+  .command('wrap')
+  .description('Run a shell command and emit token-compressed output for AI agents (rtk-style)')
+  .option('-o, --output <file>', 'Write compressed output to file')
+  .option('--max-lines <n>', 'Max lines to keep', '120')
+  .allowUnknownOption()
+  .action(async (options) => {
+    const sep = process.argv.indexOf('--');
+    const args = sep >= 0 ? process.argv.slice(sep + 1) : [];
+    if (args.length === 0) {
+      console.error(chalk.red('Usage: mnemos wrap -- <command...>'));
+      console.error(chalk.dim('Example: mnemos wrap -- git status'));
+      process.exit(1);
+    }
+
+    printMnemosBanner('Wrap — token-efficient command proxy');
+
+    const child = spawn(args[0]!, args.slice(1), {
+      shell: process.platform === 'win32',
+      stdio: ['inherit', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    let stderr = '';
+    child.stdout?.on('data', (chunk: Buffer) => {
+      const text = chunk.toString();
+      stdout += text;
+      process.stdout.write(text);
+    });
+    child.stderr?.on('data', (chunk: Buffer) => {
+      const text = chunk.toString();
+      stderr += text;
+      process.stderr.write(text);
+    });
+
+    const code: number = await new Promise((resolve) => {
+      child.on('close', resolve);
+    });
+
+    const combined = [stdout, stderr].filter(Boolean).join('\n');
+    const { text, stats } = compressCommandOutput(combined, {
+      maxLines: Number(options.maxLines) || 120,
+    });
+
+    printCompressStats(stats);
+
+    const outPath =
+      options.output ??
+      path.join(process.cwd(), '.mnemos', 'wrap-last.txt');
+    await mkdir(path.dirname(outPath), { recursive: true });
+    await writeFile(outPath, text, 'utf-8');
+    printSuccessLine(`Compressed output → ${outPath}`);
+    printInfoLine('Feed this file to Claude/Cursor instead of raw terminal noise');
+
+    process.exit(code ?? 1);
+  });
 
 program
   .argument('[path]', 'Repository path', '.')

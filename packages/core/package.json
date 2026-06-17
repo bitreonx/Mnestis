@@ -20,14 +20,15 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "node --test dist/**/*.test.js"
+    "build:test": "tsc -p tsconfig.test.json",
+    "test": "npm run build && npm run build:test && node --test dist/**/*.test.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "fast-glob": "^3.3.3",
     "graphology": "^0.25.4",
-    "graphology-types": "^0.24.8"
-  },
-  "devDependencies": {
+    "graphology-types": "^0.24.8",
     "typescript": "^5.8.3"
-  }
+  },
+  "devDependencies": {}
 }

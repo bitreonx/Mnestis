@@ -6,6 +6,7 @@ import { fetchWorkspace, triggerBuild, type WorkspaceSummary } from '../lib/work
 import type { MemoryModel } from '../types';
 import { fetchRepoMemory } from '../lib/workspace';
 import { MnemosLogo } from './illustrations/MnemosLogo';
+import type { FocusMode } from '../dashboard';
 
 export function MnemosDashboard() {
   const [workspace, setWorkspace] = useState<WorkspaceSummary | null>(null);
@@ -15,6 +16,7 @@ export function MnemosDashboard() {
   const [buildingAll, setBuildingAll] = useState(false);
   const [activeMemory, setActiveMemory] = useState<MemoryModel | null>(null);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
+  const [focusMode, setFocusMode] = useState<FocusMode>('coder');
 
   const refresh = useCallback(async () => {
     const ws = await fetchWorkspace();
@@ -107,6 +109,8 @@ export function MnemosDashboard() {
       onQuickInsight={(target) => {
         window.dispatchEvent(new CustomEvent('mnemos:quick-insight', { detail: target }));
       }}
+      focusMode={focusMode}
+      onFocusModeChange={setFocusMode}
     >
       {!activeRepo ? (
         <GlobalOverview
@@ -118,6 +122,7 @@ export function MnemosDashboard() {
           onBuild={handleBuild}
           onBuildAll={handleBuildAll}
           buildingAll={buildingAll}
+          focusMode={focusMode}
         />
       ) : (
         <RepoWorkspace
@@ -127,6 +132,7 @@ export function MnemosDashboard() {
           onRefresh={refresh}
           pendingQuestion={pendingQuestion}
           onPendingQuestionHandled={() => setPendingQuestion(null)}
+          focusMode={focusMode}
         />
       )}
     </DashboardShell>

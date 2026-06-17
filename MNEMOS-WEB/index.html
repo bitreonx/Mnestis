@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#060509" />
+    <title>Mnemos — Give AI a memory of your codebase</title>
+    <meta
+      name="description"
+      content="Mnemos transforms repositories into understanding. Humans and AI instantly grasp architecture, flows, domains, APIs, and business capabilities. Local-first, one command."
+    />
+    <meta property="og:title" content="Mnemos — Give AI a memory of your codebase" />
+    <meta
+      property="og:description"
+      content="The memory layer for software. One command turns a codebase into architecture intelligence humans and AI can use immediately."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      // Set theme before paint to avoid a flash.
+      (function () {
+        try {
+          var t = localStorage.getItem("mnemos-theme");
+          if (!t) t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          document.documentElement.classList.remove("light", "dark");
+          document.documentElement.classList.add(t);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

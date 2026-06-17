@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   buildSearchIndex,
+  deserializeSearchIndex,
   searchMemory,
   classifyIntent,
   type SearchHit,
+  type MemorySearchIndex,
 } from '@mnemos/core/search';
 import { askCopilot } from '@mnemos/core/copilot';
 
@@ -19,6 +21,7 @@ import type {
 
 interface AICompanionProps {
   memory: MemoryModel;
+  searchIndex?: MemorySearchIndex | null;
 }
 
 type CardType = 'capability' | 'journey' | 'flow' | 'domain' | 'service' | 'critical' | 'smell' | 'impact' | 'list';
@@ -71,9 +74,12 @@ const SUGGESTIONS = [
   'I want to vibe-code a feature — which domain?',
 ];
 
-export function AICompanion({ memory }: AICompanionProps) {
+export function AICompanion({ memory, searchIndex: persistedIndex }: AICompanionProps) {
   const coreMemory = memory as unknown as CoreMemoryModel;
-  const searchIndex = useMemo(() => buildSearchIndex(coreMemory), [coreMemory]);
+  const searchIndex = useMemo(
+    () => persistedIndex ?? buildSearchIndex(coreMemory),
+    [coreMemory, persistedIndex],
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'greeting',
@@ -164,6 +170,7 @@ export function AICompanion({ memory }: AICompanionProps) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about the codebase…"
+          aria-label="Ask about the codebase"
           autoFocus
         />
         <button type="submit" disabled={!input.trim()}>
@@ -272,7 +279,7 @@ function answer(
   coreMemory: CoreMemoryModel,
   searchIndex: ReturnType<typeof buildSearchIndex>,
 ): AnswerResult {
-  const copilot = askCopilot(coreMemory, query);
+  const copilot = askCopilot(coreMemory, query, { searchIndex });
   const classification = classifyIntent(query);
   const searchResult = searchMemory(searchIndex, query, { limit: 6 });
   const cards = copilot.hits?.length ? hitsToCards(copilot.hits) : hitsToCards(searchResult.hits);

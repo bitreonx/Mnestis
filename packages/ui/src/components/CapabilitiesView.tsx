@@ -91,6 +91,7 @@ export function CapabilitiesView({ memory }: CapabilitiesViewProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filter by name, purpose, category, or service…"
+          aria-label="Filter capabilities"
         />
       </div>
 

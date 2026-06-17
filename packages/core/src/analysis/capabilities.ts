@@ -1,6 +1,7 @@
 import type { ApiEndpoint, Domain, MemoryModel, Service } from '../types.js';
 import type { MnemosGraph } from '../graph/graph.js';
 import { getNodesByKind } from '../graph/graph.js';
+import { formatDomainName } from '../scanner/index.js';
 
 export interface CapabilitySignature {
   id: string;
@@ -216,9 +217,26 @@ const SIGNATURES: CapabilitySignature[] = [
   },
 ];
 
+/** npm package names → capability signature ids (evidence from dependencies, not keyword guessing) */
+const PACKAGE_CAPABILITY_SIGNALS: Array<{ packages: string[]; signatureId: string; reason: string }> = [
+  { packages: ['stripe', '@stripe/stripe-js', 'paypal', 'braintree'], signatureId: 'payments', reason: 'Payment SDK in package.json' },
+  { packages: ['passport', 'next-auth', '@auth/core', '@clerk/clerk-sdk-node', 'firebase-admin', 'jsonwebtoken', 'bcrypt', 'argon2'], signatureId: 'authentication', reason: 'Auth library in package.json' },
+  { packages: ['@casl/ability', 'accesscontrol', 'casbin'], signatureId: 'authorization', reason: 'Authorization library in package.json' },
+  { packages: ['nodemailer', '@sendgrid/mail', 'twilio', 'firebase', '@slack/web-api'], signatureId: 'notifications', reason: 'Messaging SDK in package.json' },
+  { packages: ['express', 'fastify', 'koa', 'hono', '@nestjs/core', 'next'], signatureId: 'web_framework', reason: 'HTTP framework in package.json' },
+  { packages: ['@apollo/server', 'graphql', '@trpc/server'], signatureId: 'api_layer', reason: 'API layer library in package.json' },
+  { packages: ['launchdarkly-node-server-sdk', '@unleash/proxy'], signatureId: 'feature_flags', reason: 'Feature flag SDK in package.json' },
+  { packages: ['socket.io', 'ws', 'mqtt'], signatureId: 'notifications', reason: 'Realtime messaging transport in package.json' },
+];
+
+export interface DiscoverCapabilitiesOptions {
+  packageDeps?: string[];
+}
+
 export function discoverCapabilities(
   graph: MnemosGraph,
   memory: Pick<MemoryModel, 'services' | 'apis' | 'domains'>,
+  options: DiscoverCapabilitiesOptions = {},
 ): Capability[] {
   const serviceNodes = getNodesByKind(graph, 'service');
   const apiNodes = getNodesByKind(graph, 'api');
@@ -331,7 +349,108 @@ export function discoverCapabilities(
 
   return hits
     .filter((h) => h.confidence >= 0.12)
+    .sort((a, b) => b.confidence - a.confidence)
+    .concat(discoverFromPackageDeps(options.packageDeps ?? []))
+    .concat(discoverFromRoutePrefixes(apiPaths, memory.apis))
+    .reduce(mergeCapabilityHits, [] as Capability[])
     .sort((a, b) => b.confidence - a.confidence);
+}
+
+function discoverFromPackageDeps(deps: string[]): Capability[] {
+  if (deps.length === 0) return [];
+  const depSet = new Set(deps.map((d) => d.toLowerCase()));
+  const hits: Capability[] = [];
+
+  for (const signal of PACKAGE_CAPABILITY_SIGNALS) {
+    const matched = signal.packages.filter((pkg) => depSet.has(pkg.toLowerCase()));
+    if (matched.length === 0) continue;
+
+    const sig = SIGNATURES.find((s) => s.id === signal.signatureId);
+    if (!sig) continue;
+
+    hits.push({
+      id: `capability:${sig.id}`,
+      signature: sig,
+      confidence: Math.min(0.95, 0.55 + matched.length * 0.08),
+      actors: sig.actors,
+      data: sig.data,
+      outcomes: sig.outcomes,
+      services: [],
+      apis: [],
+      domains: [],
+      evidence: matched.map((pkg) => `dependency: ${pkg}`),
+      reasons: [signal.reason],
+    });
+  }
+
+  return hits;
+}
+
+function discoverFromRoutePrefixes(
+  apiPaths: { id: string; path: string; method: string }[],
+  apis: ApiEndpoint[],
+): Capability[] {
+  const prefixCounts = new Map<string, number>();
+
+  for (const api of apiPaths) {
+    const segments = api.path.replace(/\\/g, '/').split('/').filter(Boolean);
+    if (segments.length < 2) continue;
+    const prefixStart = segments[0] === 'api' || segments[0] === 'v1' ? 1 : 0;
+    const prefix = segments[prefixStart];
+    if (!prefix || prefix.length < 3) continue;
+    if (/^(v\d+|health|status|docs?)$/i.test(prefix)) continue;
+    prefixCounts.set(prefix, (prefixCounts.get(prefix) ?? 0) + 1);
+  }
+
+  const hits: Capability[] = [];
+  for (const [prefix, count] of [...prefixCounts.entries()].filter(([, c]) => c >= 2)) {
+    const name = formatDomainName(prefix);
+    const relatedApis = apis.filter((a) => a.path.toLowerCase().includes(`/${prefix}/`) || a.path.toLowerCase().includes(`/${prefix}`));
+    hits.push({
+      id: `capability:route:${prefix}`,
+      signature: {
+        id: `route_${prefix}`,
+        name: `${name} API Surface`,
+        purpose: `HTTP endpoints grouped under /${prefix} — inferred from route prefix clustering.`,
+        keywords: [prefix, name.toLowerCase()],
+        actors: ['Client', 'End user'],
+        data: ['HTTP request', 'Route params'],
+        outcomes: ['Response returned'],
+        category: 'platform',
+      },
+      confidence: Math.min(0.88, 0.35 + count * 0.08),
+      actors: ['Client'],
+      data: ['HTTP request'],
+      outcomes: ['Response handled'],
+      services: [],
+      apis: relatedApis.slice(0, 6).map((a) => `${a.method} ${a.path}`),
+      domains: [...new Set(relatedApis.map((a) => a.domain).filter(Boolean) as string[])],
+      evidence: relatedApis.slice(0, 4).map((a) => `endpoint: ${a.method} ${a.path}`),
+      reasons: [`${count} routes share prefix /${prefix}`],
+    });
+  }
+
+  return hits;
+}
+
+function mergeCapabilityHits(existing: Capability[], incoming: Capability): Capability[] {
+  const key = incoming.signature.id;
+  const idx = existing.findIndex((c) => c.signature.id === key);
+  if (idx < 0) return [...existing, incoming];
+
+  const prev = existing[idx]!;
+  const merged: Capability = {
+    ...prev,
+    confidence: Math.min(1, Math.max(prev.confidence, incoming.confidence) + 0.05),
+    services: dedupe([...prev.services, ...incoming.services]).slice(0, 8),
+    apis: dedupe([...prev.apis, ...incoming.apis]).slice(0, 10),
+    domains: dedupe([...prev.domains, ...incoming.domains]),
+    evidence: dedupe([...prev.evidence, ...incoming.evidence]).slice(0, 8),
+    reasons: dedupe([...prev.reasons, ...incoming.reasons]).slice(0, 5),
+  };
+  const next = [...existing];
+  next[idx] = merged;
+  return next;
 }
 
 function isTestOrExamplePath(filePath: string): boolean {
@@ -360,15 +479,22 @@ function dedupe<T>(arr: T[]): T[] {
 
 function indexDomainsByService(services: Service[], domains: Domain[]): Map<string, string> {
   const out = new Map<string, string>();
-  for (const svc of services) {
-    if (svc.domain) out.set(svc.name, svc.domain);
-  }
-  // Also map by file→service→domain
+  const domainByNodeId = new Map<string, string>();
+
   for (const d of domains) {
     for (const nodeId of d.nodes) {
-      // Best-effort: just attach domain name for paths inside
+      domainByNodeId.set(nodeId, d.name);
+      const pathMatch = nodeId.match(/^file:(.+)$/);
+      if (pathMatch?.[1]) domainByNodeId.set(pathMatch[1], d.name);
     }
   }
+
+  for (const svc of services) {
+    if (svc.domain) out.set(svc.name, svc.domain);
+    const domainFromPath = domainByNodeId.get(svc.path) ?? domainByNodeId.get(`file:${svc.path}`);
+    if (domainFromPath) out.set(svc.name, domainFromPath);
+  }
+
   return out;
 }
 

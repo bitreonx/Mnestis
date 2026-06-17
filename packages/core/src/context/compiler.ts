@@ -3,6 +3,18 @@ import path from 'node:path';
 import type { MemoryModel } from '../types.js';
 import type { MnemosGraph } from '../graph/graph.js';
 import { toSerializable } from '../graph/graph.js';
+import { buildArchitectureLanguageSection, buildRepositoryLanguagesMarkdown } from '../languages/docs.js';
+import {
+  buildGraphsIndexMarkdown,
+  buildDomainSectionGraph,
+  buildFlowsSectionGraphs,
+  buildDependenciesSectionGraphs,
+  buildCriticalPathsSectionGraph,
+  buildArchitectureOverviewGraphs,
+  buildRepositorySummaryGraphs,
+  buildSmellsSectionGraph,
+} from './graph-markdown.js';
+import { buildLanguagePipelineMermaid } from '../languages/docs.js';
 
 export async function compileContext(
   memory: MemoryModel,
@@ -13,8 +25,11 @@ export async function compileContext(
   await mkdir(contextDir, { recursive: true });
 
   const files: Record<string, string> = {
+    'README.md': compileContextReadme(memory),
     'repository_summary.md': compileRepositorySummary(memory),
     'architecture.md': compileArchitecture(memory),
+    'languages.md': buildRepositoryLanguagesMarkdown(memory),
+    'graphs.md': buildGraphsIndexMarkdown(memory),
     'domains.md': compileDomains(memory),
     'flows.md': compileFlows(memory),
     'critical_paths.md': compileCriticalPaths(memory),
@@ -37,6 +52,44 @@ export async function compileContext(
   );
 
   return contextDir;
+}
+
+function compileContextReadme(memory: MemoryModel): string {
+  const { architecture } = memory;
+  return `# Mnemos Context — ${architecture.name}
+
+> Generated at \`${memory.builtAt}\` · Mermaid diagrams render in GitHub, Cursor, and VS Code
+
+## Start here
+
+| Priority | File | Why |
+|----------|------|-----|
+| 1 | [repository_summary.md](./repository_summary.md) | Stats, layers, language pie |
+| 2 | [graphs.md](./graphs.md) | **All architecture diagrams** |
+| 3 | [languages.md](./languages.md) | Stack breakdown + parsing pipeline |
+| 4 | [architecture.md](./architecture.md) | Services, layers, capabilities |
+
+## Full index
+
+| File | Graphs |
+|------|--------|
+| [graphs.md](./graphs.md) | Domain · flow · service · dependency · risk · language · pipeline |
+| [languages.md](./languages.md) | Pie chart · language flow · extractor routing · families |
+| [architecture.md](./architecture.md) | Layers · domains · capabilities · language section |
+| [domains.md](./domains.md) | Domain interaction graph |
+| [flows.md](./flows.md) | Flow overview + step diagrams |
+| [dependencies.md](./dependencies.md) | Top edges + service graph |
+| [critical_paths.md](./critical_paths.md) | High-risk path diagram |
+| [smells.md](./smells.md) | Smell severity pie |
+| [services.md](./services.md) | Service catalog |
+| [apis.md](./apis.md) | Route/API table |
+
+## Build pipeline
+
+${buildLanguagePipelineMermaid()}
+
+Re-run \`mnemos build\` after structural changes to refresh every chart.
+`;
 }
 
 function compileRepositorySummary(memory: MemoryModel): string {
@@ -67,8 +120,11 @@ ${architecture.summary}
 ## Languages
 
 ${Object.entries(architecture.languages)
+  .sort((a, b) => b[1] - a[1])
   .map(([lang, count]) => `- **${lang}**: ${count} files`)
   .join('\n')}
+
+See **[languages.md](./languages.md)** for distribution charts and the Mnemos parsing pipeline.
 
 ## Packages
 
@@ -81,6 +137,8 @@ ${architecture.packages.map((p) => `- \`${p}\``).join('\n')}
 - ${memory.apis.length} API/route endpoints
 - ${memory.services.length} services
 - ${memory.smells.length} architecture smells detected
+
+${buildRepositorySummaryGraphs(memory)}
 `;
 }
 
@@ -110,6 +168,10 @@ ${services
 - **Key exports**: ${s.exports.slice(0, 5).join(', ') || 'none'}`,
   )
   .join('\n\n')}
+
+${buildArchitectureOverviewGraphs(memory)}
+
+${buildArchitectureLanguageSection(memory)}
 `;
 }
 
@@ -117,6 +179,8 @@ function compileDomains(memory: MemoryModel): string {
   return `# Domains
 
 ${memory.domains.length} logical domains discovered through path analysis and import-graph clustering.
+
+${buildDomainSectionGraph(memory)}
 
 ${memory.domains
   .map(
@@ -140,6 +204,8 @@ function compileFlows(memory: MemoryModel): string {
   let content = `# Execution Flows
 
 ${memory.flows.length} flows detected across the codebase.
+
+${buildFlowsSectionGraphs(memory)}
 
 `;
 
@@ -170,6 +236,8 @@ function compileCriticalPaths(memory: MemoryModel): string {
   return `# Critical Paths
 
 High-risk paths where changes have wide blast radius.
+
+${buildCriticalPathsSectionGraph(memory)}
 
 ${memory.criticalPaths
   .map(
@@ -223,6 +291,8 @@ function compileDependencies(memory: MemoryModel): string {
 
 Top dependency relationships by frequency.
 
+${buildDependenciesSectionGraphs(memory)}
+
 ${topDeps
   .map(([pair, count]) => `- **${pair}**: ${count} references`)
   .join('\n')}
@@ -233,6 +303,8 @@ function compileSmells(memory: MemoryModel): string {
   return `# Architecture Smells
 
 ${memory.smells.length} potential issues detected.
+
+${buildSmellsSectionGraph(memory)}
 
 ${memory.smells
   .map(

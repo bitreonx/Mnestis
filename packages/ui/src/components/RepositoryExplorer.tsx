@@ -195,6 +195,7 @@ export function RepositoryExplorer({ memory, onSelectRepo, onQuickInsight }: Rep
         <input
           type="text"
           placeholder="Search files and folders..."
+          aria-label="Search files and folders"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"

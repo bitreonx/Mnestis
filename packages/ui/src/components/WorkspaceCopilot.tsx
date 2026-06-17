@@ -116,6 +116,7 @@ export function WorkspaceCopilot({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder='e.g. "I need to edit the auth system — where do I start?"'
+          aria-label="Ask the workspace copilot"
           disabled={loading}
         />
         <button type="submit" disabled={loading || !input.trim()}>Ask</button>

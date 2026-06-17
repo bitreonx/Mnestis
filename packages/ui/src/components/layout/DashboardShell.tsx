@@ -7,6 +7,7 @@ import { BottomPanel } from './BottomPanel';
 import { useDashboardPrefs } from '../../hooks/useDashboardPrefs';
 import type { RepoSnapshot } from '../../lib/workspace';
 import type { MemoryModel } from '../../types';
+import type { FocusMode } from '../../dashboard';
 
 interface DashboardShellProps {
   workspaceName?: string;
@@ -22,6 +23,8 @@ interface DashboardShellProps {
   onQuickInsight: (target: string) => void;
   children: ReactNode;
   singleRepoMode?: boolean;
+  focusMode: FocusMode;
+  onFocusModeChange: (mode: FocusMode) => void;
 }
 
 export function DashboardShell({
@@ -38,6 +41,8 @@ export function DashboardShell({
   onQuickInsight,
   children,
   singleRepoMode,
+  focusMode,
+  onFocusModeChange,
 }: DashboardShellProps) {
   const { prefs, togglePin, setSortBy, toggleTerminal, setTerminalHeight, toggleInspector } = useDashboardPrefs();
   const [railSearch, setRailSearch] = useState('');
@@ -77,7 +82,7 @@ export function DashboardShell({
     <div
       className="cockpit-shell"
       style={{
-        gridTemplateColumns: prefs.inspectorOpen ? '240px 1fr 340px' : '240px 1fr',
+        gridTemplateColumns: prefs.inspectorOpen ? '220px 1fr 320px' : '220px 1fr',
         gridTemplateRows: prefs.terminalOpen && terminalRepo ? 'auto 1fr auto' : 'auto 1fr',
       }}
     >
@@ -99,6 +104,8 @@ export function DashboardShell({
       <div className="cockpit-center">
         <TopBar
           breadcrumbs={breadcrumbs}
+          focusMode={focusMode}
+          onFocusModeChange={onFocusModeChange}
           search={globalSearch}
           onSearchChange={setGlobalSearch}
           onOpenCommandPalette={() => setCmdOpen(true)}

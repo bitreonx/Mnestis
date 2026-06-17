@@ -6,9 +6,11 @@ import { MnemosBanner } from './illustrations/VisualShowcase';
 interface OverviewProps {
   memory: MemoryModel;
   healthScore?: HealthScore | null;
+  /** Hide duplicate health block when ScoreExplainer is shown above. */
+  hideHealthScore?: boolean;
 }
 
-export function Overview({ memory, healthScore = null }: OverviewProps) {
+export function Overview({ memory, healthScore = null, hideHealthScore = false }: OverviewProps) {
 
   const { stats, architecture, domains, flows, smells, capabilities, journeys } = memory;
 
@@ -48,7 +50,7 @@ export function Overview({ memory, healthScore = null }: OverviewProps) {
 
 
 
-      {healthScore && (
+      {healthScore && !hideHealthScore && (
 
         <div className="mb-8 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-5">
 

@@ -1,18 +1,59 @@
 export * from './types.js';
 export { scanRepository, inferLanguage, isTestFile, inferRoutePath, inferDomainFromPath, formatDomainName } from './scanner/index.js';
+export {
+  SUPPORTED_LANGUAGES,
+  SUPPORTED_LANGUAGE_COUNT,
+  LANGUAGE_DEFINITIONS,
+  ALL_SOURCE_EXTENSIONS,
+  getLanguageDefinition,
+  listSupportedLanguageLabels,
+  buildLanguagePipelineMermaid,
+  buildExtractorRoutingMermaid,
+  buildLanguageFamiliesMermaid,
+  buildRepositoryLanguagePieMermaid,
+  buildRepositoryLanguagesMarkdown,
+  buildArchitectureLanguageSection,
+  buildLanguagesReferenceMarkdown,
+  buildLanguageSummaryLine,
+} from './languages/index.js';
 export { parseFile, parseFiles, parseFilesIncremental, parseContent } from './parser/index.js';
-export { createGraph, addNode, addEdge, getNodesByKind, getNeighbors, bfsPaths, toSerializable, fromSerializable, fanIn, fanOut, findCycles, nodeId } from './graph/graph.js';
+export { createGraph, addNode, addEdge, getNodesByKind, getNeighbors, bfsPaths, reverseBfsPaths, shortestPath, toSerializable, fromSerializable, fanIn, fanOut, findCycles, nodeId } from './graph/graph.js';
+export { getNodeQueryIndex, buildNodeQueryIndex, resolveNodeQueryFast } from './graph/node-index.js';
 export type { MnemosGraph } from './graph/graph.js';
 export { buildGraph, buildGraphAsync, resolveNodeQuery } from './graph/builder.js';
+export { patchGraph, shouldPatchGraph, buildEmptyGraph } from './graph/incremental.js';
 export { loadPathAliases, resolveAliasImport, resolveRelativeImport } from './graph/paths.js';
 export { discoverDomains, findDomain } from './analysis/domains.js';
 export { discoverFlows, findFlow } from './analysis/flows.js';
 export { analyzeImpact, formatImpactReport } from './analysis/impact.js';
 export { detectDeadCode } from './analysis/dead-code.js';
+export { discoverPackageEntryPoints, isPackageEntryPoint } from './analysis/entry-points.js';
 export { detectSmells } from './analysis/smells.js';
 export { assembleMemoryModel, buildArchitectureModel, extractServices, extractApis } from './memory/writer.js';
 export { compileContext, writeMemoryModel } from './context/compiler.js';
-export { build, loadMemoryModel } from './pipeline/build.js';
+export { buildGraphsIndexMarkdown, buildMcpArchitectureGraphBundle } from './context/graph-markdown.js';
+export {
+  buildGraphsReferenceMarkdown,
+  buildArchitectureReferenceMarkdown,
+} from './docs/reference.js';
+export { syncMnemosDocs } from './docs/sync.js';
+export type { SyncDocsResult } from './docs/sync.js';
+export {
+  wrapMermaid,
+  buildDomainGraphMermaid,
+  buildFlowGraphMermaid,
+  buildGraphIndexSections,
+  buildMemoryPipelineMermaid,
+  buildTopDependenciesMermaid,
+  buildServiceDependencyGraphMermaid,
+  buildCriticalPathGraphMermaid,
+  buildArchitectureLayersMermaid,
+  buildCapabilitiesGraphMermaid,
+  buildJourneyGraphMermaid,
+  buildRiskHeatmapMermaid,
+  buildSmellsSeverityMermaid,
+} from './graph/mermaid.js';
+export { build, loadMemoryModel, loadPersistedGraph } from './pipeline/build.js';
 export { buildReportData, generateReport, renderReport, computeMemoryScore, buildStory } from './report.js';
 export type { ReportData, MemoryScore, ArchitectureStory, Capability, Journey, DomainView, Risk } from './report.js';
 export {
@@ -39,6 +80,23 @@ export type { ExplainResult } from './explain.js';
 export { buildArchitectureNarrative, formatArchitectureStory } from './story.js';
 export type { ArchitectureNarrative } from './story.js';
 export { generateSnapshots } from './snapshot.js';
+export { buildAiPack, aiPackToJson, renderIssuePrompt, filterBySection, AI_PACK_VERSION, AI_PACK_SCHEMA } from './ai-pack.js';
+export type {
+  AiPack,
+  AiPackOptions,
+  AiPackSection,
+  AiPackRepository,
+  AiPackSummary,
+  AiPackScore,
+  AiPackHealth,
+  AiPackAiReadiness,
+  AiPackHealthDimension,
+  AiPackIssue,
+  AiPackPrompts,
+  AiPackIssuePromptInput,
+  IssueType,
+  Mode,
+} from './ai-pack.js';
 export type { SnapshotResult } from './snapshot.js';
 export { computeAiReadiness } from './ai-readiness.js';
 export type { AiReadinessResult } from './ai-readiness.js';
@@ -61,12 +119,57 @@ export {
   buildContextFiles,
 } from './ai-toolkit.js';
 export type { AiToolkit } from './ai-toolkit.js';
-export { writeAiToolkit, installAiIntegrations } from './ai-toolkit-io.js';
-export type { SetupOptions, SetupResult } from './ai-toolkit-io.js';
+export { writeAiToolkit, installAiIntegrations, uninstallAiIntegrations, ALL_PLATFORMS, PLATFORM_FILES } from './ai-toolkit-io.js';
+export type { SetupOptions, SetupResult, Platform } from './ai-toolkit-io.js';
+export {
+  buildSkillMd,
+  buildSteeringMd,
+  buildVscodeInstructions,
+  buildCopilotInstructions,
+  buildWindsurfRule,
+  buildGeminiMd,
+  buildClaudeMdSection,
+} from './ai-toolkit.js';
 export { startMemoryServer } from './serve.js';
 export type { ServeOptions, ServeHandle } from './serve.js';
+export { startMcpServer } from './mcp-server.js';
+export type { McpServerOptions } from './mcp-server.js';
+export { MnemosRuntime, MNEMOS_VERSION, MNEMOS_MCP_URI, MnemosAgentError, envelopeToMcpContent, errorToMcpContent, invalidateMnemosRuntime } from './agent-runtime.js';
+export type { MnemosArtifacts, AgentEnvelope, MnemosResourceDescriptor, AgentErrorCode } from './agent-runtime.js';
+export {
+  buildMcpServerConfig,
+  formatMcpConfigJson,
+  buildMcpSetupMarkdown,
+  buildVscodeMcpServerConfig,
+  formatVscodeMcpConfigJson,
+} from './mcp-config.js';
+export type { CursorMcpConfig, McpServerConfigEntry, VscodeMcpConfig, VscodeMcpServerConfigEntry } from './mcp-config.js';
+export { queryGraph, findGraphPath, explainNode, formatPathResult, formatNodeExplain } from './graph-query.js';
+export type { GraphQueryResult, PathResult, NodeExplainResult } from './graph-query.js';
+export { generateCallflowHtml, writeCallflowHtml } from './callflow.js';
+export type { CallflowOptions } from './callflow.js';
+export { runExport, exportGraphSvg, exportGraphml, exportWiki } from './export/index.js';
+export type { ExportFormat } from './export/index.js';
+export { installHooks, uninstallHooks, getHookStatus } from './hooks.js';
+export type { HookStatus } from './hooks.js';
+export { compileSubgraphContext, formatSubgraphContext } from './context/subgraph-compiler.js';
+export type { SubgraphContext, SubgraphNode, SubgraphEdge } from './context/subgraph-compiler.js';
+export {
+  snapshotFromMemory,
+  compareDnaSnapshots,
+  loadBuildHistory,
+  appendBuildSnapshot,
+  formatDnaDiffReport,
+} from './snapshot/dna-diff.js';
+export type { DnaSnapshot, DnaDiffResult, DnaDiffChange } from './snapshot/dna-diff.js';
+export { analyzeGitHotspots, formatGitIntelReport, enrichMemoryWithGitHotspots } from './analysis/git-intel.js';
+export type { GitHotspot, GitIntelSummary } from './analysis/git-intel.js';
 export {
   buildSearchIndex,
+  serializeSearchIndex,
+  deserializeSearchIndex,
+  loadPersistedSearchIndex,
+  loadOrBuildSearchIndex,
   searchMemory,
   classifyIntent,
   findBestMatch,
@@ -77,7 +180,13 @@ export type {
   SearchHit,
   SearchResult,
   MemorySearchIndex,
+  SerializableSearchIndex,
   CopilotIntent,
   IntentClassification,
   SearchEntityKind,
 } from './search/index.js';
+export { startGraphSync } from './sync/graph-sync.js';
+export type { GraphSyncOptions, GraphSyncHandle } from './sync/graph-sync.js';
+export { compressCommandOutput } from './proxy/compress-output.js';
+export type { CompressStats, CompressOptions } from './proxy/compress-output.js';
+export { REPORT_CSS, REPORT_FONT_LINK, renderHealthRingHtml, healthRingTone } from './report/design-tokens.js';

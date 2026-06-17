@@ -1,3 +1,5 @@
+import type { FocusMode } from '../../dashboard';
+
 interface TopBarProps {
   breadcrumbs: { label: string; onClick?: () => void }[];
   search: string;
@@ -9,6 +11,8 @@ interface TopBarProps {
   terminalOpen: boolean;
   inspectorOpen: boolean;
   onScreenshot?: () => void;
+  focusMode: FocusMode;
+  onFocusModeChange: (mode: FocusMode) => void;
 }
 
 /* Supabase-style SVG icons */
@@ -42,6 +46,8 @@ export function TopBar({
   terminalOpen,
   inspectorOpen,
   onScreenshot,
+  focusMode,
+  onFocusModeChange,
 }: TopBarProps) {
   return (
     <header className="cockpit-topbar">
@@ -61,11 +67,30 @@ export function TopBar({
       </nav>
 
       <div className="cockpit-topbar-center">
+        <div className="cockpit-mode-switch" role="tablist" aria-label="Dashboard mode">
+          {([
+            ['vibe', 'Vibecoder'],
+            ['ai', 'AI'],
+            ['coder', 'Coder'],
+          ] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={`cockpit-mode-btn ${focusMode === id ? 'cockpit-mode-btn--active' : ''}`}
+              onClick={() => onFocusModeChange(id)}
+              role="tab"
+              aria-selected={focusMode === id}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <div className="cockpit-search-wrapper">
           <IconSearch />
           <input
             className="cockpit-global-search"
             placeholder="Search…"
+            aria-label="Search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
           />

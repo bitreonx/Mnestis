@@ -6,17 +6,27 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "a11y": "lhci autorun --config=lighthouserc.json"
   },
   "dependencies": {
     "@xyflow/react": "^12.6.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "framer-motion": "^11.13.5",
+    "lucide-react": "^0.460.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-router-dom": "^7.6.0",
+    "react-dom": "^19.1.0",
+    "sonner": "^1.7.1",
+    "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
+    "@lhci/cli": "^0.14.0",
     "@vitejs/plugin-react": "^4.5.1",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3",

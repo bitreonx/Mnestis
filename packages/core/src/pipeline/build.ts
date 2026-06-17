@@ -9,6 +9,8 @@ import { scanRepository } from '../scanner/index.js';
 import { parseFile, parseFiles, parseFilesIncremental } from '../parser/index.js';
 
 import { buildGraph, buildGraphAsync } from '../graph/builder.js';
+import { loadPathAliases } from '../graph/paths.js';
+import { patchGraph, shouldPatchGraph } from '../graph/incremental.js';
 
 import { discoverDomains } from '../analysis/domains.js';
 
@@ -17,6 +19,8 @@ import { discoverFlows } from '../analysis/flows.js';
 import { discoverCapabilities } from '../analysis/capabilities.js';
 
 import { discoverJourneys } from '../analysis/journeys.js';
+
+import { discoverPackageEntryPoints } from '../analysis/entry-points.js';
 
 import { detectDeadCode } from '../analysis/dead-code.js';
 
@@ -55,7 +59,8 @@ import {
 
 } from '../cache.js';
 
-import { buildSearchIndex } from '../search/index.js';
+import { invalidateMnemosRuntime } from '../agent-runtime.js';
+import { buildSearchIndex, serializeSearchIndex } from '../search/index.js';
 
 
 
@@ -97,7 +102,9 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
   let filesCached = 0;
 
+  let deletedPaths = new Set<string>();
 
+  let reparsedPaths = new Set<string>();
 
   if (incremental) {
 
@@ -140,6 +147,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
         } else {
 
           changedPaths.add(relativePath);
+          reparsedPaths.add(relativePath);
 
           recordFile(fileCache, relativePath, content, fileStat.mtimeMs);
 
@@ -148,6 +156,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
       } catch {
 
         changedPaths.add(relativePath);
+        reparsedPaths.add(relativePath);
 
       }
 
@@ -164,6 +173,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
         cachedParsed.delete(relPath);
 
         changedPaths.add(relPath);
+        deletedPaths.add(relPath);
 
       }
 
@@ -195,7 +205,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
 
 
-    filesParsed = changedPaths.size;
+    filesParsed = reparsedPaths.size;
 
 
 
@@ -249,13 +259,41 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
 
 
-  const graph = await buildGraphAsync(root, scan, parsedFiles);
+  const entryPoints = await discoverPackageEntryPoints(root);
+
+  const existingGraph = incremental ? await loadPersistedGraph(outputDir) : undefined;
+  const patchAffected = filesParsed + deletedPaths.size;
+
+  let graph;
+  if (
+    incremental &&
+    existingGraph &&
+    shouldPatchGraph(parsedFiles.length, patchAffected, true)
+  ) {
+    const aliases = await loadPathAliases(root);
+    graph = patchGraph(existingGraph, {
+      root,
+      scan,
+      parsedFiles,
+      changedPaths: reparsedPaths,
+      deletedPaths,
+      entryPoints,
+      aliases,
+    });
+    if (options.verbose) {
+      console.log(`Incremental graph patch: ${patchAffected} file(s) (${filesParsed} changed, ${deletedPaths.size} deleted)`);
+    }
+  } else {
+    graph = await buildGraphAsync(root, scan, parsedFiles, entryPoints);
+  }
 
   const domains = discoverDomains(graph);
 
   const flows = discoverFlows(graph, parsedFiles);
 
-  const capabilities = discoverCapabilities(graph, { services: [], apis: [], domains });
+  const packageDeps = await readPackageDependencies(root);
+
+  const capabilities = discoverCapabilities(graph, { services: [], apis: [], domains }, { packageDeps });
 
   const journeys = discoverJourneys(graph, parsedFiles, flows);
 
@@ -368,11 +406,17 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
     path.join(outputDir, 'search-index.json'),
 
-    JSON.stringify({ documentCount: searchIndex.documents.length, builtAt: new Date().toISOString() }, null, 2),
+    JSON.stringify(serializeSearchIndex(searchIndex), null, 2),
 
     'utf-8',
 
   );
+
+  const { appendBuildSnapshot } = await import('../snapshot/dna-diff.js');
+  const dnaDiff = await appendBuildSnapshot(memory, outputDir);
+  if (options.verbose && dnaDiff.changes.length > 0) {
+    console.log(`DNA diff: ${dnaDiff.summary} (risk: ${dnaDiff.regressionRisk})`);
+  }
 
 
 
@@ -384,7 +428,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
   }
 
-
+  invalidateMnemosRuntime(root);
 
   return { memory, outputDir };
 
@@ -436,6 +480,36 @@ export async function loadMemoryModel(root: string): Promise<{ memory: MemoryMod
 
   }
 
+}
+
+async function readPackageDependencies(root: string): Promise<string[]> {
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const raw = await readFile(path.join(root, 'package.json'), 'utf-8');
+    const pkg = JSON.parse(raw) as {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+      optionalDependencies?: Record<string, string>;
+    };
+    return [
+      ...Object.keys(pkg.dependencies ?? {}),
+      ...Object.keys(pkg.devDependencies ?? {}),
+      ...Object.keys(pkg.optionalDependencies ?? {}),
+    ];
+  } catch {
+    return [];
+  }
+}
+
+export async function loadPersistedGraph(outputDir: string) {
+  const { fromSerializable } = await import('../graph/graph.js');
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const raw = await readFile(path.join(outputDir, 'graph.json'), 'utf-8');
+    return fromSerializable(JSON.parse(raw));
+  } catch {
+    return undefined;
+  }
 }
 
 

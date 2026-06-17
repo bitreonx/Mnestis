@@ -4,6 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   buildSearchIndex,
+  serializeSearchIndex,
+  deserializeSearchIndex,
   searchMemory,
   classifyIntent,
   tokenize,
@@ -47,6 +49,33 @@ describe('Mnemos search engine', () => {
     const result = searchMemory(index, 'service domain', { limit: 5 });
     assert.ok(result.hits.length >= 0);
     assert.ok(result.tookMs >= 0);
+  });
+
+  it('serializes and loads v2 search index with inverted postings', async () => {
+    const loaded = await loadMemoryModel(fixturesRoot);
+    const memory = loaded?.memory;
+    if (!memory) return;
+
+    const index = buildSearchIndex(memory);
+    assert.ok(index.postings.size > 0);
+    assert.ok(index.docById.size === index.documents.length);
+
+    const serialized = serializeSearchIndex(index);
+    assert.equal(serialized.version, 2);
+
+    const restored = deserializeSearchIndex(serialized);
+    const result = searchMemory(restored, 'authentication login', { limit: 5 });
+    assert.ok(result.tookMs < 50, `search took ${result.tookMs}ms, expected <50ms`);
+  });
+
+  it('start intent answers without full repo scan', async () => {
+    const loaded = await loadMemoryModel(fixturesRoot);
+    const memory = loaded?.memory;
+    if (!memory) return;
+
+    const answer = askCopilot(memory, 'where should I start as a new developer');
+    assert.ok(answer.answer.length > 10);
+    assert.equal(answer.intent, 'start');
   });
 
   it('copilot returns structured answers with intent', async () => {

@@ -157,11 +157,17 @@ export function RepoRail({
           <input
             className="rail-search"
             placeholder="Filter repositories…"
+            aria-label="Filter repositories"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <select className="rail-sort" value={sortBy} onChange={(e) => onSortChange(e.target.value as typeof sortBy)}>
+        <select
+          className="rail-sort"
+          aria-label="Sort repositories"
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value as typeof sortBy)}
+        >
           <option value="name">Name</option>
           <option value="health">Health</option>
           <option value="updated">Updated</option>

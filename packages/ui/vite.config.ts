@@ -5,6 +5,7 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { workspacePlugin, resolveCliPath, resolveWorkspaceFile } from './vite.workspace';
+import { buildAiPackFromDir, aiPackHeaders, parseAiPackQuery } from './vite.ai-pack';
 
 function mnemosStaticPlugin(): Plugin {
   const mnemosRoot = process.env.MNEMOS_ROOT ?? process.cwd();
@@ -13,14 +14,33 @@ function mnemosStaticPlugin(): Plugin {
     name: 'mnemos-static',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url?.startsWith('/.mnemos/')) return next();
+        if (!req.url) return next();
+
+        const jsonMatch = req.url.match(/^\/api\/json\/([^/?]+)/);
+        if (jsonMatch && req.method === 'GET') {
+          const repoId = jsonMatch[1];
+          const { section, mode } = parseAiPackQuery(req.url);
+          const mnemosDir = path.join(mnemosRoot, '.mnemos');
+          const { body, status } = await buildAiPackFromDir(mnemosDir, {
+            repoId,
+            root: mnemosRoot,
+            section,
+            mode,
+          });
+          res.statusCode = status;
+          for (const [k, v] of Object.entries(aiPackHeaders())) res.setHeader(k, v);
+          res.end(body);
+          return;
+        }
+
+        if (!req.url.startsWith('/.mnemos/')) return next();
         if (req.url.match(/^\/\.mnemos\/[^/]+\//)) return next();
 
         const filePath = path.join(mnemosRoot, req.url);
         if (!existsSync(filePath)) {
-          res.statusCode = 404;
-          res.end('Not found');
-          return;
+          // Fall through so Vite can serve a bundled copy from public/.mnemos/.
+          // This keeps dev behavior identical to the static (Vercel) deploy.
+          return next();
         }
 
         try {

@@ -1,181 +1,237 @@
 # Mnemos
 
-<p align="center">
-  <img src="images/mnemos_github_banner_final.png" alt="Mnemos — The memory layer for software" width="100%" />
-</p>
+**The memory layer for software.** One command turns a codebase into architecture intelligence that humans and AI can use immediately.
 
-> **The memory layer for software.** One command turns any repository into structured intelligence that humans and AI agents understand instantly.
+[![License: MIT](https://img.shields.io/badge/License-MIT-3ecf8e.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-6366f1.svg)](package.json)
+[![AI Pack](https://img.shields.io/badge/AI%20Pack-v1.0.0-f59e0b.svg)](docs/ai-pack.md)
+
+[Documentation](docs/architecture.md) · [Graphs](docs/GRAPHS.md) · [Languages](docs/LANGUAGES.md) · [AI Pack v1](docs/ai-pack.md) · [Modes](docs/modes.md) · [Benchmarks](mnemos-bench/) · [Contributing](docs/contributing.md)
 
 ```bash
 npx mnemos .
 ```
 
-Mnemos is a local-first **Software Memory Engine** — it discovers architecture, compresses it into Repository DNA, and answers the questions every new developer asks. No cloud. No API keys. No guesswork.
+Local-first. No cloud. No API keys. No guesswork.
 
 ---
 
-## Visual intelligence
+## The 30-second pitch
 
-Anything you can do in **Graphify** (dependency graphs) or static architecture diagrams, Mnemos does here — and goes further with DNA, blast-radius queries, and verified benchmark scores.
+**What:** Mnemos scans your repository, builds a dependency graph, discovers domains, capabilities, and user journeys, then writes structured memory to `.mnemos/`. It produces a dashboard, a shareable HTML report, and **AI Pack v1** — a versioned JSON contract agents can reason from without opening the UI.
 
-<p align="center">
-  <img src="packages/ui/public/assets/terminal-animated.svg" alt="Animated terminal — npx mnemos builds DNA and snapshots" width="48%" />
-  &nbsp;
-  <img src="packages/ui/public/assets/results-animated.svg" alt="Animated benchmark results — Mnemos vs alternatives" width="48%" />
-</p>
+**Why:** AI coding tools and new teammates both fail the same way: they grep random files instead of reading architecture. Mnemos gives every consumer the same ground truth — once, locally, on every build.
 
-| Output | Use it for |
-|--------|------------|
-| **`snapshots/*.svg`** | README badges, PR summaries, social posts — animated terminal & results cards |
-| **`report/index.html`** | Vibe / Developer / AI Agent report modes |
-| **`mnemos ui`** | Interactive graph, heatmap, domains, integrated terminal |
-| **`mnemos serve`** | Live `/dna`, `/copilot`, `/impact` for Cursor & Claude |
-
-### How AI should use Mnemos
-
-1. **Read first:** `@.mnemos/project.dna.json` and `@.mnemos/agent_context.json`
-2. **Setup once:** `mnemos setup` writes Cursor rules + `AGENTS.md`
-3. **Query live:** `mnemos serve` → `GET /copilot?q=what breaks if X changes?`
-4. **Share visually:** `mnemos snapshot` → drop SVG cards into docs
+**Who:** Vibecoders who need the product story. AI orchestrators feeding Claude, Cursor, or Trae. Human developers who want architecture, smells, and copy-ready repair context in one cockpit.
 
 ---
 
-## Verified benchmark ([Mnemos Bench](./mnemos-bench/README.md))
+## Showcase — four artifacts, one build
 
-All numbers measured on real repos. Reproduce anytime:
+Every `npx mnemos .` run produces the same intelligence in four shapes. The legend **Dashboard · Report · AI JSON** appears in every chrome so you always know which one you are looking at.
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="packages/ui/public/assets/terminal-animated.svg" alt="Animated Mnemos terminal — scan a repo, build DNA, and generate snapshots" width="100%" />
+      <br /><sub><b>Terminal → Memory</b> · one command writes DNA, agent context, an HTML report, and shareable SVG cards</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="packages/ui/public/assets/results-animated.svg" alt="Benchmark results — Mnemos vs Graphify and Gitingest" width="100%" />
+      <br /><sub><b>Verified results</b> · 80% task accuracy and 29× compression on real repos — not marketing slides</sub>
+    </td>
+  </tr>
+</table>
+
+These cards are produced by `mnemos snapshot` — drop them straight into a README or PR.
+
+| | Artifact | You get | Best for |
+|---|----------|---------|----------|
+| 🖥️ | **Terminal** | `npx mnemos .` → `.mnemos/` memory | CI, first scan, refreshing DNA |
+| 📊 | **Dashboard** | `mnemos ui` → `/vibe` · `/ai` · `/coder` cockpits | **Preview** — interactive exploration (community-driven) |
+| 📄 | **Report** | `report/index.html` · `?mode=vibe\|ai\|coder` | **Stable** — stakeholder demos, async review, shareable HTML |
+| 🤖 | **AI JSON** | `mnemos pack` · `/json/:repoId` · `/copilot/pack/:repoId` | Claude, Cursor, Trae — copy or HTTP, no UI required |
 
 ```bash
-npm run build
-npm run bench:express
-npm run bench:regression
+npx mnemos . && npx mnemos ui    # dashboard at localhost:5173
+# report: .mnemos/report/index.html or report/index.html
+npx mnemos pack --section=summary --pretty
 ```
-
-### Express (small) — expressjs/express
-
-| Metric | Manual | Mnemos | Gitingest | Graphify |
-|--------|--------|--------|-----------|----------|
-| **Task accuracy** | — | **80%** | 0% | 0% |
-| **Time to Understanding** | 51 min | **2 min** | — | — |
-| **Build latency** | — | **0.6s** | 6.3s | 0.9s |
-| **AI context tokens** | 177,553 raw | **5,942** | 1,100,000 | 26 |
-| **Compression** | 1× | **29.9×** | 0.16× | — |
-
-### NestJS (medium) — nestjs/nest, 1,724 files
-
-| Metric | Mnemos | Gitingest |
-|--------|--------|-----------|
-| **Task accuracy** | **72.4%** | 0% |
-| **Time to Understanding** | **2.6 min** (vs 146 min manual) | — |
-| **Build latency** | **35.7s** | 300s |
-| **AI context tokens** | **36,424** | 5,200,000 |
-| **Compression** | **28.1×** | 0.20× |
-| Domains / flows / capabilities | 49 / 37 / 12 | — |
-
-Impact analysis example (NestJS, measured):
-
-> Changing **NestApplication** affects **4** nodes — `nest-application.ts`, `nest-factory.ts`, `testing-module.ts` (+ spec).
-
-Full results: [mnemos-bench/results/VERIFIED.md](./mnemos-bench/results/VERIFIED.md)
 
 ---
 
-## AI model evaluation
-
-Test any LLM using Mnemos Bench — give the model only `project.dna.json`, ask the 6 universal tasks, score objectively:
+## Quick start
 
 ```bash
-node mnemos-bench/scorer/ai-eval.mjs express
+# 1. Analyze the repo (writes .mnemos/)
+npx mnemos .
+
+# 2. Open the interactive dashboard
+npx mnemos ui
+
+# 3. Serve memory for agents (optional)
+npx mnemos serve
+# → http://localhost:4000/copilot/pack/local
+
+# 4. Export AI Pack v1
+npx mnemos pack --section=summary --pretty
 ```
 
-Regression gate for CI:
+**Expected outputs in `.mnemos/`:** `project.dna.json`, `memory.json`, `agent_context.json`, `context/*.md`, `report/index.html`
+
+---
+
+## Outputs at a glance
+
+| Artifact | Command / URL | Audience | Use case |
+|----------|---------------|----------|----------|
+| **Dashboard** | `mnemos ui` → `localhost:5173` | You + team | **Preview** — interactive exploration (panels & layout in progress) |
+| **Report** | `report/index.html` | Stakeholders | **Stable** — async review, demos, shareable HTML (`?mode=vibe\|ai\|coder`) |
+| **AI JSON** | `mnemos pack` · `/json/:repoId` · `/copilot/pack/:repoId` | Claude, Cursor, Trae | Copy-paste structured context, repair prompts, score + issues |
+| **DNA** | `.mnemos/project.dna.json` | Any agent | Compressed repo DNA — `@`-mention first |
+| **MCP** | `mnemos mcp` | IDE agents | 15+ tools + 11 resources via Model Context Protocol |
+| **Sync** | `mnemos sync` | CI + local dev | Codegraph-style auto-rebuild on file changes |
+| **Wrap** | `mnemos wrap -- <cmd>` | AI agents | RTK-style token-compressed command output |
+
+**Legend:** Every dashboard view and the report header show **Dashboard · Report · AI JSON** so you always know which artifact you are looking at.
+
+---
+
+## The three modes
+
+Modes are **routes**, not toggles. The URL is canonical.
+
+| Mode | Route | For | One-liner |
+|------|-------|-----|-----------|
+| **Vibe** | `/vibe/:repoId/story` | Vibecoders, PMs, founders | Product story, journeys, capabilities — no raw JSON |
+| **AI** | `/ai/:repoId/home` | Claude, Cursor, Trae users | AI Pack v1, repairs, verify — agent-first |
+| **Coder** | `/coder/:repoId/overview` | Human developers | Architecture, flows, code map, smells, copilot |
+
+See [docs/modes.md](docs/modes.md) for deep links and keyboard map.
+
+---
+
+## Dashboard tour
+
+| Section | Coder route | What it does |
+|---------|-------------|--------------|
+| Overview | `/coder/:id/overview` | Health score (explained), issues, quick navigation |
+| Architecture | `/coder/:id/architecture` | Systems, domains, graph, smells |
+| Flows | `/coder/:id/flows` | Execution paths + user journeys |
+| Code Map | `/coder/:id/code` | File map + tech stack |
+| History | `/coder/:id/history` | Build history, timeline, risk heatmap |
+| AI Context | `/coder/:id/ai` | Copilot, context docs, JSON pack |
+
+---
+
+## AI Pack v1
+
+Single versioned JSON contract built once in `@mnemos/core`, used by UI, CLI, serve, and report.
 
 ```bash
-npm run bench:regression
+npx mnemos pack --section=issues --mode=ai -o .mnemos/ai-pack.json
+curl -s localhost:4000/copilot/pack/local?section=score | jq .version
+# → "1.0.0"
+```
+
+**Claude / Cursor / Trae recipe:**
+
+1. Run `npx mnemos .`
+2. Paste `npx mnemos pack --section=summary --mode=ai` output, **or**
+3. Point the agent at `http://localhost:4000/copilot/pack/local`, **or**
+4. Open `http://localhost:5173/json/local` and click **Copy AI Pack v1**
+
+Full spec: [docs/ai-pack.md](docs/ai-pack.md)
+
+---
+
+## Verified benchmarks
+
+Headline numbers from [mnemos-bench/](mnemos-bench/) — reproducible locally:
+
+```bash
+npm run bench:regression   # fixture regression
+npm run bench:express      # Express app fixture
+npm run bench:ai-eval      # AI blind eval
 ```
 
 ---
 
-## Killer metrics
+## Architecture
 
-**Time To Understanding (TTU)**
+```mermaid
+flowchart TB
+  subgraph ingest [Ingest]
+    SCAN[Scanner · 52 languages] --> PARSE[Lexical parser]
+    PARSE --> GRAPH[Knowledge graph]
+  end
+  subgraph analyze [Analyze]
+    GRAPH --> MEM[.mnemos/ memory]
+  end
+  subgraph output [Outputs]
+    MEM --> UI[Dashboard]
+    MEM --> RPT[Report]
+    MEM --> PACK[AI Pack · MCP]
+    MEM --> MD[context/*.md + graphs]
+  end
+```
 
-| Repository | Without Mnemos | With Mnemos | Savings |
-|------------|----------------|-------------|---------|
-| Express | 51 min | 2 min | **96%** |
-| NestJS | 146 min | 2.6 min | **98%** |
+Every build writes **Mermaid diagrams** into `.mnemos/context/` — see [docs/GRAPHS.md](docs/GRAPHS.md) for the full catalog and [docs/LANGUAGES.md](docs/LANGUAGES.md) for the 50-language parsing pipeline.
 
-**AI Context Efficiency**
-
-| Repository | Raw tokens | Mnemos DNA+context | Compression |
-|------------|------------|-------------------|-------------|
-| Express | 177,553 | 5,942 | **29.9×** |
-| NestJS | 1,024,722 | 36,424 | **28.1×** |
+Details: [docs/architecture.md](docs/architecture.md)
 
 ---
 
-## What Mnemos produces
-
-```
-.mnemos/
-├── project.dna.json          ← AI agents read this first
-├── agent_context.json        ← machine-optimized bundle
-├── report/index.html         ← Vibe / Developer / AI Agent modes
-├── context/architecture.md
-└── snapshots/*.svg           ← terminal-build, benchmark-results, architecture…
-```
-
-### Three report modes
-
-| Mode | Audience | Focus |
-|------|----------|-------|
-| **Vibe** | PMs, founders | Capabilities, user journeys |
-| **Developer** | Engineers | Domains, flows, smells, scores |
-| **AI Agent** | Claude, Cursor, Codex | DNA, agent artifacts |
-
----
-
-## CLI
+## CLI reference
 
 | Command | Description |
 |---------|-------------|
-| `npx mnemos .` | Full experience — analyze, DNA, report |
-| `mnemos ask <question>` | Architecture copilot (graph-aware impact analysis) |
-| `mnemos dna [path]` | Repository DNA summary |
-| `mnemos explain [path]` | Plain-language description |
-| `mnemos build [path]` | Build memory model |
-| `mnemos score [path]` | Health + AI readiness |
-| `mnemos serve [path]` | Memory server for agents (`:4000`) |
-| `mnemos snapshot [path]` | Animated SVG cards (terminal, results, architecture) |
-| `mnemos setup [path]` | Install Cursor rules + AGENTS.md for AI |
-| `mnemos ui` | Launch interactive **developer cockpit** — repos, architecture, flows, terminal, AI inspector |
+| `mnemos .` / `mnemos build` | Analyze repo, write `.mnemos/` |
+| `mnemos ui` | Launch dashboard (`localhost:5173`) |
+| `mnemos serve` | REST API (`localhost:4000`) |
+| `mnemos mcp` | MCP stdio server for IDEs |
+| `mnemos pack` | Print AI Pack v1 (`--section`, `--mode`, `-o`) |
+| `mnemos report` | Generate `report/index.html` (`--report-path report.html`) |
+| `mnemos ask "…"` | Architecture copilot |
+| `mnemos setup` | Install AGENTS.md + Cursor rules |
+| `mnemos explain` | Plain-language repo summary |
+| `mnemos score` | Health score breakdown |
+| `mnemos flows` | List execution flows |
+| `mnemos impact` | Blast radius analysis |
+
+```bash
+mnemos --help   # full flag list
+```
 
 ---
 
-## Development
+## Shared runtime
 
-```bash
-git clone <repo>
-cd mnemos
-npm install
-npm run build
-npx mnemos .
-```
+`MnemosRuntime` in `packages/core` is the single source of truth for REST (`mnemos serve`) and MCP (`mnemos mcp`):
 
-Monorepo: `@mnemos/core` · `@mnemos/cli` · `@mnemos/ui`
+- Parallel load of memory, graph, and BM25 search index
+- Typed `AgentEnvelope` responses
+- Actionable errors (`NOT_BUILT`, `NOT_FOUND`, `GRAPH_UNAVAILABLE`)
+- Protocol parity — same queries via HTTP or MCP
 
-### Dashboard (`mnemos ui`)
+### MCP tools (15)
 
-The UI is a full **repository intelligence cockpit** — not a static report viewer.
+`query_graph` · `get_dna` · `explain_repo` · `onboard` · `get_node` · `get_neighbors` · `shortest_path` · `impact_analysis` · `list_domains` · `list_flows` · `list_capabilities` · `search` · `get_health` · `review_diff` · `refresh_memory`
 
-| View | What it shows |
-|------|----------------|
-| **Platform overview** | All repos, aggregate health, AI readiness, quick actions |
-| **Repo workspace** | Overview, architecture, flows, code map, history, AI context |
-| **AI Inspector** | Auth summaries, routes, architecture excerpts, start-here tasks |
-| **Terminal panel** | Embedded `mnemos` CLI (`build`, `ask`, `flows`, `impact`) |
+---
 
-See [packages/ui/README.md](./packages/ui/README.md) for layout, shortcuts, and agent workflows.
+## Contributing
 
-## License
+See [docs/contributing.md](docs/contributing.md). PRs welcome.
 
-MIT
+## Roadmap
+
+[docs/roadmap.md](docs/roadmap.md)
+
+---
+
+## License · Security · Code of Conduct
+
+- [MIT](LICENSE)
+- [Security policy](SECURITY.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)

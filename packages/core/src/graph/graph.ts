@@ -49,12 +49,24 @@ export function addEdge(
 }
 
 export function getNodesByKind(graph: MnemosGraph, kind: NodeKind): GraphNode[] {
+  const cacheKey = `${kind}`;
+  let byKind = nodesByKindCache.get(graph);
+  if (!byKind) {
+    byKind = new Map();
+    nodesByKindCache.set(graph, byKind);
+  }
+  const cached = byKind.get(cacheKey);
+  if (cached) return cached;
+
   const nodes: GraphNode[] = [];
   graph.forEachNode((_node: string, attrs: GraphNode) => {
     if (attrs.kind === kind) nodes.push(attrs);
   });
+  byKind.set(cacheKey, nodes);
   return nodes;
 }
+
+const nodesByKindCache = new WeakMap<MnemosGraph, Map<string, GraphNode[]>>();
 
 export function getNeighbors(
   graph: MnemosGraph,
@@ -84,10 +96,54 @@ export function getNeighbors(
   return neighbors;
 }
 
-export function bfsPaths(
+export function shortestPath(
+  graph: MnemosGraph,
+  fromId: string,
+  toId: string,
+  maxDepth = 20,
+): string[] | undefined {
+  if (fromId === toId) return [fromId];
+  if (!graph.hasNode(fromId) || !graph.hasNode(toId)) return undefined;
+
+  const queue: Array<{ id: string; path: string[] }> = [{ id: fromId, path: [fromId] }];
+  const visited = new Set<string>([fromId]);
+
+  while (queue.length > 0) {
+    const { id, path: currentPath } = queue.shift()!;
+    if (currentPath.length > maxDepth) continue;
+
+    for (const neighbor of graph.outNeighbors(id)) {
+      if (neighbor === toId) return [...currentPath, neighbor];
+      if (visited.has(neighbor)) continue;
+      visited.add(neighbor);
+      queue.push({ id: neighbor, path: [...currentPath, neighbor] });
+    }
+  }
+
+  // Try reverse direction (undirected fallback for dependency graphs)
+  const reverseQueue: Array<{ id: string; path: string[] }> = [{ id: fromId, path: [fromId] }];
+  const reverseVisited = new Set<string>([fromId]);
+
+  while (reverseQueue.length > 0) {
+    const { id, path: currentPath } = reverseQueue.shift()!;
+    if (currentPath.length > maxDepth) continue;
+
+    for (const neighbor of [...graph.outNeighbors(id), ...graph.inNeighbors(id)]) {
+      if (neighbor === toId) return [...currentPath, neighbor];
+      if (reverseVisited.has(neighbor)) continue;
+      reverseVisited.add(neighbor);
+      reverseQueue.push({ id: neighbor, path: [...currentPath, neighbor] });
+    }
+  }
+
+  return undefined;
+}
+
+function bfsReachable(
   graph: MnemosGraph,
   startId: string,
-  maxDepth = 6,
+  maxDepth: number,
+  direction: 'out' | 'in',
 ): Map<string, string[]> {
   const paths = new Map<string, string[]>();
   const queue: Array<{ id: string; path: string[] }> = [{ id: startId, path: [startId] }];
@@ -97,7 +153,8 @@ export function bfsPaths(
     const { id, path: currentPath } = queue.shift()!;
     if (currentPath.length > maxDepth) continue;
 
-    for (const neighbor of graph.outNeighbors(id)) {
+    const neighbors = direction === 'out' ? graph.outNeighbors(id) : graph.inNeighbors(id);
+    for (const neighbor of neighbors) {
       if (visited.has(neighbor)) continue;
       visited.add(neighbor);
       const newPath = [...currentPath, neighbor];
@@ -107,6 +164,22 @@ export function bfsPaths(
   }
 
   return paths;
+}
+
+export function bfsPaths(
+  graph: MnemosGraph,
+  startId: string,
+  maxDepth = 6,
+): Map<string, string[]> {
+  return bfsReachable(graph, startId, maxDepth, 'out');
+}
+
+export function reverseBfsPaths(
+  graph: MnemosGraph,
+  startId: string,
+  maxDepth = 6,
+): Map<string, string[]> {
+  return bfsReachable(graph, startId, maxDepth, 'in');
 }
 
 export function toSerializable(graph: MnemosGraph): { nodes: GraphNode[]; edges: GraphEdge[] } {

@@ -2,6 +2,8 @@ import type { MemoryModel } from './types.js';
 
 import { explainRepository } from './explain.js';
 
+import { buildOnboardGuide } from './onboard.js';
+
 import { computeDomainHeatmap } from './analysis/heatmap.js';
 
 import { analyzeImpact, formatImpactReport } from './analysis/impact.js';
@@ -22,6 +24,8 @@ import {
 
   type CopilotIntent,
 
+  type MemorySearchIndex,
+
 } from './search/index.js';
 
 
@@ -29,6 +33,8 @@ import {
 export interface CopilotOptions {
 
   graph?: MnemosGraph;
+
+  searchIndex?: MemorySearchIndex;
 
 }
 
@@ -50,49 +56,43 @@ export interface CopilotAnswer {
 
   hits?: SearchHit[];
 
+  tookMs?: number;
+
 }
 
 
 
 export function askCopilot(memory: MemoryModel, question: string, options: CopilotOptions = {}): CopilotAnswer {
 
-  const index = buildSearchIndex(memory);
-
+  const started = Date.now();
+  const index = options.searchIndex ?? buildSearchIndex(memory);
   const searchResult = searchMemory(index, question, { limit: 8 });
-
   const classification = classifyIntent(question);
 
-  const explain = explainRepository(memory);
-
-  const heatmap = computeDomainHeatmap(memory);
+  let explainCache: ReturnType<typeof explainRepository> | undefined;
+  let heatmapCache: ReturnType<typeof computeDomainHeatmap> | undefined;
+  const getExplain = () => (explainCache ??= explainRepository(memory));
+  const getHeatmap = () => (heatmapCache ??= computeDomainHeatmap(memory));
 
   const capabilities = memory.capabilities ?? [];
-
   const journeys = memory.journeys ?? [];
-
-
-
   const baseHits = searchResult.hits;
-
   const relatedTopics = baseHits.slice(0, 5).map((h) => h.title);
+  const tookMs = () => Date.now() - started;
 
-
+  const wrap = (answer: CopilotAnswer): CopilotAnswer => ({ ...answer, tookMs: tookMs() });
 
   const impactTarget = extractImpactTarget(question) ?? classification.target;
 
   if (/what breaks|what happens if|impact of|blast radius|affected by/i.test(question)) {
-
-    return answerImpactQuestion(memory, question, impactTarget, baseHits, options.graph);
-
+    return wrap(answerImpactQuestion(memory, question, impactTarget, baseHits, options.graph));
   }
-
-
 
   switch (classification.intent) {
 
-    case 'overview':
-
-      return {
+    case 'overview': {
+      const explain = getExplain();
+      return wrap({
 
         question,
 
@@ -108,67 +108,78 @@ export function askCopilot(memory: MemoryModel, question: string, options: Copil
 
         hits: baseHits,
 
-      };
+      });
+    }
 
 
 
     case 'flow':
 
-      return answerFlowQuestion(memory, question, journeys, baseHits);
+      return wrap(answerFlowQuestion(memory, question, journeys, baseHits));
 
 
 
     case 'health':
 
-      return answerHealthQuestion(memory, explain, heatmap, question);
+      return wrap(answerHealthQuestion(memory, getExplain(), getHeatmap(), question));
+
+
+
+    case 'start':
+
+      return wrap(answerStartQuestion(memory, question, getExplain(), baseHits));
 
 
 
     case 'auth':
 
       if (/where.*(login|sign-?in).*start|where.*(login|sign-?in)/i.test(question)) {
-        return answerLoginStartQuestion(memory, question, baseHits);
+        return wrap(answerLoginStartQuestion(memory, question, baseHits));
       }
 
-      return answerThemedQuestion(memory, question, capabilities, /auth|identity|login|sign.?in/i, 'Authentication', baseHits);
+      return wrap(answerThemedQuestion(memory, question, capabilities, /auth|identity|login|sign.?in/i, 'Authentication', baseHits));
 
 
 
     case 'payment':
 
-      return answerThemedQuestion(memory, question, capabilities, /payment|billing|checkout|invoice|subscription/i, 'Payments', baseHits);
+      return wrap(answerThemedQuestion(memory, question, capabilities, /payment|billing|checkout|invoice|subscription/i, 'Payments', baseHits));
 
 
 
     case 'impact':
 
+      return wrap(answerImpactQuestion(memory, question, impactTarget, baseHits, options.graph));
+
+
+
     case 'dependency':
 
-      return answerImpactQuestion(memory, question, impactTarget, baseHits, options.graph);
+      return wrap(answerDependencyQuestion(memory, question, classification.target ?? impactTarget, baseHits, options.graph));
 
 
 
     case 'critical':
 
-      return answerCriticalQuestion(memory, question, classification.target, heatmap, explain, baseHits);
+      return wrap(answerCriticalQuestion(memory, question, classification.target, getHeatmap(), getExplain(), baseHits));
 
 
 
     case 'smell':
 
-      return answerSmellQuestion(memory, baseHits);
+      return wrap(answerSmellQuestion(memory, baseHits));
 
 
 
     case 'list':
 
-      return answerListQuestion(memory, question, baseHits);
+      return wrap(answerListQuestion(memory, question, baseHits));
 
 
 
     default:
 
-      return answerFromSearch(memory, question, explain, baseHits, classification);
+      return wrap(answerFromSearch(memory, question, getExplain(), baseHits, classification));
 
   }
 
@@ -238,6 +249,35 @@ function answerFromSearch(
 
   };
 
+}
+
+
+
+function answerStartQuestion(
+  memory: MemoryModel,
+  question: string,
+  explain: ReturnType<typeof explainRepository>,
+  hits: SearchHit[],
+): CopilotAnswer {
+  const guide = buildOnboardGuide(memory);
+  const steps = guide.steps.slice(0, 5);
+
+  const lines = steps.map(
+    (s, i) =>
+      `${i + 1}. **${s.title}** (~${s.estimatedMinutes} min) — ${s.description}${
+        s.entryPoints.length > 0 ? `\n   Entry: ${s.entryPoints.slice(0, 2).join(', ')}` : ''
+      }`,
+  );
+
+  return {
+    question,
+    answer: `**Developer onboarding for ${memory.repository}** (no IDE required — use \`mnemos ui\`, \`mnemos ask\`, or the HTML report)\n\n${explain.oneLiner}\n\n**Start here:**\n${lines.join('\n\n')}\n\n**Estimated learning time:** ${guide.estimatedLearningHours}h\n\nTip: run \`mnemos inspect <domain>\` or open the Developer report mode for deeper architecture maps.`,
+    confidence: 0.91,
+    sources: ['onboard.json', 'domains.json', 'repository_summary.md'],
+    relatedTopics: guide.startHere,
+    intent: 'start',
+    hits,
+  };
 }
 
 
@@ -501,7 +541,7 @@ function answerImpactQuestion(
       const nodeName = graph.getNodeAttributes(impact.node).name;
       return {
         question,
-        answer: `Changing **${nodeName}** affects **${impact.totalAffected}** nodes.\n\n**Dependencies / blast radius:**\n• APIs affected: ${impact.affectedApis.length}\n• Files affected: ${impact.affectedFiles.length}\n• Domains affected: ${impact.affectedDomains.length}\n• Tests affected: ${impact.affectedTests.length}\n\n${impact.affectedFiles.slice(0, 8).map((f) => `• ${f}`).join('\n')}`,
+        answer: `Changing **${nodeName}** affects **${impact.totalAffected}** nodes (forward + reverse).\n\n**Dependencies / blast radius:**\n• APIs affected: ${impact.affectedApis.length}\n• Files affected: ${impact.affectedFiles.length}\n• Domains affected: ${impact.affectedDomains.length}\n• Tests affected: ${impact.affectedTests.length}\n\n${impact.affectedFiles.slice(0, 8).map((f) => `• ${f}`).join('\n')}`,
         confidence: 0.92,
         sources: ['dependencies.json', 'graph.json', 'critical_paths.json'],
         relatedTopics: impact.affectedApis.slice(0, 4),
@@ -598,9 +638,27 @@ function answerDependencyQuestion(
 
   hits: SearchHit[],
 
+  graph?: MnemosGraph,
+
 ): CopilotAnswer {
 
   const q = question.toLowerCase();
+
+  if (graph && target) {
+    const impact = analyzeImpact(graph, target);
+    if (impact && impact.totalAffected > 0) {
+      const nodeName = graph.getNodeAttributes(impact.node).name;
+      return {
+        question,
+        answer: `**Modules that depend on ${nodeName}** (reverse dependency closure):\n\n• Total connected nodes: **${impact.totalAffected}**\n• Files importers: ${impact.affectedFiles.slice(0, 10).join(', ') || 'none'}\n• APIs upstream: ${impact.affectedApis.slice(0, 6).join(', ') || 'none'}\n• Tests that may break: ${impact.affectedTests.slice(0, 6).join(', ') || 'none'}`,
+        confidence: 0.9,
+        sources: ['graph.json', 'dependencies.json'],
+        relatedTopics: impact.affectedFiles.slice(0, 4),
+        intent: 'dependency',
+        hits,
+      };
+    }
+  }
 
   const domainMatch =
 

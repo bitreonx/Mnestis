@@ -1,5 +1,6 @@
 import type { MemoryModel } from '../types';
 import type { BuildHistoryEntry } from '../lib/workspace';
+import { formatScoreLabel } from '@/lib/format-score';
 
 interface BuildHistoryViewProps {
   history: BuildHistoryEntry[];
@@ -47,7 +48,7 @@ export function BuildHistoryView({ history, memory }: BuildHistoryViewProps) {
                 <span>{entry.domains} domains</span>
                 <span>{entry.flows} flows</span>
                 <span>health {entry.health || '—'}</span>
-                <span>AI {entry.aiReadiness || '—'}%</span>
+                <span>{formatScoreLabel('AI readiness', entry.aiReadiness || null)}</span>
                 <span>{entry.smells} smells</span>
                 <span>{(entry.durationMs / 1000).toFixed(1)}s</span>
               </div>

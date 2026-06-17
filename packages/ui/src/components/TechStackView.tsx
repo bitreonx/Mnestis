@@ -36,6 +36,11 @@ export function TechStackView({ memory }: { memory: MemoryModel }) {
 
         <section className="glass-card">
           <h4>Languages</h4>
+          <p className="ts-lang-note">
+            Mnemos analyzes 52 languages with lexical parsing — charts in{' '}
+            <code>.mnemos/context/languages.md</code> and{' '}
+            <code>.mnemos/context/graphs.md</code>.
+          </p>
           <div className="lang-bars">
             {langs.map(([lang, count]) => (
               <div key={lang} className="lang-row">

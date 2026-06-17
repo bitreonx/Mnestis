@@ -17,3 +17,14 @@ __pycache__/
 build/
 coverage/
 *.tsbuildinfo
+*dabt*
+.superpowers/
+
+# Local AI/editor tooling (not part of the public project)
+.claude/
+.cursor/
+.trae/
+packages/core/debug-parse.mjs
+
+# Local workspace config — copy mnemos.workspace.example.json to create your own
+packages/ui/mnemos.workspace.json

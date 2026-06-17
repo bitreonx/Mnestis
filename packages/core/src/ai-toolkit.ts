@@ -4,6 +4,14 @@ import type { DiscoveredJourney } from './analysis/journeys.js';
 import type { AgentContext } from './agent-mode.js';
 import { explainRepository } from './explain.js';
 import { computeAiReadiness } from './ai-readiness.js';
+import { SUPPORTED_LANGUAGE_COUNT } from './languages/index.js';
+import {
+  buildLanguagePipelineMermaid,
+  buildExtractorRoutingMermaid,
+  buildLanguageFamiliesMermaid,
+  buildRepositoryLanguagePieMermaid,
+} from './languages/docs.js';
+import { buildDomainGraphMermaid } from './graph/mermaid.js';
 
 export interface AiToolkit {
   agentsMd: string;
@@ -45,7 +53,11 @@ export function buildContextFiles(memory: MemoryModel): string[] {
     '.mnemos/project.dna.json',
     '.mnemos/agent_context.json',
     '.mnemos/context/architecture.md',
+    '.mnemos/context/languages.md',
+    '.mnemos/context/README.md',
+    '.mnemos/context/graphs.md',
     '.mnemos/context/flows.md',
+    '.mnemos/context/domains.md',
   ]);
 
   for (const d of memory.domains.slice(0, 5)) {
@@ -100,6 +112,33 @@ export function buildAgentsMd(
     `- **AI readiness:** ${ai.score}/100`,
     '',
     memory.architecture.summary,
+    '',
+    `## Language Support`,
+    '',
+    `Mnemos analyzed this repo with **${SUPPORTED_LANGUAGE_COUNT}** supported languages engine-wide.`,
+    `Detected here: ${Object.keys(memory.architecture.languages ?? {}).length} language(s), ${Object.values(memory.architecture.languages ?? {}).reduce((s, n) => s + n, 0).toLocaleString()} source files.`,
+    '',
+    'Read `.mnemos/context/README.md` for the full diagram index.',
+    'Read `.mnemos/context/languages.md` for file distribution charts and the parsing pipeline graph.',
+    'Read `.mnemos/context/graphs.md` for domain, flow, dependency, and risk Mermaid diagrams.',
+    '',
+    buildDomainGraphMermaid(memory),
+    '',
+    '### Language distribution (this repo)',
+    '',
+    buildRepositoryLanguagePieMermaid(memory.architecture.languages ?? {}),
+    '',
+    '### Extractor routing',
+    '',
+    buildExtractorRoutingMermaid(),
+    '',
+    '### Parsing pipeline',
+    '',
+    buildLanguagePipelineMermaid(),
+    '',
+    '### Language families (engine coverage)',
+    '',
+    buildLanguageFamiliesMermaid(),
     '',
   ];
 
@@ -177,10 +216,12 @@ alwaysApply: true
 Before reading source files or making changes, load repository context from Mnemos:
 
 1. **Read first:** \`.mnemos/project.dna.json\` and \`.mnemos/agent_context.json\`
-2. **Architecture:** ${memory.architecture.type} — ${memory.architecture.summary.slice(0, 200)}
-3. **Capabilities:** ${caps || 'see DNA'}
-4. **Domains:** ${domains || 'see DNA'}
-5. **Key files:** ${files}
+2. **Languages:** \`.mnemos/context/languages.md\` — stack charts + ${SUPPORTED_LANGUAGE_COUNT}-language parsing pipeline
+3. **Graphs:** \`.mnemos/context/graphs.md\` — domain, flow, dependency, and risk Mermaid diagrams
+4. **Architecture:** ${memory.architecture.type} — ${memory.architecture.summary.slice(0, 200)}
+5. **Capabilities:** ${caps || 'see DNA'}
+6. **Domains:** ${domains || 'see DNA'}
+7. **Key files:** ${files}
 
 ## Rules for AI-assisted coding
 
@@ -247,6 +288,7 @@ Add these files to your Claude Project knowledge:
 - \`.mnemos/project.dna.json\`
 - \`.mnemos/agent_context.json\`
 - \`.mnemos/context/architecture.md\`
+- \`.mnemos/context/languages.md\`
 
 ${context.summary}
 
@@ -272,4 +314,102 @@ export function buildAiToolkit(
     suggestedPrompts: buildSuggestedPrompts(memory),
     contextFiles: buildContextFiles(memory),
   };
+}
+
+const MNEMOS_MARKER_START = '<!-- mnemos:start -->';
+const MNEMOS_MARKER_END = '<!-- mnemos:end -->';
+
+export function buildSkillMd(memory: MemoryModel, context: AgentContext): string {
+  const caps = context.capabilities.slice(0, 6).map((c) => c.name).join(', ');
+  const domains = context.domains.slice(0, 6).map((d) => d.name).join(', ');
+  const files = buildContextFiles(memory).slice(0, 8).map((f) => `\`${f}\``).join(', ');
+
+  return `# Mnemos Architecture Skill
+
+Use Mnemos repository memory as ground truth before reading source files.
+
+## Context files (read first)
+
+${files}
+
+## Architecture
+
+- **Repository:** ${memory.repository}
+- **Type:** ${memory.architecture.type}
+- **Summary:** ${memory.architecture.summary.slice(0, 300)}
+- **Capabilities:** ${caps || 'see DNA'}
+- **Domains:** ${domains || 'see DNA'}
+
+## Rules
+
+- Read \`.mnemos/project.dna.json\` and \`.mnemos/agent_context.json\` before exploring code
+- Check blast radius before editing central services: \`mnemos ask "what breaks if [service] changes?"\`
+- Prefer domain entry points over whole-repo grepping
+- Run \`mnemos build\` after significant architectural changes
+
+## Starter prompts
+
+${buildSuggestedPrompts(memory)
+  .slice(0, 6)
+  .map((p) => `- ${p}`)
+  .join('\n')}
+`;
+}
+
+export function buildSteeringMd(memory: MemoryModel, context: AgentContext): string {
+  return `# Mnemos Steering — ${memory.repository}
+
+${context.summary}
+
+**Architecture:** ${memory.architecture.type}
+**Top capabilities:** ${context.mental_model.top_capabilities.join(', ')}
+**Central domains:** ${context.mental_model.central_domains.join(', ')}
+
+Always consult Mnemos DNA (\`.mnemos/project.dna.json\`) before making architectural decisions.
+`;
+}
+
+export function buildVscodeInstructions(memory: MemoryModel, context: AgentContext): string {
+  return buildSkillMd(memory, context).replace(
+    '# Mnemos Architecture Skill',
+    '# Mnemos — VS Code Copilot Instructions',
+  );
+}
+
+export function buildCopilotInstructions(memory: MemoryModel, context: AgentContext): string {
+  return `# GitHub Copilot Instructions — ${memory.repository}
+
+${buildSkillMd(memory, context)}
+
+## Copilot-specific
+
+- Reference \`.mnemos/project.dna.json\` when answering architecture questions
+- Suggest \`mnemos review\` before large refactors
+- Keep changes within detected domain boundaries
+`;
+}
+
+export function buildWindsurfRule(memory: MemoryModel, context: AgentContext): string {
+  return buildCursorRule(memory, context).replace(/^---[\s\S]*?---\n\n/, '');
+}
+
+export function buildGeminiMd(memory: MemoryModel, context: AgentContext): string {
+  return `# ${memory.repository} — Gemini Project Context
+
+${MNEMOS_MARKER_START}
+${buildClaudeProjectInstructions(memory, context)}
+${MNEMOS_MARKER_END}
+`;
+}
+
+export function buildClaudeMdSection(memory: MemoryModel, context: AgentContext): string {
+  return `\n${MNEMOS_MARKER_START}\n${buildClaudeProjectInstructions(memory, context)}\n${MNEMOS_MARKER_END}\n`;
+}
+
+export function stripMnemosSection(content: string): string {
+  const start = content.indexOf(MNEMOS_MARKER_START);
+  if (start === -1) return content;
+  const end = content.indexOf(MNEMOS_MARKER_END, start);
+  if (end === -1) return content.slice(0, start).trimEnd();
+  return (content.slice(0, start) + content.slice(end + MNEMOS_MARKER_END.length)).trimEnd();
 }

@@ -1,4 +1,5 @@
 import { renderReport } from './report-template.js';
+import { buildAiPack, AI_PACK_VERSION } from './ai-pack.js';
 import type {
   ArchitectureSmell,
   ApiEndpoint,
@@ -90,6 +91,10 @@ export interface ReportData {
   criticalPaths: CriticalPath[];
   smells: ArchitectureSmell[];
   deadCode: DeadCodeEntry[];
+  aiPackVersion: string;
+  aiPackNarrative: string;
+  aiReadinessOverall: number;
+  topIssues: Array<{ title: string; severity: string; summary: string }>;
 }
 
 export function generateReport(memory: MemoryModel): string {
@@ -103,6 +108,7 @@ export function computeMemoryScore(memory: MemoryModel): MemoryScore {
 
 export function buildReportData(memory: MemoryModel): ReportData {
   const memoryScore = computeMemoryScore(memory);
+  const pack = buildAiPack(memory, { mode: 'ai', repoId: memory.repository });
   return {
     repository: memory.repository,
     builtAt: memory.builtAt,
@@ -117,6 +123,14 @@ export function buildReportData(memory: MemoryModel): ReportData {
     criticalPaths: memory.criticalPaths,
     smells: memory.smells,
     deadCode: memory.deadCode,
+    aiPackVersion: AI_PACK_VERSION,
+    aiPackNarrative: pack.score.narrative,
+    aiReadinessOverall: pack.score.aiReadinessOverall,
+    topIssues: pack.issues.slice(0, 6).map((i) => ({
+      title: i.title,
+      severity: i.severity,
+      summary: i.summary,
+    })),
   };
 }
 
@@ -207,10 +221,23 @@ function _computeMemoryScore(memory: MemoryModel): MemoryScore {
     ? Math.round((domainsWithDesc / memory.domains.length) * 100)
     : 100;
 
-  const serviceDomainById = new Map(memory.services.map((s) => [s.id, s.domain]));
+  const serviceDomainByName = new Map<string, string>();
+  const serviceDomainById = new Map<string, string>();
+  for (const s of memory.services) {
+    if (s.domain) {
+      serviceDomainByName.set(s.name, s.domain);
+      serviceDomainById.set(s.id, s.domain);
+    }
+  }
+
+  const resolveDepDomain = (key: string): string | undefined =>
+    serviceDomainByName.get(key) ?? serviceDomainById.get(key) ?? memory.services.find(
+      (s) => s.path === key || s.path.endsWith(`/${key}`) || key.includes(s.name),
+    )?.domain;
+
   const crossDomainDeps = memory.dependencies.filter((d) => {
-    const fromDomain = serviceDomainById.get(d.from);
-    const toDomain = serviceDomainById.get(d.to);
+    const fromDomain = resolveDepDomain(d.from);
+    const toDomain = resolveDepDomain(d.to);
     return fromDomain && toDomain && fromDomain !== toDomain;
   }).length;
   const dependencyComplexity = Math.max(0, Math.min(100, Math.round(100 - crossDomainDeps * 1.5)));

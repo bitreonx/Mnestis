@@ -169,12 +169,16 @@ function labelPropagation(graph: MnemosGraph): Record<string, number> {
     labels.set(node, nextLabel++);
   });
 
-  const nodes = graph.nodes();
+  const nodes = [...graph.nodes()].sort((a, b) => {
+    const pathA = (graph.getNodeAttributes(a).path ?? a).replace(/\\/g, '/');
+    const pathB = (graph.getNodeAttributes(b).path ?? b).replace(/\\/g, '/');
+    return pathA.localeCompare(pathB) || a.localeCompare(b);
+  });
+
   for (let iter = 0; iter < 25; iter++) {
     let changed = false;
-    const shuffled = [...nodes].sort(() => Math.random() - 0.5);
 
-    for (const node of shuffled) {
+    for (const node of nodes) {
       const neighborLabels = new Map<number, number>();
       for (const neighbor of graph.outNeighbors(node)) {
         const label = labels.get(neighbor)!;
@@ -186,7 +190,10 @@ function labelPropagation(graph: MnemosGraph): Record<string, number> {
       }
       if (neighborLabels.size === 0) continue;
 
-      const best = [...neighborLabels.entries()].sort((a, b) => b[1] - a[1])[0]![0];
+      const best = [...neighborLabels.entries()].sort((a, b) => {
+        if (b[1] !== a[1]) return b[1] - a[1];
+        return a[0] - b[0];
+      })[0]![0];
       if (labels.get(node) !== best) {
         labels.set(node, best);
         changed = true;

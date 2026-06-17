@@ -53,6 +53,7 @@ export function BottomPanel({
           <input
             className="cockpit-bottom-search"
             placeholder="Filter output…"
+            aria-label="Filter terminal output"
             value={outputSearch}
             onChange={(e) => setOutputSearch(e.target.value)}
           />

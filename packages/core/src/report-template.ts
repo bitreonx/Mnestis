@@ -1,33 +1,21 @@
 import type { ReportData } from './report.js';
+import { REPORT_CSS, REPORT_FONT_LINK, renderHealthRingHtml } from './report/design-tokens.js';
 
-const STYLES = `
-  :root {
-    --bg: #fbfbfd;
-    --surface: #ffffff;
-    --surface-2: #f5f5f7;
-    --border: rgba(0, 0, 0, 0.08);
-    --border-strong: rgba(0, 0, 0, 0.14);
-    --text: #1d1d1f;
-    --text-2: #515154;
-    --text-3: #86868b;
-    --accent: #5e5ce6;
-    --accent-2: #0a84ff;
-    --good: #30d158;
-    --warn: #ff9f0a;
-    --bad: #ff453a;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
-    --radius: 14px;
-    --radius-sm: 8px;
-    --serif: ui-serif, "New York", Georgia, serif;
-    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  }
+const SCORE_DEFINITIONS: Record<string, string> = {
+  Discoverability: 'How quickly a human or AI can find the right files, domains, and entry points.',
+  'Architecture Clarity': 'How understandable the structure is after penalties from detected smells.',
+  Coupling: 'How contained modules stay vs pulling across services.',
+  Documentation: 'How well domains and system shape are described in generated context.',
+  'Dependency Complexity': 'Cross-domain and dependency sprawl increasing change risk.',
+};
+
+const STYLES = REPORT_CSS + `
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
     font-size: 15px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
@@ -41,8 +29,8 @@ const STYLES = `
     z-index: 10;
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
-    background: rgba(251, 251, 253, 0.78);
-    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+    border-bottom: 1px solid var(--color-border-subtle);
   }
   .topbar-inner {
     max-width: 1200px;
@@ -81,6 +69,75 @@ const STYLES = `
     color: var(--text-2);
   }
   .score-num { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .dashboard-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .dashboard-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .preview-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.14);
+    color: #8a5500;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  @media (prefers-color-scheme: dark) {
+    .preview-badge { color: #fbbf24; background: rgba(245, 158, 11, 0.18); }
+  }
+
+  .health-glance {
+    text-align: center;
+    padding: 48px 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .health-glance-num {
+    font-size: 72px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .health-glance-label {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .health-glance-story {
+    margin: 16px auto 0;
+    max-width: 480px;
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .health-glance-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .health-glance-link:hover { text-decoration: underline; }
 
   .toggle {
     display: inline-flex;
@@ -156,6 +213,8 @@ const STYLES = `
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
     margin-bottom: 20px;
   }
   .section-title {
@@ -165,6 +224,14 @@ const STYLES = `
     margin: 0;
   }
   .section-sub { color: var(--text-3); font-size: 13px; }
+  .section-dash-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .section-dash-link:hover { text-decoration: underline; }
 
   .grid {
     display: grid;
@@ -283,12 +350,36 @@ const STYLES = `
   .journey-key { color: var(--text-3); font-size: 12.5px; }
   .journey-val { color: var(--text); }
 
-  .dev-only { display: none; }
-  .agent-only { display: none; }
-  body[data-mode="developer"] .vibe-only { display: none; }
-  body[data-mode="developer"] .dev-only { display: block; }
-  body[data-mode="agent"] .vibe-only { display: none; }
-  body[data-mode="agent"] .agent-only { display: block; }
+  .coder-only { display: none; }
+  .ai-only { display: none; }
+  body[data-mode="coder"] .vibe-only { display: none; }
+  body[data-mode="coder"] .coder-only { display: block; }
+  body[data-mode="ai"] .vibe-only { display: none; }
+  body[data-mode="ai"] .ai-only { display: block; }
+  .artifact-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+  }
+  .artifact-legend span, .artifact-legend a {
+    padding: 4px 10px;
+    border-radius: var(--radius-xs);
+    color: var(--text-2);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+  }
+  .artifact-legend .active {
+    background: var(--color-surface);
+    color: var(--color-fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    font-weight: 600;
+  }
 
   .journey-flow {
     display: flex;
@@ -420,6 +511,42 @@ const STYLES = `
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     border-radius: 2px;
   }
+  .score-cell .desc {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.45;
+  }
+  .health-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 28px;
+    text-align: left;
+  }
+  .health-mini-item {
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .health-mini-item .lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .health-mini-item .val { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .copy-btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { color: var(--good); border-color: var(--good); }
+  .agent-json-wrap { position: relative; }
+  .agent-json-actions { display: flex; justify-content: flex-end; margin-bottom: 8px; }
 
   table {
     width: 100%;
@@ -504,8 +631,129 @@ const STYLES = `
   @media (max-width: 720px) {
     main { padding: 32px 18px 60px; }
     .hero-title { font-size: 32px; }
-    .topbar-inner { padding: 12px 18px; flex-wrap: wrap; }
+    .topbar-inner { padding: 12px 18px; flex-wrap: wrap; gap: 10px; }
+    .topbar-right { width: 100%; flex-wrap: wrap; margin-left: 0; }
+    .artifact-legend { flex-wrap: wrap; }
+    .search-box { width: 100%; max-width: none; }
     .grid, .grid-tight { grid-template-columns: 1fr; }
+    .mode-banner { flex-direction: column; }
+    .persona-grid { grid-template-columns: 1fr; }
+    .health-mini-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media print {
+    .topbar, .mode-banner, .toggle, .search-box, .dashboard-pill, .copy-btn, .section-dash-link { display: none !important; }
+    body { background: #fff; color: #111; }
+    .card, .health-glance, details { break-inside: avoid; box-shadow: none; }
+    main { padding-top: 24px; }
+  }
+
+  .dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .dashboard-btn:hover { opacity: 0.88; }
+  .dashboard-btn svg { flex-shrink: 0; }
+
+  .mode-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, rgba(94,92,230,0.06), rgba(10,132,255,0.06));
+    border: 1px solid rgba(94,92,230,0.12);
+    border-radius: var(--radius);
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: var(--text-2);
+    position: relative;
+  }
+  .mode-banner-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+    line-height: 1;
+  }
+  .mode-banner strong { color: var(--text); }
+  .mode-banner code { font-family: var(--mono); background: rgba(94,92,230,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+  .whats-next {
+    margin-top: 64px;
+    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .whats-next h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .whats-next > p {
+    color: var(--text-2);
+    font-size: 14px;
+    margin: 0 0 20px;
+  }
+  .persona-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .persona-card {
+    padding: 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .persona-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .persona-card p {
+    color: var(--text-2);
+    font-size: 13px;
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .persona-cmd {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(94,92,230,0.06);
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .persona-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
   }
 `;
 
@@ -515,13 +763,32 @@ const SCRIPT = `
     document.querySelectorAll('.toggle button').forEach((b) => {
       b.classList.toggle('active', b.dataset.mode === mode);
     });
-    try { localStorage.setItem('mnemos-mode', mode); } catch (_) {}
+    const dash = document.getElementById('dashboard-link');
+    const dashPill = document.getElementById('dashboard-link-pill');
+    if (dash || dashPill) {
+      const repo = (dash || dashPill).dataset.repo || 'local';
+      const paths = { vibe: '/vibe/' + repo + '/story', ai: '/ai/' + repo + '/home', coder: '/coder/' + repo + '/overview' };
+      const href = 'http://localhost:5173' + (paths[mode] || paths.coder);
+      if (dash) dash.href = href;
+      if (dashPill) dashPill.href = href;
+    }
+    try {
+      localStorage.setItem('mnemos.mode', mode);
+      const u = new URL(window.location.href);
+      u.searchParams.set('mode', mode);
+      history.replaceState(null, '', u.pathname + u.search);
+    } catch (_) {}
   }
   document.querySelectorAll('.toggle button').forEach((b) => {
     b.addEventListener('click', () => setMode(b.dataset.mode));
   });
   let saved = 'vibe';
-  try { saved = localStorage.getItem('mnemos-mode') || 'vibe'; } catch (_) {}
+  try {
+    const params = new URLSearchParams(window.location.search);
+    saved = params.get('mode') || localStorage.getItem('mnemos.mode') || localStorage.getItem('mnemos-mode') || 'vibe';
+  } catch (_) {}
+  if (saved === 'developer') saved = 'coder';
+  if (saved === 'agent') saved = 'ai';
   setMode(saved);
 
   const searchInput = document.getElementById('report-search');
@@ -534,6 +801,46 @@ const SCRIPT = `
       });
     });
   }
+
+  // Mode explainer banner
+  const banner = document.getElementById('mode-banner');
+  const bannerClose = document.getElementById('mode-banner-close');
+  if (banner && bannerClose) {
+    let dismissed = false;
+    try { dismissed = localStorage.getItem('mnemos-banner-dismissed') === '1'; } catch (_) {}
+    if (dismissed) banner.style.display = 'none';
+    bannerClose.addEventListener('click', () => {
+      banner.style.display = 'none';
+      try { localStorage.setItem('mnemos-banner-dismissed', '1'); } catch (_) {}
+    });
+  }
+
+  // Mode tooltip on toggle hover
+  const modeDescriptions = {
+    vibe: 'Vibe — for vibecoders, PMs, founders: product story, journeys, capabilities, health at a glance.',
+    ai: 'AI — for Claude, Cursor, Trae: AI Pack v1, repairs, context docs, copy-ready prompts.',
+    coder: 'Coder — for human developers: architecture, flows, smells, score breakdown, code map.'
+  };
+  document.querySelectorAll('.toggle button[data-mode]').forEach(btn => {
+    btn.title = modeDescriptions[btn.dataset.mode] || '';
+  });
+
+  const copyBtn = document.getElementById('copy-dna-btn');
+  const dnaRaw = document.getElementById('dna-raw');
+  if (copyBtn && dnaRaw) {
+    copyBtn.addEventListener('click', async () => {
+      const raw = dnaRaw.textContent || '';
+      try {
+        await navigator.clipboard.writeText(raw);
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy JSON';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      } catch (_) {}
+    });
+  }
 `;
 
 export function renderReport(data: ReportData): string {
@@ -542,6 +849,9 @@ export function renderReport(data: ReportData): string {
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="${REPORT_FONT_LINK}" rel="stylesheet" />
 <title>${escape(data.repository)} — Mnemos Report</title>
 <style>${STYLES}</style>
 </head>
@@ -556,14 +866,21 @@ export function renderReport(data: ReportData): string {
         </div>
       </div>
       <div class="topbar-right">
+        <nav class="artifact-legend" aria-label="What am I looking at?">
+          <span style="padding:4px 8px;color:var(--text-3);font-size:11px">What am I looking at?</span>
+          <a id="dashboard-link" class="active" data-repo="${escape(data.repository)}" href="http://localhost:5173/vibe/${escape(data.repository)}/story">Dashboard</a>
+          <span class="active">Report</span>
+          <a href="http://localhost:5173/json/${escape(data.repository)}" target="_blank" rel="noopener">AI JSON</a>
+        </nav>
         <div class="score-pill" title="Repository Memory Score">
-          <span>Memory Score</span>
+          <span>Health</span>
           <span class="score-num">${data.memoryScore.overall}/100</span>
         </div>
-        <div class="toggle" role="tablist" aria-label="View mode">
+        <a id="dashboard-link-pill" class="dashboard-pill" data-repo="${escape(data.repository)}" href="http://localhost:5173/vibe/${escape(data.repository)}/story" title="Interactive dashboard — preview, under active development"><span class="preview-badge">Preview</span> Dashboard</a>
+        <div class="toggle" role="tablist" aria-label="Reader mode">
           <button data-mode="vibe" class="active">Vibe</button>
-          <button data-mode="developer">Developer</button>
-          <button data-mode="agent">AI Agent</button>
+          <button data-mode="ai">AI</button>
+          <button data-mode="coder">Coder</button>
         </div>
         <input type="search" id="report-search" class="search-box" placeholder="Search…" aria-label="Search report" />
       </div>
@@ -571,6 +888,20 @@ export function renderReport(data: ReportData): string {
   </header>
 
   <main>
+    <div class="mode-banner" id="mode-banner">
+      <div>
+        <strong>Report · AI JSON · Dashboard preview</strong>
+        <span style="margin-left:4px">
+          This HTML report is the <strong>stable</strong> surface — share it offline.
+          <strong>Vibe</strong> = product story ·
+          <strong>AI</strong> = agent context ·
+          <strong>Coder</strong> = architecture deep-dive.
+        </span>
+        <span style="margin-left:8px;color:var(--text-3)">The interactive dashboard is in preview — we welcome community help on <a href="https://github.com/bitreonx/mnemos" style="color:var(--accent)">GitHub</a>.</span>
+      </div>
+      <button class="mode-banner-close" id="mode-banner-close" aria-label="Dismiss">&times;</button>
+    </div>
+
     <section class="hero">
       <div class="hero-eyebrow">Software Intelligence</div>
       <h1 class="hero-title">${escape(data.repository)}</h1>
@@ -584,10 +915,26 @@ export function renderReport(data: ReportData): string {
 
     <section class="vibe-only">
       <div class="section-head">
+        <h2 class="section-title">User Journeys</h2>
+        <span class="section-sub">${data.journeys.length} journey${
+          data.journeys.length === 1 ? '' : 's'
+        } mapped</span>
+        <a class="section-dash-link" href="http://localhost:5173/vibe/${escape(data.repository)}/journeys">Open in dashboard →</a>
+      </div>
+      ${
+        data.journeys.length === 0
+          ? `<div class="empty">No user journeys discovered. Add route handlers and entry points to surface them.</div>`
+          : data.journeys.map(renderJourneyFlow).join('')
+      }
+    </section>
+
+    <section class="vibe-only">
+      <div class="section-head">
         <h2 class="section-title">Capabilities</h2>
         <span class="section-sub">${data.capabilities.length} system${
           data.capabilities.length === 1 ? '' : 's'
         } discovered</span>
+        <a class="section-dash-link" href="http://localhost:5173/vibe/${escape(data.repository)}/capabilities">Open in dashboard →</a>
       </div>
       ${
         data.capabilities.length === 0
@@ -597,23 +944,26 @@ export function renderReport(data: ReportData): string {
     </section>
 
     <section class="vibe-only">
-      <div class="section-head">
-        <h2 class="section-title">User Journeys</h2>
-        <span class="section-sub">${data.journeys.length} journey${
-          data.journeys.length === 1 ? '' : 's'
-        } mapped</span>
+      <div class="health-glance">
+        ${renderHealthRingHtml(data.memoryScore.overall, 128)}
+        <div class="health-glance-label">Repository health</div>
+        <p class="health-glance-story">${escape(healthNarrative(data.memoryScore.overall))}</p>
+        <div class="health-mini-grid">
+          ${renderHealthMiniItem('Discoverability', data.memoryScore.discoverability)}
+          ${renderHealthMiniItem('Architecture', data.memoryScore.architectureClarity)}
+          ${renderHealthMiniItem('Coupling', data.memoryScore.coupling)}
+          ${renderHealthMiniItem('Documentation', data.memoryScore.documentationQuality)}
+          ${renderHealthMiniItem('Dependencies', data.memoryScore.dependencyComplexity)}
+        </div>
+        <a class="health-glance-link" href="http://localhost:5173/coder/${escape(data.repository)}/overview" title="Dashboard preview">Score breakdown (dashboard preview) →</a>
       </div>
-      ${
-        data.journeys.length === 0
-          ? `<div class="empty">No user journeys discovered. Add route handlers and entry points to surface them.</div>`
-          : data.journeys.map(renderJourneyFlow).join('')
-      }
     </section>
 
-    <section class="dev-only">
+    <section class="coder-only">
       <div class="section-head">
         <h2 class="section-title">Memory Score</h2>
         <span class="section-sub">Composite 0–100</span>
+        <a class="section-dash-link" href="http://localhost:5173/coder/${escape(data.repository)}/overview">Open in dashboard →</a>
       </div>
       <div class="score-grid">
         ${renderScoreCell('Discoverability', data.memoryScore.discoverability)}
@@ -624,7 +974,7 @@ export function renderReport(data: ReportData): string {
       </div>
     </section>
 
-    <section class="dev-only">
+    <section class="coder-only">
       <div class="section-head">
         <h2 class="section-title">Domains</h2>
         <span class="section-sub">${data.domains.length} logical unit${
@@ -665,7 +1015,7 @@ export function renderReport(data: ReportData): string {
       }
     </section>
 
-    <section class="dev-only">
+    <section class="coder-only">
       <div class="section-head">
         <h2 class="section-title">Flows</h2>
         <span class="section-sub">${data.flows.length} execution path${
@@ -698,7 +1048,7 @@ export function renderReport(data: ReportData): string {
       }
     </section>
 
-    <section class="dev-only">
+    <section class="coder-only">
       <div class="section-head">
         <h2 class="section-title">Critical Paths & Risks</h2>
         <span class="section-sub">${data.criticalPaths.length} critical · ${
@@ -736,15 +1086,34 @@ export function renderReport(data: ReportData): string {
       }
     </section>
 
-    <section class="agent-only">
+    <section class="ai-only">
       <div class="section-head">
-        <h2 class="section-title">AI Agent Context</h2>
-        <span class="section-sub">Machine-optimized artifacts for Claude, Cursor, Codex</span>
+        <h2 class="section-title">AI Pack v1 — Agent Context</h2>
+        <span class="section-sub">For Claude, Cursor, Trae — structured JSON contract</span>
+        <a class="section-dash-link" href="http://localhost:5173/json/${escape(data.repository)}" target="_blank" rel="noopener">Open AI JSON →</a>
       </div>
       <p style="color:var(--text-2);margin-bottom:20px;max-width:640px">
-        Point your AI agent at <code class="mono">project.dna.json</code> first.
-        These artifacts are generated locally — no API keys, no cloud.
+        AI Pack <strong>v${escape(data.aiPackVersion)}</strong> — ${escape(data.aiPackNarrative)}
+        AI readiness: <strong>${data.aiReadinessOverall}/100</strong>.
+        Feed agents via <code class="mono">project.dna.json</code>, <code class="mono">GET /copilot/pack/:repoId</code>,
+        or the dashboard <a href="http://localhost:5173/json/${escape(data.repository)}" style="color:var(--accent)">/json/${escape(data.repository)}</a> route.
       </p>
+      ${
+        data.topIssues.length > 0
+          ? `<div style="margin-bottom:20px">
+              <div class="section-sub" style="margin-bottom:8px">Top repairs (${data.topIssues.length})</div>
+              <div class="grid">${data.topIssues
+                .map(
+                  (issue) => `<div class="card" data-search="${escape(issue.title)}">
+                    <div class="card-title">${escape(issue.title)} <span class="tag tag-${issue.severity === 'low' ? 'low' : issue.severity === 'medium' ? 'medium' : 'high'}">${escape(issue.severity)}</span></div>
+                    <div class="card-body">${escape(issue.summary)}</div>
+                  </div>`,
+                )
+                .join('')}</div>
+            </div>`
+          : ''
+      }
+      <div class="agent-artifact"><code>AI Pack v1</code><span><code class="mono">curl localhost:4000/copilot/pack/${escape(data.repository)}?section=summary</code></span></div>
       <div class="agent-artifact"><code>project.dna.json</code><span>Canonical repository DNA</span></div>
       <div class="agent-artifact"><code>agent_context.json</code><span>Rich agent context bundle</span></div>
       <div class="agent-artifact"><code>flows.json</code><span>${data.flows.length} execution flows</span></div>
@@ -763,10 +1132,40 @@ export function renderReport(data: ReportData): string {
       </div>
       <div style="margin-top:24px">
         <div class="section-sub" style="margin-bottom:12px">DNA Preview</div>
-        <div class="agent-json">${renderDnaPreview(data)}</div>
+        <div class="agent-json-wrap">
+          <div class="agent-json-actions">
+            <button type="button" class="copy-btn" id="copy-dna-btn" data-copy-target="dna-preview">Copy JSON</button>
+          </div>
+          <div class="agent-json" id="dna-preview">${renderDnaPreview(data)}</div>
+          <script type="application/json" id="dna-raw">${buildDnaPreviewJson(data).replace(/</g, '\\u003c')}</script>
+        </div>
       </div>
     </section>
   </main>
+
+  <section class="whats-next" style="max-width:1200px;margin:0 auto 48px;padding-left:28px;padding-right:28px">
+    <h2>What's next?</h2>
+    <p>Choose your path — each one is designed for a different way of working.</p>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <h3><span class="persona-dot" style="background:var(--accent)"></span> Vibecoder</h3>
+        <p>Product story, journeys, capabilities — no raw JSON or graphs. This report in Vibe mode.</p>
+        <code class="persona-cmd">mnemos report --open</code>
+      </div>
+      <div class="persona-card">
+        <h3><span class="persona-dot" style="background:var(--good)"></span> Coder</h3>
+        <p>Architecture, flows, smells, score breakdown — switch to Coder mode above.</p>
+        <code class="persona-cmd">mnemos pack --section=score</code>
+      </div>
+      <div class="persona-card">
+        <h3><span class="persona-dot" style="background:var(--accent-2)"></span> AI (Claude / Cursor / Trae)</h3>
+        <p>AI Pack v1 JSON, repairs, copy-ready prompts — fewer tokens, fewer tool calls.</p>
+        <code class="persona-cmd">mnemos pack --section=summary</code>
+        <code class="persona-cmd">mnemos serve → /copilot/pack/${escape(data.repository)}</code>
+        <p style="margin-top:8px;margin-bottom:0">Switch to <strong>AI mode</strong> above for the full agent context list.</p>
+      </div>
+    </div>
+  </section>
 
   <footer>
     <span>Generated by Mnemos</span>
@@ -862,8 +1261,8 @@ function buildJourneySteps(j: ReportData['journeys'][number]): { label: string; 
   return steps;
 }
 
-function renderDnaPreview(data: ReportData): string {
-  const preview = {
+function buildDnaPreviewObject(data: ReportData) {
+  return {
     repository: data.repository,
     architecture: data.architecture.type,
     health_score: data.memoryScore.overall,
@@ -871,7 +1270,14 @@ function renderDnaPreview(data: ReportData): string {
     journeys: data.journeys.slice(0, 4).map((j) => j.name),
     domains: data.domains.slice(0, 6).map((d) => d.name),
   };
-  const json = JSON.stringify(preview, null, 2);
+}
+
+function buildDnaPreviewJson(data: ReportData): string {
+  return JSON.stringify(buildDnaPreviewObject(data), null, 2);
+}
+
+function renderDnaPreview(data: ReportData): string {
+  const json = buildDnaPreviewJson(data);
   return json
     .replace(/"([^"]+)":/g, '<span class="key">"$1"</span>:')
     .replace(/: "([^"]*)"/g, ': <span class="str">"$1"</span>')
@@ -918,11 +1324,27 @@ function renderJourney(j: ReportData['journeys'][number]): string {
   </article>`;
 }
 
+function healthNarrative(score: number): string {
+  if (score >= 80) return 'This codebase is in great shape for shipping and onboarding teammates or AI agents.';
+  if (score >= 60) return 'Healthy enough to move fast — a few areas need attention before big changes.';
+  if (score >= 40) return 'Understandable, but plan fixes before humans or AI can move safely every day.';
+  return 'Needs work before humans or AI can reason about this repo without risk.';
+}
+
+function renderHealthMiniItem(label: string, value: number): string {
+  return `<div class="health-mini-item">
+    <div class="lbl">${escape(label)}</div>
+    <div class="val">${value}</div>
+  </div>`;
+}
+
 function renderScoreCell(label: string, value: number): string {
+  const def = SCORE_DEFINITIONS[label] ?? '';
   return `<div class="score-cell">
     <div class="num">${value}</div>
     <div class="lbl">${escape(label)}</div>
     <div class="score-bar"><span style="width:${Math.max(0, Math.min(100, value))}%"></span></div>
+    ${def ? `<div class="desc">${escape(def)}</div>` : ''}
   </div>`;
 }
 

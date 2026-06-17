@@ -1,20 +1,21 @@
 import type { ImpactResult } from '../types.js';
 import type { MnemosGraph } from '../graph/graph.js';
-import { bfsPaths, getNodesByKind } from '../graph/graph.js';
+import { bfsPaths, reverseBfsPaths } from '../graph/graph.js';
 import { resolveNodeQuery } from '../graph/builder.js';
 
 export function analyzeImpact(graph: MnemosGraph, query: string): ImpactResult | null {
   const nodeId = resolveNodeQuery(graph, query);
   if (!nodeId) return null;
 
-  const paths = bfsPaths(graph, nodeId, 8);
+  const forwardPaths = bfsPaths(graph, nodeId, 8);
+  const reversePaths = reverseBfsPaths(graph, nodeId, 8);
   const affectedApis: string[] = [];
   const affectedDomains: string[] = [];
   const affectedTests: string[] = [];
   const affectedFiles: string[] = [];
   const allPaths: string[][] = [];
 
-  for (const [targetId, pathNodes] of paths) {
+  const collectAffected = (targetId: string, pathNodes: string[]) => {
     allPaths.push(pathNodes);
     const attrs = graph.getNodeAttributes(targetId);
 
@@ -30,23 +31,27 @@ export function analyzeImpact(graph: MnemosGraph, query: string): ImpactResult |
         affectedTests.push(attrs.path ?? attrs.name);
         break;
       case 'file':
+      case 'service':
         affectedFiles.push(attrs.path ?? attrs.name);
         break;
     }
+  };
+
+  for (const [targetId, pathNodes] of forwardPaths) {
+    collectAffected(targetId, pathNodes);
   }
 
-  // Also check reverse dependencies (who imports this node)
-  graph.forEachInNeighbor(nodeId, (neighbor: string) => {
-    const attrs = graph.getNodeAttributes(neighbor) as import('../types.js').GraphNode;
-    if (attrs.kind === 'file') {
-      affectedFiles.push(attrs.path ?? attrs.name);
-    }
-    if (attrs.kind === 'test') {
-      affectedTests.push(attrs.path ?? attrs.name);
-    }
-  });
+  for (const [targetId, pathNodes] of reversePaths) {
+    collectAffected(targetId, pathNodes);
+  }
 
   const unique = <T>(arr: T[]): T[] => [...new Set(arr)];
+  const allAffected = unique([
+    ...affectedApis,
+    ...affectedDomains,
+    ...affectedTests,
+    ...affectedFiles,
+  ]);
 
   return {
     node: nodeId,
@@ -54,7 +59,7 @@ export function analyzeImpact(graph: MnemosGraph, query: string): ImpactResult |
     affectedDomains: unique(affectedDomains),
     affectedTests: unique(affectedTests),
     affectedFiles: unique(affectedFiles),
-    totalAffected: unique([...affectedApis, ...affectedDomains, ...affectedTests, ...affectedFiles]).length,
+    totalAffected: allAffected.length,
     paths: allPaths.slice(0, 20),
   };
 }
@@ -65,7 +70,7 @@ export function formatImpactReport(result: ImpactResult, graph: MnemosGraph): st
     `Impact Analysis: ${nodeAttrs.name}`,
     `${'='.repeat(50)}`,
     '',
-    `Total affected nodes: ${result.totalAffected}`,
+    `Total affected nodes: ${result.totalAffected} (forward + reverse dependency closure)`,
     '',
     `APIs affected (${result.affectedApis.length}):`,
     ...result.affectedApis.slice(0, 15).map((a) => `  • ${a}`),

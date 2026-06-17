@@ -1,5 +1,4 @@
 {
-  "$schema": "mnemos-bench/ground-truth/v1",
   "repo": "nestjs",
   "verified_at": "2026-06-15",
   "verification_method": "Mnemos build on nestjs/nest @ depth 1 — framework with DI, modules, guards",

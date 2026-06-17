@@ -32,7 +32,23 @@ interface WorkspaceConfig {
   repos: WorkspaceRepo[];
 }
 
+import { buildAiPackFromDir, aiPackHeaders, parseAiPackQuery } from './vite.ai-pack';
+
 const building = new Map<string, Promise<void>>();
+
+async function serveAiPackJson(
+  res: import('http').ServerResponse,
+  mnemosDir: string,
+  repoId: string,
+  repoRoot: string,
+  queryUrl: string,
+) {
+  const { section, mode } = parseAiPackQuery(queryUrl);
+  const { body, status } = await buildAiPackFromDir(mnemosDir, { repoId, root: repoRoot, section, mode });
+  res.statusCode = status;
+  for (const [k, v] of Object.entries(aiPackHeaders())) res.setHeader(k, v);
+  res.end(body);
+}
 
 function json(res: import('http').ServerResponse, data: unknown, status = 200) {
   res.statusCode = status;
@@ -140,7 +156,11 @@ function runCli(cliPath: string, args: string[]): Promise<{ stdout: string; stde
   });
 }
 
-const ALLOWED_CLI = new Set(['build', 'ask', 'flows', 'explain', 'score', 'dna', 'inspect', 'context', 'story', 'impact']);
+const ALLOWED_CLI = new Set([
+  'build', 'ask', 'flows', 'explain', 'score', 'dna', 'inspect', 'context', 'story', 'impact',
+  // AI / agent-facing surface (vibe + ai + coder modes)
+  'query', 'path', 'onboard', 'focus', 'hotspots', 'diff', 'pack', 'prompt',
+]);
 
 function parseTerminalCommand(raw: string): string[] | null {
   const trimmed = raw.trim();
@@ -189,6 +209,21 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
           res.statusCode = 204;
           res.end();
           return;
+        }
+
+        const jsonMatch = req.url.match(/^\/api\/json\/([^/?]+)/);
+        if (jsonMatch && req.method === 'GET') {
+          if (!config) {
+            try {
+              config = JSON.parse(await readFile(workspaceFile, 'utf-8')) as WorkspaceConfig;
+            } catch {
+              return json(res, { error: 'Invalid workspace config' }, 500);
+            }
+          }
+          const repo = config.repos.find((r) => r.id === jsonMatch[1]);
+          if (!repo) return json(res, { error: 'Unknown repo' }, 404);
+          const mnemosDir = path.join(repo.path, '.mnemos');
+          return serveAiPackJson(res, mnemosDir, repo.id, repo.path, req.url);
         }
 
         if (req.url === '/api/workspace') {
@@ -329,11 +364,13 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
             const result = await runCli(cliPath, ['ask', body.question, '--path', repo.path]);
             const text = (result.stdout || result.stderr).trim();
             const confidenceMatch = text.match(/Confidence:\s*(\d+)%/);
+            const tookMatch = text.match(/·\s*(\d+)ms/);
             const answer = text.split('\n').slice(3).join('\n').trim() || text;
             return json(res, {
               ok: result.code === 0,
               answer,
               confidence: confidenceMatch ? Number(confidenceMatch[1]) / 100 : 0.8,
+              tookMs: tookMatch ? Number(tookMatch[1]) : undefined,
               raw: text,
             });
           } catch (err) {
@@ -423,7 +460,17 @@ export function resolveCliPath(): string {
 export function resolveWorkspaceFile(): string | undefined {
   const env = process.env.MNEMOS_WORKSPACE;
   if (env && existsSync(env)) return path.resolve(env);
-  const defaultPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'dabt.workspace.json');
-  if (existsSync(defaultPath)) return defaultPath;
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  // Resolution order: your own workspace, then a legacy/local file, then the
+  // committed example template so a fresh clone runs out of the box.
+  const candidates = [
+    'mnemos.workspace.json',
+    'dabt.workspace.json',
+    'mnemos.workspace.example.json',
+  ];
+  for (const name of candidates) {
+    const candidate = path.resolve(here, name);
+    if (existsSync(candidate)) return candidate;
+  }
   return undefined;
 }

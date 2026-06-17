@@ -4,7 +4,8 @@
   "private": true,
   "description": "The memory layer for software — transform codebases into structured intelligence",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
@@ -15,7 +16,11 @@
     "bench:nestjs": "node mnemos-bench/scorer/run.mjs nestjs",
     "bench:regression": "node mnemos-bench/scorer/regression.mjs",
     "bench:ai-eval": "node mnemos-bench/scorer/ai-eval.mjs",
-    "dabt:ui": "node packages/cli/dist/index.js ui --workspace packages/ui/dabt.workspace.json"
+    "dabt:ui": "node packages/cli/dist/index.js ui --workspace packages/ui/dabt.workspace.json",
+    "docs:sync": "npm run build --workspace @mnemos/core && node scripts/sync-docs.mjs",
+    "docs:dev": "npm --workspace @mnemos/docs-site run dev",
+    "docs:build": "npm --workspace @mnemos/docs-site run build",
+    "docs:preview": "npm --workspace @mnemos/docs-site run preview"
   },
   "engines": {
     "node": ">=20"
