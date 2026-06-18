@@ -15,6 +15,7 @@ import {
   buildSmellsSectionGraph,
 } from './graph-markdown.js';
 import { buildLanguagePipelineMermaid } from '../languages/docs.js';
+import { compactMarkdown } from '../util/compact-json.js';
 
 export async function compileContext(
   memory: MemoryModel,
@@ -40,7 +41,7 @@ export async function compileContext(
   };
 
   for (const [filename, content] of Object.entries(files)) {
-    await writeFile(path.join(contextDir, filename), content, 'utf-8');
+    await writeFile(path.join(contextDir, filename), compactMarkdown(content), 'utf-8');
   }
 
   // Also write graph snapshot for UI

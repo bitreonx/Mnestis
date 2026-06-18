@@ -56,9 +56,24 @@ export function printCompressStats(stats: {
   estimatedCompressedTokens: number;
   savingsPercent: number;
   compressedLines: number;
+  phaseStats?: {
+    noiseStripped: number;
+    pathsShortened: number;
+    stackFramesFolded: number;
+    duplicatesRemoved: number;
+    budgetDropped: number;
+  };
 }): void {
   printSection('Token compression');
   printMetricRow('Before (est.)', stats.estimatedOriginalTokens, 'tokens');
   printMetricRow('After (est.)', stats.estimatedCompressedTokens, 'tokens');
   printMetricRow('Saved', `${stats.savingsPercent}%`, `${stats.compressedLines} lines kept`);
+  if (stats.phaseStats) {
+    const { noiseStripped, stackFramesFolded, duplicatesRemoved } = stats.phaseStats;
+    if (noiseStripped + stackFramesFolded + duplicatesRemoved > 0) {
+      printInfoLine(
+        `Phases: ${noiseStripped} noise · ${stackFramesFolded} stack · ${duplicatesRemoved} dupes removed`,
+      );
+    }
+  }
 }

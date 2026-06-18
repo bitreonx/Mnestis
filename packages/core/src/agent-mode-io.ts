@@ -1,4 +1,5 @@
 import type { AgentExports } from './agent-mode.js';
+import { compactJson } from './util/compact-json.js';
 
 /**
  * Node-only I/O for agent exports. Kept in a separate module so the pure
@@ -13,18 +14,19 @@ export async function writeAgentExports(
   const path = await import('node:path');
   await mkdir(outputDir, { recursive: true });
 
-  const dnaJson = JSON.stringify(exports.dna, null, 2);
-  const contextJson = JSON.stringify(exports.context, null, 2);
+  // Compact JSON for agent-facing exports — fewer tokens, same semantics.
+  const dnaJson = compactJson(exports.dna);
+  const contextJson = compactJson(exports.context);
 
   const files: Record<string, string> = {
     'project.dna.json': dnaJson,
     'repository.dna.json': dnaJson,
     'agent_context.json': contextJson,
     'agent-context.json': contextJson,
-    'repository_summary.json': JSON.stringify(exports.summary, null, 2),
-    'repository-summary.json': JSON.stringify(exports.summary, null, 2),
-    'architecture-agent.json': JSON.stringify(exports.architecture, null, 2),
-    'critical_paths.json': JSON.stringify(exports.criticalPaths, null, 2),
+    'repository_summary.json': compactJson(exports.summary),
+    'repository-summary.json': compactJson(exports.summary),
+    'architecture-agent.json': compactJson(exports.architecture),
+    'critical_paths.json': compactJson(exports.criticalPaths),
   };
 
   for (const [filename, content] of Object.entries(files)) {

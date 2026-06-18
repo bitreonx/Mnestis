@@ -33,6 +33,7 @@ import { compileContext, writeMemoryModel } from '../context/compiler.js';
 import { buildAgentExports } from '../agent-mode.js';
 import { writeAgentExports } from '../agent-mode-io.js';
 import { buildAiToolkit } from '../ai-toolkit.js';
+import { compactJson } from '../util/compact-json.js';
 import { writeAiToolkit } from '../ai-toolkit-io.js';
 
 import { computeMemoryScore } from '../report.js';
@@ -410,7 +411,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
   await writeFile(path.join(outputDir, 'heatmap.json'), JSON.stringify(heatmap, null, 2), 'utf-8');
 
-  await writeFile(path.join(outputDir, 'health-score.json'), JSON.stringify(memoryScore, null, 2), 'utf-8');
+  await writeFile(path.join(outputDir, 'health-score.json'), compactJson(memoryScore), 'utf-8');
 
   await writeFile(
 
