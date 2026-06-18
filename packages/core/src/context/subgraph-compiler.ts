@@ -4,6 +4,7 @@ import { bfsPaths, reverseBfsPaths, getNeighbors } from '../graph/graph.js';
 import { resolveNodeQuery } from '../graph/builder.js';
 import { searchMemory, buildSearchIndex, type MemorySearchIndex } from '../search/index.js';
 import { analyzeImpact } from '../analysis/impact.js';
+import { optimizeContextWindow } from '../routing/optimize-context.js';
 
 export interface SubgraphNode {
   id: string;
@@ -171,8 +172,9 @@ export function compileSubgraphContext(
   let estimatedTokens = Math.ceil(markdown.length / CHARS_PER_TOKEN);
 
   if (estimatedTokens > tokenBudget) {
-    markdown = markdown.slice(0, tokenBudget * CHARS_PER_TOKEN) + '\n\n…(truncated to token budget)';
-    estimatedTokens = tokenBudget;
+    const optimized = optimizeContextWindow(markdown, tokenBudget, 6);
+    markdown = optimized.text;
+    estimatedTokens = optimized.tokensAfter;
   }
 
   const json: Record<string, unknown> = {

@@ -1,0 +1,155 @@
+.visual-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.visual-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.illustration-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+
+.illustration-terminal {
+  background: linear-gradient(180deg, rgba(134, 59, 255, 0.06), transparent 40%);
+}
+
+.illustration-results {
+  background: linear-gradient(180deg, rgba(71, 191, 255, 0.05), transparent 40%);
+}
+
+.illustration-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: calc(var(--radius-md, 12px) - 4px);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.12));
+}
+
+.illustration-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--color-fg-muted);
+}
+
+.illustration-caption strong {
+  color: var(--color-fg);
+  font-weight: 600;
+}
+
+.mnemos-banner-wrap {
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.mnemos-banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.visual-showcase-ai,
+.visual-capabilities {
+  padding: 1.25rem;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.visual-showcase-ai h3,
+.visual-capabilities h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.visual-showcase-lead {
+  margin: 0 0 1rem;
+  color: var(--color-fg-muted);
+  line-height: 1.55;
+  max-width: 72ch;
+}
+
+.ai-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.ai-flow-step {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-raised);
+}
+
+.ai-flow-num {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #863bff, #47bfff);
+}
+
+.ai-flow-step h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+}
+
+.ai-flow-step code {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: var(--color-surface-2);
+  color: var(--color-accent, #863bff);
+}
+
+.ai-flow-step p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-fg-muted);
+  line-height: 1.45;
+}
+
+.visual-cap-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.45rem;
+  color: var(--color-fg-muted);
+  line-height: 1.5;
+}
+
+.mnemos-logo-mark,
+.mnemos-logo-wordmark {
+  display: block;
+  object-fit: contain;
+}
+
+.mnemos-logo-mark {
+  color: var(--color-fg);
+}

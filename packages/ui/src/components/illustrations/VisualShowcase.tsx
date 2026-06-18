@@ -26,7 +26,7 @@ export function AnimatedResultsIllustration({ className = '' }: { className?: st
       />
       <div className="illustration-caption">
         <strong>Verified results</strong>
-        <span>100% task accuracy on Express & NestJS — reproducible via mnemos-bench.</span>
+        <span>80% task accuracy on Express — 29.9× context compression vs raw repo tokens.</span>
       </div>
     </div>
   );
