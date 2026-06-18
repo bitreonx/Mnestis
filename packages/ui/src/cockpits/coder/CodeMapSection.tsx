@@ -1,27 +1,36 @@
+import { FolderTree } from 'lucide-react'
 import { RepositoryExplorer } from '@/components/RepositoryExplorer'
 import { TechStackView } from '@/components/TechStackView'
-import { useRepoWorkspace } from '@/cockpits/coder/RepoWorkspaceContext'
-import { CoderWorkspaceLoading } from '@/cockpits/coder/CoderWorkspaceHeader'
+import { useIntelligence } from '@/core/IntelligenceProvider'
+import { CODE_SUBSECTIONS } from '@/core/navigation'
+import { PageLayout, PageHeader, SubNav, LoadingState, ContentWell } from '@/shell/PageLayout'
 
 export const CodeMapSection = () => {
-  const { loading, memory, codeView, setCodeView, setInsightTarget } = useRepoWorkspace()
-  if (loading || !memory) return <CoderWorkspaceLoading />
+  const { loading, memory, codeView, setCodeView, setInsightTarget } = useIntelligence()
+  if (loading || !memory) return <LoadingState />
 
   return (
-    <div className="repo-workspace-body">
-      <div className="repo-sub-layout">
-        <aside className="repo-sub-nav">
-          <button type="button" className={codeView === 'map' ? 'active' : ''} onClick={() => setCodeView('map')}>File Map</button>
-          <button type="button" className={codeView === 'stack' ? 'active' : ''} onClick={() => setCodeView('stack')}>Tech Stack</button>
-        </aside>
-        <div className="repo-sub-content">
-          {codeView === 'map' ? (
-            <RepositoryExplorer memory={memory} onSelectRepo={() => {}} onQuickInsight={setInsightTarget} />
-          ) : (
-            <TechStackView memory={memory} />
-          )}
-        </div>
-      </div>
-    </div>
+    <PageLayout wide>
+      <PageHeader
+        title="Code map"
+        description="Inferred file tree and technology stack from repository analysis."
+        icon={<FolderTree className="h-6 w-6" />}
+      />
+
+      <SubNav
+        items={CODE_SUBSECTIONS}
+        value={codeView}
+        onChange={setCodeView}
+        ariaLabel="Code map views"
+      />
+
+      <ContentWell className="min-h-[480px]">
+        {codeView === 'map' ? (
+          <RepositoryExplorer memory={memory} onSelectRepo={() => {}} onQuickInsight={setInsightTarget} />
+        ) : (
+          <TechStackView memory={memory} />
+        )}
+      </ContentWell>
+    </PageLayout>
   )
 }

@@ -1,6 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom'
-import { ModeLayout } from '@/layouts/ModeLayout'
-import { CockpitSectionNav } from '@/cockpits/shared/CockpitSectionNav'
+import { AppShell } from '@/shell/AppShell'
 import { AiContextHome } from '@/cockpits/ai/AiContextHome'
 import { JsonPackSection } from '@/cockpits/ai/JsonPackSection'
 import { RepairsSection } from '@/cockpits/ai/RepairsSection'
@@ -14,14 +13,18 @@ const SECTION_MAP: Record<string, React.ComponentType> = {
 }
 
 export const AiCockpit = () => {
-  const { section = 'home' } = useParams()
-  const Section = SECTION_MAP[section] ?? AiContextHome
+  const { section = 'home', repoId = 'local' } = useParams()
+
+  if (!SECTION_MAP[section]) {
+    return <Navigate to={`/ai/${repoId}/home`} replace />
+  }
+
+  const Section = SECTION_MAP[section]
 
   return (
-    <ModeLayout mode="ai">
-      <CockpitSectionNav mode="ai" />
+    <AppShell mode="ai">
       <Section />
-    </ModeLayout>
+    </AppShell>
   )
 }
 

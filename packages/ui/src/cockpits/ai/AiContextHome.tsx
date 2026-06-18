@@ -1,79 +1,100 @@
 import { Link, useParams } from 'react-router-dom'
-import { Bot, FileJson, Globe, Server } from 'lucide-react'
+import { Bot, FileJson, Globe, Server, ArrowRight } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { buildModePath } from '@/lib/mode'
+import { PageLayout, PageHeader } from '@/shell/PageLayout'
+import { useIntelligence } from '@/core/IntelligenceProvider'
+import { StatTile } from '@/components/viz'
 
 const FEED_METHODS = [
   {
     icon: FileJson,
     title: 'project.dna.json',
-    description: 'The compressed repository DNA file written to .mnemos/ after every build.',
-    action: 'Read .mnemos/project.dna.json',
-    href: '/.mnemos/project.dna.json',
+    description: 'Compressed repository DNA written to .mnemos/ after every build.',
+    action: 'Open DNA file',
+    resolve: (repoId: string) =>
+      repoId === 'local' ? '/.mnemos/project.dna.json' : `/.mnemos/${repoId}/project.dna.json`,
     external: true,
   },
   {
     icon: Server,
-    title: 'mnemos serve → /copilot/pack',
+    title: 'mnemos serve',
     description: 'HTTP endpoint for live agent queries without opening the dashboard.',
-    action: 'GET /copilot/pack/:repoId',
-    href: 'http://localhost:4000/copilot/pack/local',
+    action: 'GET /copilot/pack',
+    resolve: (repoId: string) => `http://localhost:4000/copilot/pack/${repoId}`,
     external: true,
   },
   {
     icon: Globe,
-    title: 'Dashboard /json route',
-    description: 'Browser URL with syntax-highlighted AI Pack v1 and one-click copy.',
-    action: 'Open AI JSON view',
-    href: '/json/local',
+    title: 'AI Pack JSON',
+    description: 'Browser view with syntax highlighting and one-click copy.',
+    action: 'Open JSON view',
+    resolve: (repoId: string) => `/json/${repoId}`,
     external: false,
   },
   {
     icon: Bot,
-    title: 'Copy-paste pack',
-    description: 'Copy the full AI Pack v1 JSON or a pre-built repair prompt in one click.',
-    action: 'Open JSON Pack section',
-    href: '/ai/local/json',
+    title: 'Repair prompts',
+    description: 'Pre-built fix prompts and issue cards for Claude, Cursor, Trae.',
+    action: 'Open repairs',
+    resolve: (repoId: string) => buildModePath('ai', repoId, 'repairs'),
     external: false,
   },
-]
+] as const
 
 export const AiContextHome = () => {
   const { repoId = 'local' } = useParams()
+  const { pulse, packIssues, suggestedPrompts } = useIntelligence()
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 p-6 md:p-10">
-      <div>
-        <h1 className="text-2xl font-bold">AI Pack v1 — feed any agent</h1>
-        <p className="mt-2 text-[var(--color-fg-muted)]">
-          Claude, Cursor, Trae, and Codex can reason about your repo from structured Mnemos output — no dashboard required.
-        </p>
+    <PageLayout>
+      <PageHeader
+        eyebrow="Agent context"
+        title="AI Pack v1 — feed any agent"
+        description="Claude, Cursor, Trae, and Codex can reason about your repo from structured Mnemos output — no dashboard required."
+        icon={<Bot className="h-6 w-6" />}
+        actions={
+          <Link to={buildModePath('ai', repoId, 'json')}>
+            <Button size="sm">
+              Open full pack
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        }
+      />
+
+      <div className="mb-8 grid gap-3 sm:grid-cols-3">
+        <StatTile label="AI readiness" value={pulse.aiReadiness ?? 0} unit="/100" />
+        <StatTile label="Open issues" value={packIssues.length} />
+        <StatTile label="Prompt seeds" value={suggestedPrompts.length} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {FEED_METHODS.map(({ icon: Icon, title, description, action, href, external }) => {
-          const resolved = href.replace('local', repoId)
+        {FEED_METHODS.map(({ icon: Icon, title, description, action, resolve, external }) => {
+          const href = resolve(repoId)
           return (
-            <Card key={title}>
+            <Card key={title} className="group transition-shadow hover:shadow-[var(--shadow-glow)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Icon className="h-4 w-4 text-[var(--color-accent)]" aria-hidden />
+                  <span className="metallic-ring flex h-8 w-8 items-center justify-center rounded-[var(--radius-xs)]">
+                    <Icon className="h-4 w-4 text-[var(--color-accent)]" aria-hidden />
+                  </span>
                   {title}
                 </CardTitle>
                 <CardDescription>{description}</CardDescription>
               </CardHeader>
               <CardContent>
                 {external ? (
-                  <Button variant="secondary" size="sm" onClick={() => window.open(resolved, '_blank')}>
+                  <Button variant="secondary" size="sm" onClick={() => window.open(href, '_blank')}>
                     {action}
                   </Button>
                 ) : (
-                  <Link
-                    to={resolved.startsWith('/') ? resolved : buildModePath('ai', repoId, 'json')}
-                    className="inline-flex h-8 items-center rounded-[var(--radius-xs)] bg-[var(--color-surface-2)] px-3 text-xs font-medium hover:bg-[var(--color-surface-raised)]"
-                  >
-                    {action}
+                  <Link to={href}>
+                    <Button variant="secondary" size="sm">
+                      {action}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
                   </Link>
                 )}
               </CardContent>
@@ -81,6 +102,6 @@ export const AiContextHome = () => {
           )
         })}
       </div>
-    </div>
+    </PageLayout>
   )
 }

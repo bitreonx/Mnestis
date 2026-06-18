@@ -41,3 +41,7 @@ export const CommandItem = ({ className, ...props }: React.ComponentProps<typeof
     {...props}
   />
 )
+
+export const CommandSeparator = ({ className }: { className?: string }) => (
+  <div className={cn('my-1 h-px bg-[var(--glass-border)]', className)} role="separator" />
+)

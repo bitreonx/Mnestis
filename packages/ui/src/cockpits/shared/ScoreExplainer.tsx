@@ -4,7 +4,7 @@ import type { HealthScore } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { HealthRing } from '@/components/ui/HealthRing'
+import { Gauge } from '@/components/viz'
 import { cn } from '@/lib/utils'
 import { formatScore } from '@/lib/format-score'
 
@@ -70,7 +70,7 @@ export const ScoreExplainer = ({
       <Card className="repo-health-card">
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-5">
-            <HealthRing value={overall} size={108} label="Repository health" />
+            <Gauge value={overall} size={108} label="Repository health" />
             <div>
               <CardTitle className="text-base">Repository health</CardTitle>
               {narrative && <p className="mt-1 max-w-md text-sm text-[var(--color-fg-muted)]">{narrative}</p>}

@@ -1,27 +1,47 @@
+import { History } from 'lucide-react'
 import { BuildHistoryView } from '@/components/BuildHistoryView'
 import { HeatmapView } from '@/components/HeatmapView'
 import { TimelineView } from '@/components/TimelineView'
-import { useRepoWorkspace } from '@/cockpits/coder/RepoWorkspaceContext'
-import { CoderWorkspaceLoading } from '@/cockpits/coder/CoderWorkspaceHeader'
+import { useIntelligence } from '@/core/IntelligenceProvider'
+import { HISTORY_SUBSECTIONS } from '@/core/navigation'
+import { PageLayout, PageHeader, SubNav, LoadingState, ContentWell } from '@/shell/PageLayout'
+import { TrendChart } from '@/components/viz'
 
 export const HistorySection = () => {
-  const { loading, memory, history, heatmap, historyView, setHistoryView } = useRepoWorkspace()
-  if (loading || !memory) return <CoderWorkspaceLoading />
+  const { loading, memory, history, heatmap, historyView, setHistoryView } = useIntelligence()
+  if (loading || !memory) return <LoadingState />
+
+  const trendPoints = [...history]
+    .sort((a, b) => new Date(a.builtAt).getTime() - new Date(b.builtAt).getTime())
+    .map((h) => ({ label: new Date(h.builtAt).toLocaleDateString(), value: h.health }))
 
   return (
-    <div className="repo-workspace-body">
-      <div className="repo-sub-layout">
-        <aside className="repo-sub-nav">
-          <button type="button" className={historyView === 'builds' ? 'active' : ''} onClick={() => setHistoryView('builds')}>Build History</button>
-          <button type="button" className={historyView === 'timeline' ? 'active' : ''} onClick={() => setHistoryView('timeline')}>Activity</button>
-          <button type="button" className={historyView === 'risk' ? 'active' : ''} onClick={() => setHistoryView('risk')}>Risk Heatmap</button>
-        </aside>
-        <div className="repo-sub-content">
-          {historyView === 'builds' && <BuildHistoryView history={history} memory={memory} />}
-          {historyView === 'timeline' && <TimelineView memory={memory} />}
-          {historyView === 'risk' && <HeatmapView heatmap={heatmap} />}
+    <PageLayout wide>
+      <PageHeader
+        title="Build history"
+        description="Track health trends, activity timeline, and domain risk hotspots over time."
+        icon={<History className="h-6 w-6" />}
+      />
+
+      {trendPoints.length > 1 && (
+        <div className="glass-panel mb-6 p-4">
+          <p className="mb-3 text-sm font-medium">Health trend</p>
+          <TrendChart data={trendPoints} height={120} ariaLabel="Health score over builds" />
         </div>
-      </div>
-    </div>
+      )}
+
+      <SubNav
+        items={HISTORY_SUBSECTIONS}
+        value={historyView}
+        onChange={setHistoryView}
+        ariaLabel="History views"
+      />
+
+      <ContentWell className="min-h-[480px]">
+        {historyView === 'builds' && <BuildHistoryView history={history} memory={memory} />}
+        {historyView === 'timeline' && <TimelineView memory={memory} />}
+        {historyView === 'heatmap' && <HeatmapView heatmap={heatmap} />}
+      </ContentWell>
+    </PageLayout>
   )
 }

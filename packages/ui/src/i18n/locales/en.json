@@ -1,0 +1,73 @@
+{
+  "common": {
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "search": "Search",
+    "close": "Close",
+    "back": "Go back",
+    "retry": "Try again",
+    "home": "Open cockpit"
+  },
+  "beta": {
+    "title": "Mnemos dashboard is in beta",
+    "description": "This cockpit is under active development. Layout, scores, and flows may change between releases.",
+    "stable": "The CLI and HTML report are the stable surfaces today.",
+    "report": "Report issue on GitHub"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "description": "Mnemos doesn't have a page at this URL. Use the cockpit navigation or command palette (Ctrl+K)."
+    },
+    "unexpected": {
+      "code": "Error",
+      "title": "Unexpected application error",
+      "description": "Something went wrong. You can go back, reload, or return to your cockpit."
+    },
+    "server": "The server returned an unexpected response.",
+    "whyTitle": "Why this can happen",
+    "tryTitle": "Try this",
+    "copied": "Command copied",
+    "copyFailed": "Copy failed"
+  },
+  "report": {
+    "opening": "Opening HTML report…"
+  },
+  "shell": {
+    "home": "Mnemos home",
+    "selectRepo": "Select repository",
+    "cockpitMode": "Cockpit mode",
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "label": "Language",
+      "en": "English",
+      "ar": "العربية"
+    }
+  },
+  "modes": {
+    "vibe": {
+      "label": "Vibecoder",
+      "short": "Vibe",
+      "lens": "Shows business capabilities, journeys, and the clearest next actions first."
+    },
+    "ai": {
+      "label": "AI",
+      "short": "AI",
+      "lens": "Highlights DNA, issue exports, context docs, and copy-ready payloads."
+    },
+    "coder": {
+      "label": "Coder",
+      "short": "Coder",
+      "lens": "Prioritizes architecture, code map, history, and build intelligence."
+    }
+  },
+  "health": {
+    "score": "Health score",
+    "dimensions": "Dimensions"
+  }
+}

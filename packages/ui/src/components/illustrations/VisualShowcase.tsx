@@ -26,7 +26,7 @@ export function AnimatedResultsIllustration({ className = '' }: { className?: st
       />
       <div className="illustration-caption">
         <strong>Verified results</strong>
-        <span>80% task accuracy and 29× compression on real repos — not marketing slides.</span>
+        <span>100% task accuracy on Express & NestJS — reproducible via mnemos-bench.</span>
       </div>
     </div>
   );

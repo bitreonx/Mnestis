@@ -1,26 +1,56 @@
 import { Link, useParams } from 'react-router-dom'
+import { LayoutDashboard, ArrowRight, TrendingUp, AlertTriangle } from 'lucide-react'
 import { Overview } from '@/components/Overview'
 import { IssueCard } from '@/components/issues/IssueCard'
 import { ScoreExplainer, healthScoreToDimensions } from '@/cockpits/shared/ScoreExplainer'
-import { useRepoWorkspace } from '@/cockpits/coder/RepoWorkspaceContext'
-import { CoderWorkspaceLoading } from '@/cockpits/coder/CoderWorkspaceHeader'
+import { useIntelligence } from '@/core/IntelligenceProvider'
+import { PageLayout, PageHeader, MetricGrid, LoadingState, EmptyState } from '@/shell/PageLayout'
+import { StatTile, DimensionBars } from '@/components/viz'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { copyText } from '@/lib/clipboard'
 import { buildModePath } from '@/lib/mode'
+import { scoreNarrative } from '@/core/intelligence'
 import { useState } from 'react'
-
-const scoreNarrative = (score: number) => {
-  if (score >= 80) return 'Strong and ready for fast onboarding.'
-  if (score >= 60) return 'Usable, with a few blind spots to clean up.'
-  if (score >= 40) return 'Understandable, but risky in day-to-day work.'
-  return 'Needs attention before humans or AI can move safely.'
-}
 
 export const CoderOverview = () => {
   const { repoId = 'local' } = useParams()
-  const { loading, memory, healthScore, packIssues, packScore, agentPackJson, fixPrompt, repo } = useRepoWorkspace()
+  const {
+    loading,
+    error,
+    memory,
+    healthScore,
+    packIssues,
+    packScore,
+    agentPackJson,
+    fixPrompt,
+    repo,
+    pulse,
+    domainRisks,
+    flowRanks,
+    smellClusters,
+    healthInsights,
+    handleBuild,
+    building,
+  } = useIntelligence()
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null)
 
-  if (loading || !memory) return <CoderWorkspaceLoading />
+  if (loading) return <LoadingState />
+  if (error || !memory) {
+    return (
+      <PageLayout>
+        <EmptyState
+          title="No intelligence yet"
+          description={error ?? 'Run Mnemos to analyze this repository.'}
+          action={
+            <Button onClick={handleBuild} disabled={building}>
+              {building ? 'Building…' : 'Run Mnemos'}
+            </Button>
+          }
+        />
+      </PageLayout>
+    )
+  }
 
   const handleCopy = async (label: string, text: string) => {
     await copyText(text)
@@ -29,95 +59,158 @@ export const CoderOverview = () => {
   }
 
   const dims = healthScore ? healthScoreToDimensions(healthScore) : []
-  const strongest = dims.length ? dims.reduce((a, b) => (b.value > a.value ? b : a)) : null
-  const weakest = dims.length ? dims.reduce((a, b) => (b.value < a.value ? b : a)) : null
+  const highRiskDomains = domainRisks.filter((d) => d.risk === 'high').slice(0, 3)
 
   return (
-    <div className="repo-workspace repo-workspace--cockpit">
-      <div className="repo-workspace-body">
-        <div className="repo-tab-panel repo-tab-panel--overview">
-          <section className="repo-story-grid">
-            <article className="repo-story-card repo-story-card--hero">
-              <small>What this repository does</small>
-              <h2>{memory.architecture.name || repo.name}</h2>
-              <p>{memory.architecture.summary || repo.description}</p>
-              <div className="repo-story-pills">
-                <span>{memory.domains.length} domains</span>
-                <span>{memory.flows.length} flows</span>
-                <span>{memory.services.length} services</span>
-                <span>{memory.apis.length} APIs</span>
-              </div>
-            </article>
-            <article className="repo-story-card">
-              <small>Use the right output</small>
-              <h3>Dashboard · Report · AI JSON</h3>
-              <div className="repo-mini-list">
-                <div><strong>Dashboard</strong><span>Interactive exploration and architecture navigation.</span></div>
-                <div><strong>report/index.html</strong><span>Shareable HTML for stakeholders.</span></div>
-                <div><strong>AI JSON</strong><span>AI Pack v1 for Claude, Cursor, Trae.</span></div>
-              </div>
-            </article>
-          </section>
+    <PageLayout wide>
+      <PageHeader
+        eyebrow="Repository pulse"
+        title={memory.architecture.name || repo.name}
+        description={memory.architecture.summary || repo.description}
+        icon={<LayoutDashboard className="h-6 w-6" />}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={() => handleCopy('json', agentPackJson)}>
+              {copyFeedback === 'json' ? 'Copied' : 'Copy AI Pack'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleCopy('prompt', fixPrompt)}>
+              {copyFeedback === 'prompt' ? 'Copied' : 'Copy fix prompt'}
+            </Button>
+          </>
+        }
+      />
 
-          {healthScore && (
-            <section className="repo-score-section">
-              <ScoreExplainer
-                overall={healthScore.overall}
-                aiReadinessOverall={packScore.aiReadinessOverall}
-                narrative={packScore.narrative ?? scoreNarrative(healthScore.overall)}
-                healthDimensions={healthScoreToDimensions(healthScore)}
-                aiDimensions={packScore.aiDimensions}
-                factors={packScore.factors}
-                strongest={strongest ? { name: strongest.name, value: strongest.value } : null}
-                weakest={weakest ? { name: weakest.name, value: weakest.value } : null}
+      <MetricGrid cols={4}>
+        <StatTile label="Files" value={pulse.files} />
+        <StatTile label="Domains" value={pulse.domains} />
+        <StatTile label="Flows" value={pulse.flows} />
+        <StatTile label="Smells" value={pulse.smells} />
+      </MetricGrid>
+
+      {healthScore && (
+        <section className="mt-8">
+          <ScoreExplainer
+            overall={healthScore.overall}
+            aiReadinessOverall={packScore.aiReadinessOverall}
+            narrative={packScore.narrative ?? scoreNarrative(healthScore.overall)}
+            healthDimensions={dims}
+            aiDimensions={packScore.aiDimensions}
+            factors={packScore.factors}
+            strongest={healthInsights.strongest}
+            weakest={healthInsights.weakest}
+          />
+        </section>
+      )}
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <TrendingUp className="h-4 w-4 text-[var(--color-accent)]" />
+              Top flows by centrality
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {flowRanks.length > 0 ? (
+              <DimensionBars
+                items={flowRanks.slice(0, 5).map((f) => ({
+                  name: f.name,
+                  value: f.centrality,
+                }))}
+                max={flowRanks[0]?.centrality ?? 100}
               />
-            </section>
-          )}
+            ) : (
+              <p className="text-sm text-[var(--color-fg-muted)]">No flows detected.</p>
+            )}
+          </CardContent>
+        </Card>
 
-          <section className="repo-issues-section">
-            <div className="repo-section-headline">
-              <div>
-                <small>Issues and bugs</small>
-                <h3>Copy-ready repair context</h3>
-              </div>
-              <div className="repo-copy-actions">
-                <button type="button" className="repo-copy-btn" onClick={() => handleCopy('json', agentPackJson)}>
-                  {copyFeedback === 'json' ? 'Copied JSON' : 'Copy AI Pack v1'}
-                </button>
-                <button type="button" className="repo-copy-btn" onClick={() => handleCopy('prompt', fixPrompt)}>
-                  {copyFeedback === 'prompt' ? 'Copied prompt' : 'Copy fix prompt'}
-                </button>
-              </div>
-            </div>
-            <div className="repo-issue-grid grid gap-4 lg:grid-cols-2 p-4">
-              {packIssues.length > 0 ? (
-                packIssues.map((issue) => <IssueCard key={issue.id} issue={issue} repoId={repoId} />)
-              ) : (
-                <article className="repo-empty-state col-span-full">
-                  <strong>No major issues detected</strong>
-                </article>
-              )}
-            </div>
-          </section>
-
-          <section className="repo-next-grid">
-            <Link to={buildModePath('coder', repoId, 'architecture')} className="repo-next-card">
-              <strong>Open architecture</strong>
-              <span>Systems, domains, graph, smells.</span>
-            </Link>
-            <Link to={buildModePath('coder', repoId, 'flows')} className="repo-next-card">
-              <strong>Open flows</strong>
-              <span>Execution paths and journeys.</span>
-            </Link>
-            <Link to={buildModePath('ai', repoId, 'json')} className="repo-next-card">
-              <strong>Open AI JSON</strong>
-              <span>Full AI Pack v1 with copy.</span>
-            </Link>
-          </section>
-
-          <Overview memory={memory} healthScore={healthScore} hideHealthScore />
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <AlertTriangle className="h-4 w-4 text-[var(--color-warn)]" />
+              High-risk domains
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {highRiskDomains.length > 0 ? (
+              <ul className="space-y-2">
+                {highRiskDomains.map((d) => (
+                  <li
+                    key={d.id}
+                    className="flex items-center justify-between rounded-[var(--radius-xs)] border border-[var(--color-border)] px-3 py-2 text-sm"
+                  >
+                    <span>{d.name}</span>
+                    <span className="tabular-nums text-[var(--color-danger)]">{d.score}/100</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-[var(--color-fg-muted)]">No high-risk domains detected.</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </div>
+
+      {smellClusters.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-base">Smell clusters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {smellClusters.slice(0, 6).map((c) => (
+                <span
+                  key={c.type}
+                  className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs"
+                >
+                  {c.type.replace(/_/g, ' ')} · {c.count}
+                </span>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <section className="mt-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Issues & repairs</h2>
+          <Link to={buildModePath('ai', repoId, 'repairs')} className="text-sm text-[var(--color-accent)] hover:underline">
+            View all repairs
+          </Link>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {packIssues.length > 0 ? (
+            packIssues.map((issue) => <IssueCard key={issue.id} issue={issue} repoId={repoId} />)
+          ) : (
+            <EmptyState title="No major issues detected" description="Repository looks clean from Mnemos analysis." />
+          )}
+        </div>
+      </section>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        {[
+          { to: buildModePath('coder', repoId, 'architecture'), title: 'Architecture', desc: 'Systems, domains, graph' },
+          { to: buildModePath('coder', repoId, 'flows'), title: 'Flows', desc: 'Execution paths' },
+          { to: buildModePath('ai', repoId, 'json'), title: 'AI JSON', desc: 'Full agent pack' },
+        ].map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className="glass-panel group flex items-center justify-between p-4 transition-all hover:scale-[1.01] hover:shadow-[var(--shadow-glow)]"
+          >
+            <div>
+              <p className="font-medium">{item.title}</p>
+              <p className="text-xs text-[var(--color-fg-muted)]">{item.desc}</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-[var(--color-muted)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-accent)]" />
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-8">
+        <Overview memory={memory} healthScore={healthScore} hideHealthScore />
+      </div>
+    </PageLayout>
   )
 }

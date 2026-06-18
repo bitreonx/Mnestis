@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchRepoMemory, fetchWorkspace, type RepoSnapshot } from '@/lib/workspace'
-import type { MemoryModel } from '@/types'
+import { useIntelligence } from '@/core/IntelligenceProvider'
 
 const LOCAL_REPO: RepoSnapshot = {
   id: 'local',
@@ -8,7 +8,7 @@ const LOCAL_REPO: RepoSnapshot = {
   label: 'Repository',
   path: '.',
   description: '',
-  accent: '#6366f1',
+  accent: '#3ecf8e',
   status: 'missing',
 }
 
@@ -31,7 +31,7 @@ export const useActiveRepo = (repoId: string): RepoSnapshot => {
             label: m.architecture.type,
             path: '.',
             description: m.architecture.summary,
-            accent: '#6366f1',
+            accent: '#3ecf8e',
             status: m.stats.filesScanned > 0 ? 'ready' : 'missing',
             health: data.healthScore?.overall,
           })
@@ -44,27 +44,13 @@ export const useActiveRepo = (repoId: string): RepoSnapshot => {
   return repo
 }
 
-export const useRepoIntelligence = (repoId: string) => {
-  const [loading, setLoading] = useState(true)
-  const [memory, setMemory] = useState<MemoryModel | null>(null)
-  const [healthScore, setHealthScore] = useState<Awaited<ReturnType<typeof fetchRepoMemory>>['healthScore']>(null)
-  const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>([])
-
-  useEffect(() => {
-    setLoading(true)
-    fetchRepoMemory(repoId)
-      .then((d) => {
-        setMemory(d.memory)
-        setHealthScore(d.healthScore)
-        setSuggestedPrompts(d.suggestedPrompts)
-      })
-      .catch(() => {
-        setMemory(null)
-        setHealthScore(null)
-        setSuggestedPrompts([])
-      })
-      .finally(() => setLoading(false))
-  }, [repoId])
-
-  return { loading, memory, healthScore, suggestedPrompts }
+/** @deprecated Use useIntelligence from @/core — only works inside AppShell */
+export const useRepoIntelligence = (_repoId: string) => {
+  const intel = useIntelligence()
+  return {
+    loading: intel.loading,
+    memory: intel.memory,
+    healthScore: intel.healthScore,
+    suggestedPrompts: intel.suggestedPrompts,
+  }
 }

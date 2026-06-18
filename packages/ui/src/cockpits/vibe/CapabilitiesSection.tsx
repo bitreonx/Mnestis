@@ -1,19 +1,39 @@
-import { useParams } from 'react-router-dom'
-import { useRepoIntelligence } from '@/cockpits/coder/CoderBridgeData'
+import { Layers } from 'lucide-react'
 import { CapabilitiesView } from '@/components/CapabilitiesView'
-import { Skeleton } from '@/components/ui/skeleton'
-import { EmptyState } from '@/components/ui/empty-state'
+import { useIntelligence } from '@/core/IntelligenceProvider'
+import { PageLayout, PageHeader, LoadingState, EmptyState, ContentWell } from '@/shell/PageLayout'
+import { Button } from '@/components/ui/button'
 
 export const CapabilitiesSection = () => {
-  const { repoId = 'local' } = useParams()
-  const { loading, memory } = useRepoIntelligence(repoId)
+  const { loading, memory, error, handleBuild, building } = useIntelligence()
 
-  if (loading) return <div className="p-8"><Skeleton className="h-64 w-full" /></div>
-  if (!memory) return <EmptyState title="No capabilities" description="Build the repository to detect product capabilities." className="m-8" />
+  if (loading) return <LoadingState />
+  if (!memory) {
+    return (
+      <PageLayout>
+        <EmptyState
+          title="No capabilities detected"
+          description={error ?? 'Run Mnemos to infer business capabilities.'}
+          action={
+            <Button onClick={handleBuild} disabled={building}>
+              {building ? 'Building…' : 'Run Mnemos'}
+            </Button>
+          }
+        />
+      </PageLayout>
+    )
+  }
 
   return (
-    <div className="p-6">
-      <CapabilitiesView memory={memory} />
-    </div>
+    <PageLayout wide>
+      <PageHeader
+        title="Capabilities"
+        description="What this product can do — inferred from code structure, APIs, and domain boundaries."
+        icon={<Layers className="h-6 w-6" />}
+      />
+      <ContentWell>
+        <CapabilitiesView memory={memory} />
+      </ContentWell>
+    </PageLayout>
   )
 }

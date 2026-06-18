@@ -1,6 +1,7 @@
 import { LayoutDashboard, FileText, Braces } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { MNEMOS_REPORT_PATH } from '@/lib/support'
 
 export type ArtifactKind = 'dashboard' | 'report' | 'json'
 
@@ -12,7 +13,7 @@ interface LegendProps {
 
 const ITEMS: { id: ArtifactKind; label: string; icon: typeof LayoutDashboard; href: (repoId: string) => string }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: () => '#' },
-  { id: 'report', label: 'Report', icon: FileText, href: () => '/report/index.html' },
+  { id: 'report', label: 'Report', icon: FileText, href: () => MNEMOS_REPORT_PATH },
   { id: 'json', label: 'AI JSON', icon: Braces, href: (id) => `/json/${id}` },
 ]
 

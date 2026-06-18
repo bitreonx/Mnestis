@@ -1,7 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom'
-import { ModeLayout } from '@/layouts/ModeLayout'
-import { CockpitSectionNav } from '@/cockpits/shared/CockpitSectionNav'
-import { VibeWorkspaceHeader } from '@/cockpits/vibe/VibeWorkspaceHeader'
+import { AppShell } from '@/shell/AppShell'
 import { StorySection } from '@/cockpits/vibe/StorySection'
 import { JourneysSection } from '@/cockpits/vibe/JourneysSection'
 import { CapabilitiesSection } from '@/cockpits/vibe/CapabilitiesSection'
@@ -17,15 +15,18 @@ const SECTION_MAP: Record<string, React.ComponentType> = {
 }
 
 export const VibeCockpit = () => {
-  const { section = 'story' } = useParams()
-  const Section = SECTION_MAP[section] ?? StorySection
+  const { section = 'story', repoId = 'local' } = useParams()
+
+  if (!SECTION_MAP[section]) {
+    return <Navigate to={`/vibe/${repoId}/story`} replace />
+  }
+
+  const Section = SECTION_MAP[section]
 
   return (
-    <ModeLayout mode="vibe">
-      <VibeWorkspaceHeader />
-      <CockpitSectionNav mode="vibe" />
+    <AppShell mode="vibe">
       <Section />
-    </ModeLayout>
+    </AppShell>
   )
 }
 

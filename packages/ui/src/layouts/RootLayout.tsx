@@ -1,21 +1,25 @@
-import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { CommandPaletteRouter } from '@/components/layout/CommandPaletteRouter'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { useTheme } from '@/styles/theme'
 
-export const RootLayout = () => {
+const RootShell = () => {
   useKeyboardShortcuts()
-
-  useEffect(() => {
-    document.documentElement.style.setProperty('--ease-out', 'cubic-bezier(0.2, 0.8, 0.2, 1)')
-  }, [])
+  const { resolved } = useTheme()
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-fg)]">
+    <div className="ambient-mesh min-h-screen text-[var(--color-fg)]">
       <Outlet />
-      <Toaster position="bottom-right" richColors closeButton />
+      <Toaster position="bottom-right" theme={resolved} richColors closeButton />
       <CommandPaletteRouter />
     </div>
   )
 }
+
+export const RootLayout = () => (
+  <ErrorBoundary>
+    <RootShell />
+  </ErrorBoundary>
+)
