@@ -1,10 +1,34 @@
 {
   "name": "@mnemos/cli",
   "version": "0.3.0",
+  "description": "The memory layer for software — CLI to transform codebases into structured intelligence",
   "type": "module",
   "bin": {
     "mnemos": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "mnemos",
+    "memory",
+    "ai",
+    "codebase",
+    "architecture",
+    "intelligence",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitreonx/mnemos.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/bitreonx/mnemos/issues"
+  },
+  "homepage": "https://mnemos.dev",
+  "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "bundle": "node scripts/bundle.mjs",
@@ -21,5 +45,8 @@
     "@yao-pkg/pkg": "^5.16.1",
     "esbuild": "^0.25.0",
     "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

@@ -1,0 +1,51 @@
+name: publish-npm
+
+# Publishes @mnemos/cli to npm registry when a version tag is pushed
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: publish @mnemos/cli to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # needed for provenance
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build core package (dependency of CLI)
+        run: npm run build --workspace @mnemos/core
+
+      - name: Build CLI package
+        run: npm run build --workspace @mnemos/cli
+
+      - name: Verify tag matches package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          PKG_VERSION=$(node -p "require('./packages/cli/package.json').version")
+          if [ "$TAG" != "$PKG_VERSION" ]; then
+            echo "::error::Tag v$TAG does not match packages/cli/package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Publish to npm
+        working-directory: packages/cli
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
