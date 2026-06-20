@@ -1,15 +1,33 @@
 {
-  "$schema": "mnemos-bench/tasks/v1",
-  "description": "Every tool answers the same six questions. Scoring is objective — keyword coverage against per-repo ground truth.",
+  "$schema": "inferno-bench/tasks/v1",
+  "benchmark": "INFERNO-bench",
+  "description": "Six Trials of INFERNO — every entrant faces the same adversarial questions.",
+  "trials": {
+    "task1_login_start": { "codename": "EMBER_GATE", "subtitle": "Auth entry navigation" },
+    "task2_impact": { "codename": "BLAST_FORGE", "subtitle": "Impact & blast radius" },
+    "task3_explain": { "codename": "ARCHITECT_TRIAL", "subtitle": "Architecture overview" },
+    "task4_critical": { "codename": "CROWN_OF_ASH", "subtitle": "Critical subsystem" },
+    "task5_capabilities": { "codename": "CAULDRON", "subtitle": "Business capabilities" },
+    "task6_context": { "codename": "PHOENIX_PACK", "subtitle": "AI context export" }
+  },
+  "engines": {
+    "EMBER": "Exact Match Engine — word boundaries, paths, synonyms",
+    "BRIMSTONE": "Adversarial trap layer — forbidden, injection, homoglyphs",
+    "CINDER": "Anti-gaming — keyword stuffing, empty shells",
+    "PANDEMONIUM": "Intent-aware multi-signal fusion",
+    "SPECTER": "Tamper-evident integrity manifests"
+  },
   "tasks": [
     {
       "id": "task1_login_start",
+      "codename": "EMBER_GATE",
       "question": "Where does login start?",
       "expected_dimensions": ["route", "controller", "service", "entry", "handler"],
       "intent": "auth_entry"
     },
     {
       "id": "task2_impact",
+      "codename": "BLAST_FORGE",
       "question": "What breaks if {impact_target} changes?",
       "expected_dimensions": ["dependencies", "apis", "flows", "blast", "dependents"],
       "intent": "impact",
@@ -17,6 +35,7 @@
     },
     {
       "id": "task3_explain",
+      "codename": "ARCHITECT_TRIAL",
       "question": "Explain the repository in under 300 words.",
       "expected_dimensions": ["architecture", "capabilities", "framework", "layers", "modules"],
       "intent": "overview",
@@ -24,12 +43,14 @@
     },
     {
       "id": "task4_critical",
+      "codename": "CROWN_OF_ASH",
       "question": "Find the most critical subsystem.",
       "expected_dimensions": ["centrality", "critical", "domain", "core", "hub"],
       "intent": "critical"
     },
     {
       "id": "task5_capabilities",
+      "codename": "CAULDRON",
       "question": "List business capabilities.",
       "expected_dimensions": ["capability", "authentication", "payments", "notifications"],
       "reject_folder_names": true,
@@ -37,6 +58,7 @@
     },
     {
       "id": "task6_context",
+      "codename": "PHOENIX_PACK",
       "question": "Generate AI context package.",
       "expected_dimensions": ["dna", "context", "agent", "architecture"],
       "intent": "context_export",

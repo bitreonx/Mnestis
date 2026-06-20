@@ -56,7 +56,7 @@
   "task6_context": {
     "required_artifacts": ["project.dna.json", "agent_context.json"],
     "min_compression": 3,
-    "max_tokens": 500_000
+    "max_tokens": 500000
   },
   "manual_baseline": {
     "files_to_read_estimate": 85,

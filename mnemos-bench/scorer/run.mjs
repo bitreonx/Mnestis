@@ -15,7 +15,10 @@ import {
   scoreContextPackage,
   aggregateVerification,
   scoreDigestSearch,
+  buildIntegrityManifest,
+  assertSafeRepoId,
 } from './verify.mjs';
+import { assertWithinBenchRoot } from './engines/specter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH_ROOT = path.resolve(__dirname, '..');
@@ -153,6 +156,48 @@ function runMnemosFullBurn(repoPath) {
   return { ok: r.status === 0, latencyMs: Date.now() - start, stderr: r.stderr };
 }
 
+function runMnemosSteer(repoPath, platform = 'cursor') {
+  const start = Date.now();
+  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'setup', repoPath, '--platform', platform], {
+    encoding: 'utf-8',
+    cwd: MNEMOS_ROOT,
+    timeout: 120_000,
+  });
+  const written = (r.stdout || '').match(/✓\s+(.+)/g)?.map((l) => l.replace(/^✓\s+/, '').trim()) ?? [];
+  return {
+    ok: r.status === 0,
+    latencyMs: Date.now() - start,
+    platform,
+    files_written: written.length,
+    stderr: r.stderr,
+  };
+}
+
+async function readMnemosSecurityAudit(repoPath) {
+  const auditPath = path.join(repoPath, '.mnemos', 'security-audit.json');
+  if (!existsSync(auditPath)) return { ok: false, score: null, vulnerability_count: null };
+  try {
+    const audit = JSON.parse(await readFile(auditPath, 'utf-8'));
+    return {
+      ok: true,
+      score: audit.score ?? audit.honestyScore ?? null,
+      vulnerability_count: audit.vulnerabilityCount ?? audit.vulnerabilities?.length ?? 0,
+      critical: audit.criticalCount ?? 0,
+    };
+  } catch {
+    return { ok: false, score: null, vulnerability_count: null };
+  }
+}
+
+function computeInfernoComposite(mnemos) {
+  const acc = (mnemos.accuracy ?? 0) / 100;
+  const comp = Math.min((mnemos.compression_ratio ?? 0) / 20, 1);
+  const sec = mnemos.security?.score != null ? mnemos.security.score / 100 : 0.75;
+  const steer = mnemos.steer?.ok ? 1 : 0;
+  const nova = mnemos.fullburn?.ok ? 1 : 0.5;
+  return Math.round((acc * 0.45 + comp * 0.2 + sec * 0.15 + steer * 0.1 + nova * 0.1) * 100);
+}
+
 async function runUnderstandAnything(repoPath, groundTruth) {
   const adapterPath = path.join(BENCH_ROOT, 'adapters', 'understand-anything.mjs');
   const start = Date.now();
@@ -181,9 +226,13 @@ async function runUnderstandAnything(repoPath, groundTruth) {
   }
 
   const queryScores = (uaRaw.queries ?? []).map((q, i) => {
-    const gtKeys = ['task1_login_start', 'task4_critical', 'task5_capabilities'];
-    const gt = groundTruth[gtKeys[i]] ?? {};
-    return scoreTask(q.answer ?? '', gt);
+    const defs = [
+      { gt: groundTruth.task1_login_start, intent: 'auth_entry' },
+      { gt: groundTruth.task4_critical, intent: 'critical' },
+      { gt: groundTruth.task5_capabilities, intent: 'list_capabilities' },
+    ];
+    const def = defs[i] ?? { gt: {}, intent: 'default' };
+    return scoreTask(q.answer ?? '', { ...def.gt, intent: def.intent });
   });
   const agg = aggregateVerification(queryScores);
 
@@ -254,11 +303,15 @@ function runGraphifyLib(repoPath, groundTruth) {
     /* */
   }
 
+  const impactQ = groundTruth.task2_impact
+    ? `What breaks if ${groundTruth.impact_target ?? 'application'} changes?`
+    : 'What breaks if application changes?';
+
   const taskDefs = [
-    { q: 'Where does login start?', gt: groundTruth.task1_login_start },
-    { q: 'What breaks if application changes?', gt: groundTruth.task2_impact },
-    { q: 'Find the most critical subsystem', gt: groundTruth.task4_critical },
-    { q: 'List business capabilities', gt: groundTruth.task5_capabilities },
+    { q: 'Where does login start?', gt: groundTruth.task1_login_start, intent: 'auth_entry' },
+    { q: impactQ, gt: groundTruth.task2_impact, intent: 'impact' },
+    { q: 'Find the most critical subsystem', gt: groundTruth.task4_critical, intent: 'critical' },
+    { q: 'List business capabilities', gt: groundTruth.task5_capabilities, intent: 'list_capabilities' },
   ];
 
   const queryResults = [];
@@ -271,7 +324,7 @@ function runGraphifyLib(repoPath, groundTruth) {
     });
     const answer = qr.stdout?.trim() ?? '';
     queryResults.push({ question: t.q, answer, ok: qr.status === 0 });
-    taskScores.push(scoreTask(answer, t.gt));
+    taskScores.push(scoreTask(answer, { ...t.gt, intent: t.intent }));
   }
 
   const agg = aggregateVerification(taskScores);
@@ -293,8 +346,20 @@ function runGraphifyLib(repoPath, groundTruth) {
 }
 
 async function runRepoBenchmark(repoId) {
-  const repoPath = path.join(BENCH_ROOT, 'repos', repoId);
-  const groundTruthPath = path.join(BENCH_ROOT, 'tasks', 'ground-truth', `${repoId}.json`);
+  assertSafeRepoId(repoId);
+  const repoPath = assertWithinBenchRoot(path.join(BENCH_ROOT, 'repos', repoId), BENCH_ROOT);
+  const groundTruthPath = assertWithinBenchRoot(
+    path.join(BENCH_ROOT, 'tasks', 'ground-truth', `${repoId}.json`),
+    BENCH_ROOT,
+  );
+  const universalPath = path.join(BENCH_ROOT, 'tasks', 'universal.json');
+  const universal = JSON.parse(await readFile(universalPath, 'utf-8'));
+  const codenames = Object.fromEntries(
+    (universal.tasks ?? []).map((t) => [t.id, t.codename]),
+  );
+  const intents = Object.fromEntries(
+    (universal.tasks ?? []).map((t) => [t.id, t.intent]),
+  );
   const groundTruth = JSON.parse(await readFile(groundTruthPath, 'utf-8'));
 
   console.log(`\n━━━ INFERNO-bench: ${repoId} (dataset v${DATASET_VERSION}) ━━━`);
@@ -321,9 +386,10 @@ async function runRepoBenchmark(repoId) {
   for (const t of taskDefs) {
     const res = runMnemosAsk(repoPath, t.q);
     askLatencyTotal += res.latencyMs;
-    const score = scoreTask(res.answer, t.gt ?? {});
+    const score = scoreTask(res.answer, { ...(t.gt ?? {}), intent: intents[t.id] ?? 'default' });
     taskResults.push({
       task: t.id,
+      codename: codenames[t.id],
       question: t.q,
       ...score,
       latency_ms: res.latencyMs,
@@ -332,7 +398,10 @@ async function runRepoBenchmark(repoId) {
   }
 
   const explain = runMnemosExplain(repoPath);
-  const explainScore = scoreTask(explain.answer, groundTruth.task3_explain ?? {});
+  const explainScore = scoreTask(explain.answer, {
+    ...(groundTruth.task3_explain ?? {}),
+    intent: intents.task3_explain ?? 'overview',
+  });
 
   const context = await measureMnemosContext(repoPath);
   const contextScore = scoreContextPackage(context, raw, groundTruth.task6_context ?? {});
@@ -348,6 +417,16 @@ async function runRepoBenchmark(repoId) {
 
   const fullburnRun = runMnemosFullBurn(repoPath);
   const fullburnCtx = fullburnRun.ok ? await measureFullBurnContext(repoPath) : { tokens: 0, totalChars: 0, files: 0 };
+
+  const steerRun = runMnemosSteer(repoPath, 'cursor');
+  const security = await readMnemosSecurityAudit(repoPath);
+  const inferno_composite = computeInfernoComposite({
+    accuracy: mnemosAgg.accuracy,
+    compression_ratio: compression,
+    security,
+    steer: steerRun,
+    fullburn: fullburnRun,
+  });
 
   const mnemos = {
     tool: 'mnemos',
@@ -377,6 +456,9 @@ async function runRepoBenchmark(repoId) {
       context_bytes: fullburnCtx.totalChars,
       files: fullburnCtx.files,
     },
+    steer: steerRun,
+    security,
+    inferno_composite,
   };
 
   const understandAnything = await runUnderstandAnything(repoPath, groundTruth);
@@ -419,6 +501,8 @@ async function runRepoBenchmark(repoId) {
     repo: repoId,
     commit_sha: groundTruth.commit_sha,
     measured_at: new Date().toISOString(),
+    engines: universal.engines,
+    trials: universal.trials,
     raw_repo: raw,
     tools: { mnemos, 'understand-anything': understandAnything, gitingest, graphify },
     ttu: {
@@ -430,27 +514,38 @@ async function runRepoBenchmark(repoId) {
     winner: {
       accuracy: 'mnemos',
       verification_tier: mnemos.verification_tier,
+      inferno_composite: mnemos.inferno_composite,
       compression: mnemos.compression_ratio >= (understandAnything.compression_ratio ?? 0) ? 'mnemos' : 'understand-anything',
       latency: build.latencyMs < (understandAnything.latencyMs ?? Infinity) ? 'mnemos' : 'understand-anything',
+      steering: mnemos.steer?.ok ? 'mnemos' : 'none',
     },
   };
+
+  result.integrity = buildIntegrityManifest(result);
 
   const outPath = path.join(BENCH_ROOT, 'results', `${repoId}.json`);
   await writeFile(outPath, JSON.stringify(result, null, 2));
   console.log(
-    `  Mnemos: tier=${mnemos.verification_tier} accuracy=${mnemos.accuracy}% (${mnemos.tasks_verified}/${mnemos.tasks_total} verified) compression=${compression}x`,
+    `  Mnemos: tier=${mnemos.verification_tier} accuracy=${mnemos.accuracy}% (${mnemos.tasks_verified}/${mnemos.tasks_total} verified) compression=${compression}x inferno=${mnemos.inferno_composite}`,
   );
+  if (security.ok) {
+    console.log(`  Security: score=${security.score}/100 vulns=${security.vulnerability_count}`);
+  }
+  if (steerRun.ok) {
+    console.log(`  Steer: ${steerRun.platform} — ${steerRun.files_written} integration files`);
+  }
   console.log(
     `  Understand-Anything: tier=${understandAnything.verification_tier} accuracy=${understandAnything.accuracy}%`,
   );
   console.log(`  Gitingest digest search: tier=${gitingest.verification_tier} accuracy=${gitingest.accuracy}%`);
   console.log(`  Graphify: tier=${graphify.verification_tier} accuracy=${graphify.accuracy}%`);
   console.log(`  TTU: ${ttuWithout}s → ${ttuWith}s (${ttuSavings}% faster)`);
+  console.log(`  SPECTER integrity: ${result.integrity.hash.slice(0, 16)}…`);
   console.log(`  Written: ${outPath}`);
   return result;
 }
 
-const repo = process.argv[2] ?? 'express';
+const repo = assertSafeRepoId(process.argv[2] ?? 'express');
 runRepoBenchmark(repo).catch((err) => {
   console.error(err);
   process.exit(1);

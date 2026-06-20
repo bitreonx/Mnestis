@@ -8,6 +8,7 @@ import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertSafeRepoId } from '../scorer/engines/specter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH = path.resolve(__dirname, '..');
@@ -61,7 +62,7 @@ async function pinInstance(instance) {
 }
 
 const dataset = await loadDataset();
-const ids = process.argv.slice(2);
+const ids = process.argv.slice(2).map((id) => assertSafeRepoId(id));
 const targets = ids.length
   ? dataset.instances.filter((i) => ids.includes(i.id))
   : dataset.instances.filter((i) => i.commit_sha && i.status === 'verified');

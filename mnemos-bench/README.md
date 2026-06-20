@@ -2,6 +2,8 @@
 
 **Independent Framework for Evaluating Repository Navigation Objectives**
 
+See [INFERNO.md](./INFERNO.md) for the full specification, engine stack, and Six Trials codenames.
+
 The adversarial codebase understanding benchmark — where every tool faces the fire.
 
 > SWE-bench tests whether models can **fix** real bugs. INFERNO tests whether tools and models can **understand** real systems — auth flows, blast radius, architecture, capabilities, and context efficiency.
@@ -82,6 +84,10 @@ npm run bench:nestjs
 
 # Verification unit tests (no clones needed)
 npm run bench:verify
+npm run bench:cerberus        # CERBERUS triple verification
+
+# Model submission (ASHES format)
+npm run bench:submit -- express answers.json
 
 # Regression + leaderboard
 npm run bench:regression

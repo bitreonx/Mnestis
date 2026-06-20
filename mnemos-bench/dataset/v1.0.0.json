@@ -48,6 +48,16 @@
       "optional": true
     }
   ],
+  "inferno_version": "1.1.0",
+  "engines": {
+    "EMBER": "Exact Match Engine",
+    "BRIMSTONE": "Adversarial trap layer",
+    "CINDER": "Anti-gaming detectors",
+    "PANDEMONIUM": "Intent-aware fusion",
+    "SPECTER": "Integrity & sandbox",
+    "CERBERUS": "Triple verification",
+    "ASHES": "Model submission format"
+  },
   "verification_signals": [
     "keywords_required",
     "keywords_any",

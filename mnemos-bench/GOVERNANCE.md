@@ -16,6 +16,20 @@ We studied how the most trusted open benchmarks earn credibility, then adapted t
 | [GAIA](https://huggingface.co/gaia-benchmark) | Multi-step reasoning checks | Six universal tasks spanning auth, impact, overview, critical path, capabilities, context export |
 | [LiveCodeBench](https://livecodebench.github.io/) | Contamination-resistant pinned snapshots | Fixtures frozen at commit SHA; re-pin only on dataset version bump |
 
+## Engine stack (v1.1)
+
+| Engine | Role |
+|--------|------|
+| **EMBER** | Word-boundary matching, paths, synonyms |
+| **BRIMSTONE** | Forbidden traps, injection detection, homoglyphs |
+| **CINDER** | Anti-gaming (keyword stuffing, empty shells) |
+| **PANDEMONIUM** | Intent-aware signal fusion |
+| **SPECTER** | Path sandbox, allowlist, SHA-256 manifests |
+| **CERBERUS** | Triple verification runner |
+| **ASHES** | External model submission format |
+
+Full spec: [INFERNO.md](./INFERNO.md)
+
 ## Verification protocol
 
 Every ground-truth file MUST include:

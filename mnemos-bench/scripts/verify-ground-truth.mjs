@@ -6,6 +6,7 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertSafeRepoId, assertWithinBenchRoot } from '../scorer/engines/specter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH = path.resolve(__dirname, '..');
@@ -48,8 +49,12 @@ async function grepRepo(repoPath, pattern) {
 }
 
 async function verifyRepo(repoId) {
-  const repoPath = path.join(BENCH, 'repos', repoId);
-  const gtPath = path.join(BENCH, 'tasks', 'ground-truth', `${repoId}.json`);
+  assertSafeRepoId(repoId);
+  const repoPath = assertWithinBenchRoot(path.join(BENCH, 'repos', repoId), BENCH);
+  const gtPath = assertWithinBenchRoot(
+    path.join(BENCH, 'tasks', 'ground-truth', `${repoId}.json`),
+    BENCH,
+  );
   const groundTruth = JSON.parse(await readFile(gtPath, 'utf-8'));
   const checks = groundTruth.independent_checks ?? [];
   const results = [];
@@ -68,7 +73,7 @@ async function verifyRepo(repoId) {
   return { repo: repoId, ok: failed.length === 0, results, verified_at: groundTruth.verified_at };
 }
 
-const repo = process.argv[2] ?? 'express';
+const repo = assertSafeRepoId(process.argv[2] ?? 'express');
 verifyRepo(repo)
   .then((r) => {
     if (!r.ok) {

@@ -21,6 +21,8 @@
     "bench:leaderboard": "node mnemos-bench/scorer/leaderboard.mjs",
     "bench:pin": "node mnemos-bench/scripts/pin-fixtures.mjs",
     "bench:verify-gt": "node mnemos-bench/scripts/verify-ground-truth.mjs",
+    "bench:cerberus": "node mnemos-bench/scripts/cerberus.mjs",
+    "bench:submit": "node mnemos-bench/scorer/submit.mjs",
     "bench:ai-eval": "node mnemos-bench/scorer/ai-eval.mjs",
     "dabt:ui": "node packages/cli/dist/index.js ui --workspace packages/ui/dabt.workspace.json",
     "docs:sync": "npm run build --workspace @mnemos/core && node scripts/sync-docs.mjs",
