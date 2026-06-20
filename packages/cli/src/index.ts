@@ -93,6 +93,10 @@ import {
   loadEngineIndex,
   buildTrustManifest,
   formatTrustMarkdown,
+  formatProvenanceMarkdown,
+  formatVeilStatus,
+  formatSpiralfuseStatus,
+  parseVisibility,
   formatProductLabel,
   MEMORY_ENGINE,
   writeFullBurnPack,
@@ -130,6 +134,59 @@ async function requireMemoryModel(root: string): Promise<NonNullable<Awaited<Ret
     process.exit(1);
   }
   return loaded;
+}
+
+async function runSteerIntegrations(
+  root: string,
+  platform: string,
+  force?: boolean,
+): Promise<{ written: string[]; skipped: string[] }> {
+  const loaded = await requireMemoryModel(root);
+  const memoryScore = computeMemoryScore(loaded.memory).overall;
+  const exports = buildAgentExports({
+    memory: loaded.memory,
+    capabilities: loaded.memory.capabilities ?? [],
+    journeys: loaded.memory.journeys ?? [],
+    memoryScore,
+  });
+  const toolkit = buildAiToolkit(
+    loaded.memory,
+    loaded.memory.capabilities ?? [],
+    loaded.memory.journeys ?? [],
+    exports.context,
+  );
+
+  if (platform !== 'all' && !ALL_PLATFORMS.includes(platform as (typeof ALL_PLATFORMS)[number])) {
+    console.log(chalk.red(`Unknown platform "${platform}". Valid: ${ALL_PLATFORMS.join(', ')}, all`));
+    process.exit(1);
+  }
+
+  const result = await installAiIntegrations({
+    root,
+    outputDir: loaded.outputDir,
+    toolkit,
+    memory: loaded.memory,
+    context: exports.context,
+    platform: platform as (typeof ALL_PLATFORMS)[number] | 'all',
+    force,
+  });
+
+  return { written: result.written, skipped: result.skipped };
+}
+
+function printSteerSummary(platform: string, written: string[], skipped: string[]): void {
+  console.log('');
+  console.log(chalk.bold(`Steering installed — ${platform}`));
+  for (const f of written) {
+    console.log(chalk.green('  ✓') + ' ' + f);
+  }
+  for (const f of skipped) {
+    console.log(chalk.dim('  · skipped (exists): ') + f);
+  }
+  console.log('');
+  console.log(chalk.bold('Your agent now knows how to use Mnemos'));
+  console.log(chalk.dim('  Open the repo in your editor — rules/skills load automatically.'));
+  console.log(chalk.dim(`  Try: ${chalk.cyan('mnemos ask "where does auth start?"')} or ${chalk.cyan('mnemos pack')}`));
 }
 
 program
@@ -841,37 +898,13 @@ program
       return;
     }
 
-    const loaded = await requireMemoryModel(root);
-
     const platform = options.platform as string;
     if (platform !== 'all' && !ALL_PLATFORMS.includes(platform as (typeof ALL_PLATFORMS)[number])) {
       console.log(chalk.red(`Unknown platform "${platform}". Valid: ${ALL_PLATFORMS.join(', ')}, all`));
       process.exit(1);
     }
 
-    const memoryScore = computeMemoryScore(loaded.memory).overall;
-    const exports = buildAgentExports({
-      memory: loaded.memory,
-      capabilities: loaded.memory.capabilities ?? [],
-      journeys: loaded.memory.journeys ?? [],
-      memoryScore,
-    });
-    const toolkit = buildAiToolkit(
-      loaded.memory,
-      loaded.memory.capabilities ?? [],
-      loaded.memory.journeys ?? [],
-      exports.context,
-    );
-
-    const result = await installAiIntegrations({
-      root,
-      outputDir: loaded.outputDir,
-      toolkit,
-      memory: loaded.memory,
-      context: exports.context,
-      platform: platform as (typeof ALL_PLATFORMS)[number] | 'all',
-      force: options.force,
-    });
+    const result = await runSteerIntegrations(root, platform, options.force);
 
     console.log('');
     console.log(chalk.bold(`AI integrations installed (${platform})`));
@@ -890,6 +923,86 @@ program
     console.log(chalk.bold('Platforms'));
     console.log(chalk.dim(`  Available: ${ALL_PLATFORMS.join(', ')}, all`));
     console.log(chalk.dim(`  Uninstall: mnemos setup --uninstall`));
+  });
+
+program
+  .command('launch [path]')
+  .description('Build memory + security audit + auto-steer your AI platform (one shot)')
+  .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
+  .option('--platform <name>', `Steer target: ${ALL_PLATFORMS.join(', ')}`, 'cursor')
+  .option('-f, --force', 'Overwrite existing integration files')
+  .option('--supernova', 'Also generate Supernova beast-mode intelligence pack')
+  .option('-v, --verbose', 'Show detailed build progress')
+  .option('--no-open', 'Do not open report after launch')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const outputDir = path.join(root, '.mnemos');
+    const platform = options.platform as string;
+
+    printMnemosBanner(`Launch — build · audit · steer (${platform})`);
+
+    const spinner = ora(`  Building memory model for ${root}`).start();
+    let result;
+    try {
+      result = await build({
+        root,
+        outputDir,
+        verbose: options.verbose,
+        incremental: true,
+      });
+      spinner.succeed(chalk.green('Memory model built'));
+    } catch (err) {
+      spinner.fail(chalk.red('Build failed'));
+      console.error(err);
+      process.exit(1);
+    }
+
+    const auditPath = path.join(outputDir, 'security-audit.json');
+    if (existsSync(auditPath)) {
+      try {
+        const audit = JSON.parse(await readFile(auditPath, 'utf-8')) as {
+          score?: number;
+          vulnerabilityCount?: number;
+        };
+        printSection('Security audit');
+        printMetricRow('Score', `${audit.score ?? '—'}/100`);
+        printMetricRow('Vulnerabilities', audit.vulnerabilityCount ?? 0);
+      } catch {
+        /* best-effort */
+      }
+    }
+
+    const steer = await runSteerIntegrations(root, platform, options.force);
+    printSteerSummary(platform, steer.written, steer.skipped);
+
+    if (options.supernova) {
+      const loaded = await requireMemoryModel(root);
+      const graph = await loadGraphFromMemory(loaded.outputDir);
+      const novaSpinner = ora('Supernova: writing beast-mode intelligence pack…').start();
+      const novaResult = await writeFullBurnPack(loaded.memory, loaded.outputDir, graph);
+      novaSpinner.succeed(chalk.green('Supernova complete'));
+      const pack = buildFullBurnPack(loaded.memory, graph);
+      console.log('');
+      console.log(formatFullBurnSummary(pack));
+      for (const f of novaResult.files) {
+        console.log(chalk.dim('  · ') + path.basename(f));
+      }
+    }
+
+    const { memory } = result;
+    const score = computeMemoryScore(memory);
+    printSection('Ready');
+    printMetricRow('Health', `${score.overall}/100`);
+    printMetricRow('Domains', memory.domains.length);
+    printMetricRow('Platform', platform);
+
+    if (options.open !== false) {
+      const indexPath = path.join(outputDir, 'report', 'index.html');
+      if (existsSync(indexPath)) {
+        printInfoLine('Opening report in browser…');
+        openInBrowser(indexPath);
+      }
+    }
   });
 
 program
@@ -1528,6 +1641,203 @@ memoryCmd
     console.log(chalk.green(`Imported from ${manifest.repository} (${manifest.exportedAt})`));
   });
 
+memoryCmd
+  .command('ask <question> [path]')
+  .description('Provenance answer — cited recall with honest "I don\'t know" (GBrain pattern)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--json', 'Output as JSON')
+  .action(async (question, targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const outputDir = path.join(root, '.mnemos');
+    if (!(await engineExists(outputDir))) {
+      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnemos build .')} first.`));
+      process.exit(1);
+    }
+    const engine = new MnemosMemoryEngine(root, outputDir);
+    const answer = await engine.ask(question);
+    if (options.json) {
+      console.log(JSON.stringify(answer, null, 2));
+      return;
+    }
+    console.log(formatProvenanceMarkdown(answer));
+  });
+
+memoryCmd
+  .command('chronoshift <sessionsPath> [path]')
+  .description('Import Claude Code / agent JSONL sessions into episodic memory (Chronoshift)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--dry-run', 'Parse only — do not write episodes')
+  .option('--json', 'Output as JSON')
+  .action(async (sessionsPath, targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const result = await engine.chronoshift(path.resolve(sessionsPath), { dryRun: options.dryRun });
+    if (options.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+    console.log('');
+    console.log(chalk.bold('Chronoshift · session back-catalog import'));
+    console.log(`  Files scanned:    ${result.filesScanned}`);
+    console.log(`  Turns parsed:     ${result.turnsParsed}`);
+    console.log(`  Episodes created: ${chalk.green(String(result.episodesCreated))}`);
+    console.log(`  Skipped (dup):    ${result.episodesSkipped}`);
+    console.log(`  Duration:         ${result.durationMs}ms`);
+    if (result.errors.length) {
+      console.log(chalk.yellow(`  Errors: ${result.errors.length}`));
+      for (const e of result.errors.slice(0, 5)) console.log(chalk.dim(`    ${e}`));
+    }
+    if (!options.dryRun && result.episodesCreated > 0) {
+      console.log(chalk.dim('  Run `mnemos build .` to re-index episodes into hybrid search.'));
+    }
+  });
+
+memoryCmd
+  .command('veil <action> [path]')
+  .description('Veil scoped memory — set | status (team/client isolation)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--actor <id>', 'Actor id', 'local')
+  .option('--role <role>', 'owner | lead | member | guest', 'owner')
+  .option('--team <team>', 'Team scope (repeatable)', collectTags, [] as string[])
+  .option('--client <client>', 'Client scope (repeatable)', collectTags, [] as string[])
+  .option('--visibility <vis>', 'private | team | client | org', 'private')
+  .option('--json', 'Output as JSON')
+  .action(async (action, targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    if (action === 'status') {
+      const policy = await engine.getVeilPolicy();
+      if (options.json) console.log(JSON.stringify(policy, null, 2));
+      else console.log(formatVeilStatus(policy));
+      return;
+    }
+    if (action === 'set') {
+      const vis = parseVisibility(options.visibility);
+      if (!vis) {
+        console.log(chalk.red('Invalid --visibility'));
+        process.exit(1);
+      }
+      const policy = await engine.setVeilPolicy(
+        {
+          id: options.actor,
+          role: options.role,
+          teams: options.team.length ? options.team : ['*'],
+          clients: options.client.length ? options.client : ['*'],
+        },
+        { defaultVisibility: vis, enforceAtQuery: true },
+      );
+      console.log(chalk.green('Veil policy saved'));
+      if (options.json) console.log(JSON.stringify(policy, null, 2));
+      else console.log(formatVeilStatus(policy));
+      return;
+    }
+    console.log(chalk.yellow('Use: set | status'));
+    process.exit(1);
+  });
+
+memoryCmd
+  .command('spindle <action> [path]')
+  .description('Spindle turn capture — capture <text> | frozen (Hermes snapshot)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-t, --tag <tag>', 'Tag (repeatable)', collectTags, [] as string[])
+  .option('--json', 'Output as JSON')
+  .action(async (action, targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    if (action === 'frozen') {
+      const snapshot = await engine.buildFrozenSnapshot();
+      if (options.json) {
+        console.log(JSON.stringify(snapshot, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Frozen snapshot · ~${snapshot.estimatedTokens} tokens`));
+      console.log(chalk.dim('  Written to .mnemos/engine/frozen/{soul,user,memory,today}.md'));
+      return;
+    }
+    console.log(chalk.yellow('Use: spindle frozen — or: mnemos memory remember "..." for capture'));
+    process.exit(1);
+  });
+
+memoryCmd
+  .command('capture <content> [path]')
+  .description('Spindle — evaluate and capture a durable turn fact')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-t, --tag <tag>', 'Tag (repeatable)', collectTags, [] as string[])
+  .action(async (content, targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const episode = await engine.spindleCapture(content, { tags: options.tag });
+    if (!episode) {
+      console.log(chalk.dim('Spindle: not durable enough to capture (noise filtered)'));
+      return;
+    }
+    console.log(chalk.green(`Spindle captured · ${episode.id}`));
+  });
+
+memoryCmd
+  .command('frozen [path]')
+  .description('Regenerate Hermes-style frozen snapshot (soul/user/memory/today)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--json', 'Output as JSON')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const snapshot = await engine.buildFrozenSnapshot();
+    if (options.json) console.log(JSON.stringify(snapshot, null, 2));
+    else {
+      console.log(chalk.green(`Frozen snapshot · ~${snapshot.estimatedTokens} tokens`));
+      console.log(chalk.dim('  .mnemos/engine/frozen/'));
+    }
+  });
+
+memoryCmd
+  .command('loop <action> [path]')
+  .description('Spiralfuse loop budget — start | tick | status | reset')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--label <label>', 'Loop label', 'workflow')
+  .option('--max-tokens <n>', 'Token budget', '250000')
+  .option('--max-iterations <n>', 'Iteration cap', '50')
+  .option('--tokens <n>', 'Tokens used this tick', '0')
+  .option('--json', 'Output as JSON')
+  .action(async (action, targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    if (action === 'start') {
+      const budget = await engine.loopStart({
+        label: options.label,
+        maxTokens: parseInt(options.maxTokens, 10),
+        maxIterations: parseInt(options.maxIterations, 10),
+      });
+      console.log(chalk.green(`Spiralfuse started · ${budget.loopId}`));
+      if (options.json) console.log(JSON.stringify(budget, null, 2));
+      else console.log(formatSpiralfuseStatus(budget));
+      return;
+    }
+    if (action === 'tick') {
+      const result = await engine.loopTick({ tokensDelta: parseInt(options.tokens, 10), label: options.label });
+      if (options.json) console.log(JSON.stringify(result, null, 2));
+      else {
+        console.log(formatSpiralfuseStatus(result.budget));
+        if (result.warning) console.log(chalk.yellow(result.warning));
+        if (!result.allowed) console.log(chalk.red('Loop fused — stop and escalate to human'));
+      }
+      return;
+    }
+    if (action === 'status') {
+      const budget = await engine.loopStatus();
+      if (options.json) console.log(JSON.stringify(budget, null, 2));
+      else console.log(formatSpiralfuseStatus(budget));
+      return;
+    }
+    if (action === 'reset') {
+      await engine.loopReset();
+      console.log(chalk.green('Spiralfuse reset'));
+      return;
+    }
+    console.log(chalk.yellow('Use: start | tick | status | reset'));
+    process.exit(1);
+  });
+
 function collectTags(value: string, previous: string[]): string[] {
   return previous.concat([value]);
 }
@@ -1818,7 +2128,7 @@ program
 
 async function runDefaultExperience(
   targetPath: string,
-  options: { open?: boolean; verbose?: boolean },
+  options: { open?: boolean; verbose?: boolean; platform?: string; force?: boolean },
 ): Promise<void> {
   const root = path.resolve(targetPath);
   const outputDir = path.join(root, '.mnemos');
@@ -1851,6 +2161,13 @@ async function runDefaultExperience(
   printCheck('AI integrations ready (Cursor + Claude)');
   printCheck('Screenshot-ready SVG cards rendered');
 
+  let steerResult: { written: string[]; skipped: string[] } | null = null;
+
+  if (options.platform) {
+    steerResult = await runSteerIntegrations(root, options.platform, options.force);
+    printCheck(`Steering installed for ${options.platform} (${steerResult.written.length} files)`);
+  }
+
   // Generate the polished report and snapshots
   const reportDir = path.join(outputDir, 'report');
   await mkdir(reportDir, { recursive: true });
@@ -1881,6 +2198,10 @@ async function runDefaultExperience(
   printReaderModes();
   printPrimaryNextSteps();
   printDashboardPreviewNote();
+
+  if (steerResult && options.platform) {
+    printSteerSummary(options.platform, steerResult.written, steerResult.skipped);
+  }
 
   if (options.open !== false) {
     printInfoLine('Opening report in browser…');
@@ -2044,6 +2365,8 @@ program
   .argument('[path]', 'Repository path', '.')
   .option('--no-open', 'Do not open browser after analysis')
   .option('-v, --verbose', 'Show detailed progress')
+  .option('--platform <name>', `Auto-steer AI platform: ${ALL_PLATFORMS.join(', ')}`)
+  .option('-f, --force', 'Overwrite existing steering files when using --platform')
   .action(async (targetPath, options) => {
     await runDefaultExperience(targetPath, options);
   });

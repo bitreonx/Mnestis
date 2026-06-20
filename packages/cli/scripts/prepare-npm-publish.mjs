@@ -1,5 +1,5 @@
 /**
- * Produces a self-contained npm publish artifact for `mnemosx`.
+ * Produces a self-contained npm publish artifact for `getmnemos`.
  * Bundles @mnemos/core + CLI into dist/npm.cjs — no workspace deps on the registry.
  */
 import { build } from 'esbuild'
@@ -47,3 +47,5 @@ console.log(`[publish] bundled -> ${outFile}`)
 
 const { stripWorkspaceDeps } = await import('./strip-publish-deps.mjs')
 stripWorkspaceDeps()
+
+await import('./validate-publish.mjs')

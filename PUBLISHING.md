@@ -3,6 +3,8 @@
 Package: **`getmnemos`** on npm and PyPI  
 Site: **https://getmnemos.vercel.app**
 
+> **First time?** Nothing is on npm yet — follow **[docs/NPM_FIRST_PUBLISH.md](./docs/NPM_FIRST_PUBLISH.md)** for the full step-by-step (account → manual publish → Trusted Publishers → tag releases).
+
 ## npm trusted publishing (recommended)
 
 1. On npmjs.com → package `getmnemos` → **Publishing** → enable **Trusted Publishers** → GitHub `bitreonx/mnemos`
@@ -27,5 +29,5 @@ pip install getmnemos
 ## Customer one-liner
 
 ```bash
-npx getmnemos .
+npx getmnemos launch . --platform cursor
 ```

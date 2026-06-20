@@ -31,8 +31,8 @@ export default function CTA() {
           </p>
 
           {/* terminal pill + docs (recreation of the brand card) */}
-          <div className="mx-auto mt-10 w-full max-w-xl">
-            <InstallCard />
+          <div className="mx-auto mt-10 w-full max-w-2xl">
+            <InstallCard variant="onDark" />
 
             {/* view repo · made by */}
             <div className="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row">

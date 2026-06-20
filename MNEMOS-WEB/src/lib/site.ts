@@ -1,5 +1,7 @@
 /** Single source of truth for site-wide constants and homepage content. */
 
+import type { BrandKey } from "./logos";
+
 export const SITE = {
   name: "Mnemos",
   brand: "Get Mnemos",
@@ -12,10 +14,104 @@ export const SITE = {
   author: "bitreonx",
   authorByline: "by bitreonx",
   authorTitle: "Mnemos Creator",
-  install: "npx getmnemos .",
+  install: "npx getmnemos launch . --platform cursor",
   npm: "getmnemos",
+  npmUrl: "https://www.npmjs.com/package/getmnemos",
   pypi: "getmnemos",
 } as const;
+
+/** AI platform steering — one command builds memory + installs skills/rules. */
+export type SteerPlatformId =
+  | "cursor"
+  | "claude"
+  | "codex"
+  | "gemini"
+  | "kiro"
+  | "copilot"
+  | "vscode";
+
+export type SteerPlatform = {
+  id: SteerPlatformId;
+  label: string;
+  brandKey: BrandKey | null;
+  codename: string;
+  tagline: string;
+  installs: readonly string[];
+};
+
+export const STEER_PLATFORMS: readonly SteerPlatform[] = [
+  {
+    id: "cursor",
+    label: "Cursor",
+    brandKey: "Cursor",
+    codename: "Neural Lock",
+    tagline: "Architecture rules + Fable discipline + MCP server",
+    installs: [
+      ".cursor/rules/mnemos-architecture.mdc",
+      ".cursor/rules/mnemos-discipline.mdc",
+      ".cursor/mcp.json",
+    ],
+  },
+  {
+    id: "claude",
+    label: "Claude Code",
+    brandKey: "Claude",
+    codename: "Skill Forge",
+    tagline: "Mnemos skill + Fable mindset skill + CLAUDE.md steering",
+    installs: [
+      ".claude/skills/mnemos/SKILL.md",
+      ".claude/skills/fable-mindset/SKILL.md",
+      "CLAUDE.md",
+    ],
+  },
+  {
+    id: "codex",
+    label: "Codex",
+    brandKey: "Codex",
+    codename: "Agent Bridge",
+    tagline: "Codex skill + AGENTS.md contract",
+    installs: [".codex/skills/mnemos/SKILL.md", "AGENTS.md"],
+  },
+  {
+    id: "gemini",
+    label: "Gemini",
+    brandKey: "Gemini",
+    codename: "Context Weaver",
+    tagline: "GEMINI.md + skill bundle for Gemini CLI",
+    installs: ["GEMINI.md", ".gemini/skills/mnemos.md"],
+  },
+  {
+    id: "kiro",
+    label: "Kiro",
+    brandKey: "Kiro",
+    codename: "Steering Rail",
+    tagline: "Kiro skill + steering doc for autonomous flows",
+    installs: [".kiro/skills/mnemos/SKILL.md", ".kiro/steering/mnemos.md"],
+  },
+  {
+    id: "copilot",
+    label: "GitHub Copilot",
+    brandKey: null,
+    codename: "Pilot Deck",
+    tagline: "Copilot instructions wired to your DNA pack",
+    installs: [".github/copilot-instructions.md"],
+  },
+  {
+    id: "vscode",
+    label: "VS Code",
+    brandKey: null,
+    codename: "Instruction Deck",
+    tagline: "Workspace instructions for any VS Code agent",
+    installs: [".vscode/mnemos.instructions.md"],
+  },
+] as const;
+
+export const buildLaunchCommand = (platform: SteerPlatformId = "cursor") =>
+  `npx getmnemos launch . --platform ${platform}`;
+
+export const buildQuickCommand = () => "npx getmnemos .";
+
+export const buildGlobalInstallCommand = () => "npm install -g getmnemos";
 
 export const NAV_LINKS = [
   { label: "Why Mnemos", href: "#why" },
@@ -128,6 +224,14 @@ export const MODES = [
   },
 ] as const;
 
+/** INFERNO-bench verified scores — see mnemos-bench/results/VERIFIED.md */
+export const INFERNO = {
+  name: 'INFERNO-bench',
+  tagline: 'Independent Framework for Evaluating Repository Navigation Objectives',
+  engines: ['EMBER', 'BRIMSTONE', 'CINDER', 'PANDEMONIUM', 'SPECTER'] as const,
+  trials: ['EMBER GATE', 'BLAST FORGE', 'ARCHITECT TRIAL', 'CROWN OF ASH', 'CAULDRON', 'PHOENIX PACK'] as const,
+} as const;
+
 /** Verified mnemos-bench scores — see mnemos-bench/results/VERIFIED.md */
 export const BENCHMARK_RESULTS = [
   {
@@ -159,21 +263,41 @@ export const BENCHMARKS = [
   { label: "Time saved", value: 96, suffix: "%", hint: "onboarding TTU vs manual grep" },
 ] as const;
 
+export type ComparisonCell = boolean | "partial" | "llm";
+
+export const COMPARISON_COLS = [
+  { key: "mnemos", label: "Mnemos", highlight: true },
+  { key: "understandAnything", label: "Understand Anything", highlight: false },
+  { key: "graphify", label: "Graphify", highlight: false },
+  { key: "gitingest", label: "gitingest", highlight: false },
+  { key: "madge", label: "Madge", highlight: false },
+] as const;
+
+export type ComparisonColKey = (typeof COMPARISON_COLS)[number]["key"];
+
 export const COMPARISON = {
+  cols: COMPARISON_COLS,
   rows: [
-    { feature: "Architecture & domains", mnemos: true, graphify: "partial", gitingest: false, madge: false },
-    { feature: "Execution flows & journeys", mnemos: true, graphify: "partial", gitingest: false, madge: false },
-    { feature: "Business capabilities", mnemos: true, graphify: false, gitingest: false, madge: false },
-    { feature: "Dependency graph", mnemos: true, graphify: true, gitingest: false, madge: true },
-    { feature: "AI Pack (versioned JSON)", mnemos: true, graphify: false, gitingest: "partial", madge: false },
-    { feature: "MCP server for IDEs", mnemos: true, graphify: false, gitingest: false, madge: false },
-    { feature: "Impact / blast radius", mnemos: true, graphify: "partial", gitingest: false, madge: "partial" },
-    { feature: "Local-first, no cloud", mnemos: true, graphify: true, gitingest: true, madge: true },
-    { feature: "Security dependency audit", mnemos: true, graphify: false, gitingest: false, madge: false },
-    { feature: "Supernova beast-mode intelligence", mnemos: true, graphify: false, gitingest: false, madge: false },
+    { feature: "Architecture & domains", mnemos: true, understandAnything: "partial", graphify: "partial", gitingest: false, madge: false },
+    { feature: "Execution flows & journeys", mnemos: true, understandAnything: "partial", graphify: "partial", gitingest: false, madge: false },
+    { feature: "Business capabilities", mnemos: true, understandAnything: "llm", graphify: false, gitingest: false, madge: false },
+    { feature: "Guided tours (no LLM)", mnemos: true, understandAnything: "partial", graphify: false, gitingest: false, madge: false },
+    { feature: "Persona exports (PM / dev / AI)", mnemos: true, understandAnything: "partial", graphify: false, gitingest: false, madge: false },
+    { feature: "Dependency graph", mnemos: true, understandAnything: true, graphify: true, gitingest: false, madge: true },
+    { feature: "AI Pack (versioned JSON)", mnemos: true, understandAnything: false, graphify: false, gitingest: "partial", madge: false },
+    { feature: "MCP server for IDEs", mnemos: true, understandAnything: false, graphify: false, gitingest: false, madge: false },
+    { feature: "Impact / blast radius", mnemos: true, understandAnything: "llm", graphify: "partial", gitingest: false, madge: "partial" },
+    { feature: "Session back-import (Chronoshift)", mnemos: true, understandAnything: false, graphify: false, gitingest: false, madge: false },
+    { feature: "Cited recall + honest gaps (Provenance)", mnemos: true, understandAnything: "llm", graphify: false, gitingest: false, madge: false },
+    { feature: "Team-scoped memory (Veil)", mnemos: true, understandAnything: false, graphify: false, gitingest: false, madge: false },
+    { feature: "Agent loop token fuse (Spiralfuse)", mnemos: true, understandAnything: false, graphify: false, gitingest: false, madge: false },
+    { feature: "Local-first, no cloud", mnemos: true, understandAnything: "partial", graphify: true, gitingest: true, madge: true },
+    { feature: "Supernova full-burn intelligence", mnemos: true, understandAnything: false, graphify: false, gitingest: false, madge: false },
   ],
-  cols: ["Mnemos", "Graphify", "gitingest", "Madge"],
-} as const;
+} as const satisfies {
+  cols: typeof COMPARISON_COLS;
+  rows: ReadonlyArray<{ feature: string } & Record<ComparisonColKey, ComparisonCell>>;
+};
 
 export const CHAT_LINES = [
   "Welcome to Mnemos.",
@@ -215,6 +339,6 @@ export const FABLE = {
     { value: 94, suffix: "%", label: "Context vs raw dumps", hint: "Agents read the compact DNA pack instead of grepping the whole repo." },
     { value: 0, suffix: "", label: "Cloud / API keys", hint: "Local-first. Nothing leaves your machine.", display: "Zero" },
   ],
-  install: "npx getmnemos . && getmnemos setup --platform claude",
+  install: "npx getmnemos launch . --platform claude",
   skillNote: "Installs the fable-mindset skill + CLAUDE.md context so Opus, Sonnet — any agent — adopts the discipline.",
 } as const;

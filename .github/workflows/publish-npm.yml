@@ -48,9 +48,14 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to npm (OIDC trusted publishing preferred)
+      - name: Publish to npm
         working-directory: packages/cli
-        run: npm publish --access public --provenance
+        run: |
+          if [ -n "${{ secrets.NPM_TOKEN }}" ]; then
+            npm publish --access public
+          else
+            npm publish --access public --provenance
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
