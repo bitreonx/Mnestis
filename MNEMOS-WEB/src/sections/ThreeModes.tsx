@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import { MODES } from "../lib/site";
@@ -174,7 +174,7 @@ export default function ThreeModes() {
               <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
               <span className="h-3 w-3 rounded-full bg-[#28c840]" />
               <span className="ml-3 font-mono text-xs text-[var(--text-faint)]">
-                mnemos / {mode.id}
+                MNESTIS / {mode.id}
               </span>
             </div>
             <ModePreview id={mode.id} color={mode.color} />

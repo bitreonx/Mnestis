@@ -258,7 +258,7 @@ import {
   SUPPORTED_LANGUAGES,
   inferLanguage,
   getLanguageDefinition,
-} from '@mnemos/core';
+} from '@mnestis/core';
 \`\`\`
 `;
 }
@@ -329,7 +329,7 @@ ${
 
 Mnemos can also analyze: ${notInRepo.join(', ')}, and ${SUPPORTED_LANGUAGE_COUNT - 8}+ more.
 
-Full list: [docs/LANGUAGES.md](https://github.com/mnemos/mnemos/blob/main/docs/LANGUAGES.md) or \`SUPPORTED_LANGUAGES\` in \`@mnemos/core\`.
+Full list: [docs/LANGUAGES.md](https://github.com/mnemos/mnemos/blob/main/docs/LANGUAGES.md) or \`SUPPORTED_LANGUAGES\` in \`@mnestis/core\`.
 `
     : ''
 }

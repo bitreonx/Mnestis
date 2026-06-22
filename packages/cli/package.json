@@ -1,11 +1,12 @@
 {
-  "name": "getmnemos",
-  "version": "0.3.0",
-  "description": "Get Mnemos — the memory layer for software. One command, instant codebase intelligence.",
+  "name": "mnestis",
+  "version": "0.3.2",
+  "description": "Mnestis — the memory layer for software. One command, instant codebase intelligence.",
   "type": "module",
   "bin": {
-    "getmnemos": "bin/getmnemos.cjs",
-    "mnemos": "bin/mnemos.cjs"
+    "mnestis": "bin/mnestis.cjs",
+    "mnemos": "bin/mnemos-legacy.cjs",
+    "getmnemos": "bin/getmnemos-legacy.cjs"
   },
   "main": "./dist/index.js",
   "files": [
@@ -15,8 +16,8 @@
     "README.md"
   ],
   "keywords": [
+    "mnestis",
     "mnemos",
-    "getmnemos",
     "memory",
     "ai",
     "codebase",
@@ -37,7 +38,7 @@
   "bugs": {
     "url": "https://github.com/bitreonx/mnemos/issues"
   },
-  "homepage": "https://getmnemos.vercel.app",
+  "homepage": "https://mnestis.vercel.app",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -49,7 +50,7 @@
     "postpublish": "node scripts/strip-publish-deps.mjs restore"
   },
   "dependencies": {
-    "@mnemos/core": "*",
+    "@mnestis/core": "*",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "ora": "^8.2.0"

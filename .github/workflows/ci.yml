@@ -27,10 +27,10 @@ jobs:
         run: npm ci
 
       - name: Build packages
-        run: npm run build --workspace @mnemos/core
+        run: npm run build --workspace @mnestis/core
 
       - name: Run core tests
-        run: npm run test --workspace @mnemos/core
+        run: npm run test --workspace @mnestis/core
 
       - name: Dependency security audit (production)
         run: npm audit --omit=dev --audit-level=high

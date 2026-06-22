@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Check, ChevronDown, Copy, Sparkles } from "lucide-react";
 import {
@@ -240,7 +240,7 @@ export default function PlatformInstallWizard({
         >
           {mode === "launch"
             ? "Builds memory, runs security audit, installs skills — agent steers automatically"
-            : "Analyze only — run setup later with getmnemos setup --platform …"}
+            : "Analyze only — run setup later with mnestis setup --platform …"}
         </p>
       </div>
 
@@ -276,7 +276,7 @@ export default function PlatformInstallWizard({
           type="button"
           onClick={async () => {
             try {
-              await navigator.clipboard.writeText("npm install -g getmnemos");
+              await navigator.clipboard.writeText("npm install -g mnestis");
             } catch {
               /* ignore */
             }
@@ -286,11 +286,11 @@ export default function PlatformInstallWizard({
             onDark ? "text-white/80" : "text-[var(--brand)]"
           )}
         >
-          npm install -g getmnemos
+          npm install -g mnestis
         </button>
         {" · "}
         <a
-          href="https://www.npmjs.com/package/getmnemos"
+          href="https://www.npmjs.com/package/mnestis"
           target="_blank"
           rel="noopener noreferrer"
           className={cn(

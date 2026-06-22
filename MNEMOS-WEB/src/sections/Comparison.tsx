@@ -1,4 +1,4 @@
-import { Check, Minus, X } from "lucide-react";
+﻿import { Check, Minus, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { COMPARISON, type ComparisonCell } from "../lib/site";
 import SectionHeading from "../components/ui/SectionHeading";
@@ -37,7 +37,7 @@ export default function Comparison() {
       <SectionHeading
         eyebrow="Comparison"
         title="Built to understand, not just to parse."
-        subtitle="Other tools dump files or draw a dependency graph. Mnemos delivers architecture, flows, capabilities, agent memory, and an agent-ready contract — local-first."
+        subtitle="Other tools dump files or draw a dependency graph. MNESTIS delivers architecture, flows, capabilities, agent memory, and an agent-ready contract — local-first."
       />
 
       <Reveal delay={0.1}>

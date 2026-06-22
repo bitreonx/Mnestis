@@ -1,9 +1,9 @@
-{
+﻿{
   "$schema": "inferno-bench/leaderboard/v1",
   "name": "INFERNO-bench",
   "generated_at": "2026-06-20T05:24:41.628Z",
   "dataset_version": "1.0.0",
-  "governance": "mnemos-bench/GOVERNANCE.md",
+  "governance": "MNESTIS-bench/GOVERNANCE.md",
   "entries": [
     {
       "repo": "express",
@@ -12,8 +12,8 @@
       "measured_at": "2026-06-19T20:17:01.701Z",
       "dataset_version": "1.0.0",
       "tools": {
-        "mnemos": {
-          "tool": "mnemos",
+        "MNESTIS": {
+          "tool": "MNESTIS",
           "accuracy": 100,
           "verification_tier": "A",
           "verified": true,
@@ -50,14 +50,14 @@
         }
       },
       "winner": {
-        "accuracy": "mnemos",
-        "compression": "mnemos",
-        "latency": "mnemos",
-        "features": "mnemos"
+        "accuracy": "MNESTIS",
+        "compression": "MNESTIS",
+        "latency": "MNESTIS",
+        "features": "MNESTIS"
       },
       "ttu": {
         "without_tool_seconds": 3060,
-        "with_mnemos_seconds": 126,
+        "with_MNESTIS_seconds": 126,
         "savings_percent": 96,
         "methodology": "Senior engineer onboarding: read lib/*.js (6), index.js, key test/app.js patterns, grep login/auth/route/middleware across repo. 90s per file + 45s per search."
       }
@@ -69,8 +69,8 @@
       "measured_at": "2026-06-19T20:24:39.361Z",
       "dataset_version": "1.0.0",
       "tools": {
-        "mnemos": {
-          "tool": "mnemos",
+        "MNESTIS": {
+          "tool": "MNESTIS",
           "accuracy": 100,
           "verification_tier": "A",
           "verified": true,
@@ -107,14 +107,14 @@
         }
       },
       "winner": {
-        "accuracy": "mnemos",
-        "compression": "mnemos",
+        "accuracy": "MNESTIS",
+        "compression": "MNESTIS",
         "latency": "understand-anything",
-        "features": "mnemos"
+        "features": "MNESTIS"
       },
       "ttu": {
         "without_tool_seconds": 8775,
-        "with_mnemos_seconds": 180,
+        "with_MNESTIS_seconds": 180,
         "savings_percent": 98,
         "methodology": "NestJS framework onboarding: packages/core, common, sample modules, DI graph, guards. 90s/file + 45s/search."
       }

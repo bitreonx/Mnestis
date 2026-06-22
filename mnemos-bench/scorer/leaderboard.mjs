@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * INFERNO leaderboard — aggregate committed results into a SWE-bench-style table.
  */
@@ -68,7 +68,7 @@ async function buildLeaderboard() {
     name: 'INFERNO-bench',
     generated_at: new Date().toISOString(),
     dataset_version: dataset.version,
-    governance: 'mnemos-bench/GOVERNANCE.md',
+    governance: 'MNESTIS-bench/GOVERNANCE.md',
     entries,
     ranking_note:
       'Primary sort: verification_tier (A > B > C > F), then accuracy, then compression_ratio. Report tier — not accuracy alone.',
@@ -79,10 +79,10 @@ async function buildLeaderboard() {
   console.log(`Leaderboard: ${out} (${entries.length} fixtures)`);
 
   for (const e of entries) {
-    const m = e.tools.mnemos;
+    const m = e.tools.MNESTIS;
     if (!m) continue;
     console.log(
-      `  ${e.repo}: mnemos tier=${m.verification_tier} accuracy=${m.accuracy}% compression=${m.compression_ratio}x`,
+      `  ${e.repo}: MNESTIS tier=${m.verification_tier} accuracy=${m.accuracy}% compression=${m.compression_ratio}x`,
     );
   }
 

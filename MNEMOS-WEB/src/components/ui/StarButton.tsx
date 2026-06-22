@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+﻿import { Star } from "lucide-react";
 import { SITE } from "../../lib/site";
 import { cn } from "../../lib/utils";
 
@@ -19,7 +19,7 @@ export default function StarButton({
       href={SITE.github}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Star Mnemos on GitHub"
+      aria-label="Star MNESTIS on GitHub"
       className={cn(
         "focus-ring group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full px-3.5 py-2 text-[13px] font-semibold text-white transition-transform hover:scale-[1.04] active:scale-95",
         className

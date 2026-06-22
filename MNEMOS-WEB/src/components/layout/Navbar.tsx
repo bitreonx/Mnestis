@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Search } from "lucide-react";
 import { NAV_LINKS, SITE } from "../../lib/site";
-import { MnemosWordmark, GitHubIcon } from "../../lib/logos";
+import { MNESTISWordmark, GitHubIcon } from "../../lib/logos";
 import ThemeToggle from "../ui/ThemeToggle";
 import MagneticButton from "../ui/MagneticButton";
 
@@ -46,8 +46,8 @@ export default function Navbar() {
         }`}
       >
         <nav className="container-px mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4">
-          <Link to="/" className="focus-ring rounded-lg" aria-label="Mnemos home">
-            <MnemosWordmark />
+          <Link to="/" className="focus-ring rounded-lg" aria-label="MNESTIS home">
+            <MNESTISWordmark />
           </Link>
 
           {/* center links */}

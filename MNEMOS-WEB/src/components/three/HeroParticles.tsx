@@ -1,8 +1,8 @@
-import { useMemo, useRef } from "react";
+﻿import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-/** A slowly-drifting nebula of points tinted in the Mnemos palette. */
+/** A slowly-drifting nebula of points tinted in the MNESTIS palette. */
 function Nebula({ count = 2600 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 

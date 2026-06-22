@@ -1,8 +1,8 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
- * AI Model Evaluation Pack — golden Q&A dataset for testing LLMs against Mnemos Bench.
- * Usage: node mnemos-bench/scorer/ai-eval.mjs [repo]
- * Output: mnemos-bench/results/ai-eval-<repo>.json
+ * AI Model Evaluation Pack — golden Q&A dataset for testing LLMs against MNESTIS Bench.
+ * Usage: node MNESTIS-bench/scorer/ai-eval.mjs [repo]
+ * Output: MNESTIS-bench/results/ai-eval-<repo>.json
  */
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -11,27 +11,27 @@ import { spawnSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH = path.resolve(__dirname, '..');
-const MNEMOS_ROOT = path.resolve(BENCH, '..');
-const MNEMOS_CLI = path.join(MNEMOS_ROOT, 'packages', 'cli', 'dist', 'index.js');
+const MNESTIS_ROOT = path.resolve(BENCH, '..');
+const MNESTIS_CLI = path.join(MNESTIS_ROOT, 'packages', 'cli', 'dist', 'index.js');
 
 async function loadJson(p) {
   return JSON.parse(await readFile(p, 'utf-8'));
 }
 
 function runAsk(repoPath, question) {
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'ask', question, '-p', repoPath], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'ask', question, '-p', repoPath], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 120_000,
   });
-  const body = (r.stdout || '').split('Mnemos Copilot')[1] ?? r.stdout ?? '';
+  const body = (r.stdout || '').split('MNESTIS Copilot')[1] ?? r.stdout ?? '';
   return { ok: r.status === 0, answer: body.trim(), latency_ms: 0 };
 }
 
 function runExplain(repoPath) {
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'explain', repoPath], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'explain', repoPath], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 120_000,
   });
   return { ok: r.status === 0, answer: (r.stdout || '').trim() };
@@ -41,7 +41,7 @@ async function buildEvalPack(repoId) {
   const repoPath = path.join(BENCH, 'repos', repoId);
   const universal = await loadJson(path.join(BENCH, 'tasks', 'universal.json'));
   const groundTruth = await loadJson(path.join(BENCH, 'tasks', 'ground-truth', `${repoId}.json`));
-  const dna = await loadJson(path.join(repoPath, '.mnemos', 'project.dna.json'));
+  const dna = await loadJson(path.join(repoPath, '.MNESTIS', 'project.dna.json'));
 
   const tasks = universal.tasks.map((t) => {
     let question = t.question;
@@ -51,26 +51,26 @@ async function buildEvalPack(repoId) {
     return { id: t.id, question, intent: t.intent, expected_dimensions: t.expected_dimensions };
   });
 
-  const mnemosAnswers = [];
+  const MNESTISAnswers = [];
   for (const t of tasks) {
     if (t.id === 'task3_explain') {
       const res = runExplain(repoPath);
-      mnemosAnswers.push({ task: t.id, tool: 'mnemos', ...res });
+      MNESTISAnswers.push({ task: t.id, tool: 'MNESTIS', ...res });
       continue;
     }
     if (t.id === 'task6_context') {
-      const ctxPath = path.join(repoPath, '.mnemos', 'project.dna.json');
-      const agentPath = path.join(repoPath, '.mnemos', 'agent_context.json');
-      mnemosAnswers.push({
+      const ctxPath = path.join(repoPath, '.MNESTIS', 'project.dna.json');
+      const agentPath = path.join(repoPath, '.MNESTIS', 'agent_context.json');
+      MNESTISAnswers.push({
         task: t.id,
-        tool: 'mnemos',
+        tool: 'MNESTIS',
         ok: true,
         answer: `DNA: ${ctxPath}\nAgent: ${agentPath}`,
         context_files: ['project.dna.json', 'agent_context.json', 'context/architecture.md'],
       });
       continue;
     }
-    mnemosAnswers.push({ task: t.id, tool: 'mnemos', ...runAsk(repoPath, t.question) });
+    MNESTISAnswers.push({ task: t.id, tool: 'MNESTIS', ...runAsk(repoPath, t.question) });
   }
 
   const gtKey = (id) => groundTruth[id.replace('task', 'task')] ?? groundTruth[id] ?? {};
@@ -87,26 +87,26 @@ async function buildEvalPack(repoId) {
     benchmark: 'INFERNO-bench',
     repo: repoId,
     generated_at: new Date().toISOString(),
-    purpose: 'Evaluate AI models on INFERNO-bench: give model the Mnemos context package, ask six universal tasks, score with verify.mjs.',
+    purpose: 'Evaluate AI models on INFERNO-bench: give model the MNESTIS context package, ask six universal tasks, score with verify.mjs.',
     protocol: {
       step1: 'Provide model with project.dna.json + agent_context.json only (no raw repo)',
       step2: 'Ask each task question verbatim from tasks/universal.json',
-      step3: 'Score with mnemos-bench/scorer/verify.mjs (multi-signal, tier A/B/C/F)',
-      step4: 'Compare model tier + accuracy vs mnemos baseline in this file',
+      step3: 'Score with MNESTIS-bench/scorer/verify.mjs (multi-signal, tier A/B/C/F)',
+      step4: 'Compare model tier + accuracy vs MNESTIS baseline in this file',
     },
     context_for_ai: {
-      dna_path: `.mnemos/project.dna.json`,
-      agent_path: `.mnemos/agent_context.json`,
+      dna_path: `.MNESTIS/project.dna.json`,
+      agent_path: `.MNESTIS/agent_context.json`,
       repository: dna.repository,
       one_liner: dna.one_liner,
       token_estimate: Math.ceil(JSON.stringify(dna).length / 4),
     },
     tasks,
     ground_truth: groundTruthMap,
-    mnemos_baseline: mnemosAnswers,
+    MNESTIS_baseline: MNESTISAnswers,
     scoring: {
       method: 'inferno_multi_signal',
-      harness: 'mnemos-bench/scorer/verify.mjs',
+      harness: 'MNESTIS-bench/scorer/verify.mjs',
       metrics: ['accuracy', 'verification_tier', 'coverage', 'latency_ms', 'token_count'],
       pass_threshold: { express: { tier: 'B', accuracy: 70 }, nestjs: { tier: 'C', accuracy: 55 } },
     },

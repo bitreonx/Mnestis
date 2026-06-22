@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import { Shield, Brain, Zap, Lock } from "lucide-react";
 import GlowCard from "../components/ui/GlowCard";
 
@@ -84,18 +84,18 @@ export function MemoryEngine() {
           <GlowCard accent="var(--cyan)">
             <pre className="overflow-x-auto font-mono text-[0.8125rem] leading-[1.75] text-[var(--text-dim)]">
               <code>
-{`# Build hybrid index (automatic with mnemos build)
-npx mnemos .
+{`# Build hybrid index (automatic with MNESTIS build)
+npx MNESTIS .
 
 # Cited recall — admits gaps honestly (Provenance)
-npx mnemos memory ask "what did we decide about auth?"
+npx MNESTIS memory ask "what did we decide about auth?"
 
 # Import Claude session back-catalog (Chronoshift)
-npx mnemos memory chronoshift ~/.claude/projects/
+npx MNESTIS memory chronoshift ~/.claude/projects/
 
 # Agent loop token fuse (Spiralfuse)
-npx mnemos memory loop start --max-tokens 250000
-npx mnemos memory loop tick --tokens 12000`}
+npx MNESTIS memory loop start --max-tokens 250000
+npx MNESTIS memory loop tick --tokens 12000`}
               </code>
             </pre>
           </GlowCard>

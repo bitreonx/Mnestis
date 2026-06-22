@@ -1,10 +1,10 @@
-import { motion, useReducedMotion } from "framer-motion";
-import { MnemosMark, BrandIcon, BRAND_KEYS, type BrandKey } from "../../lib/logos";
+﻿import { motion, useReducedMotion } from "framer-motion";
+import { MNESTISMark, BrandIcon, BRAND_KEYS, type BrandKey } from "../../lib/logos";
 
 const TOOLS: BrandKey[] = [...BRAND_KEYS];
 
 /**
- * The Mnemos mark at the centre with AI-tool chips orbiting on two rings.
+ * The MNESTIS mark at the centre with AI-tool chips orbiting on two rings.
  * Chips counter-rotate so their glyphs stay upright. Pure transforms — crisp.
  */
 export default function OrbitRing({ size = 360 }: { size?: number }) {
@@ -55,7 +55,7 @@ export default function OrbitRing({ size = 360 }: { size?: number }) {
         animate={reduce ? {} : { y: [0, -8, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
-        <MnemosMark size={size * 0.13} />
+        <MNESTISMark size={size * 0.13} />
       </motion.div>
 
       {/* orbiting rings */}

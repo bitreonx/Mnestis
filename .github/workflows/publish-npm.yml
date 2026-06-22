@@ -1,6 +1,6 @@
 name: publish-npm
 
-# Publishes getmnemos to npm via trusted publishing (OIDC) or NPM_TOKEN fallback
+# Publishes mnestis to npm via trusted publishing (OIDC) or NPM_TOKEN fallback
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   publish:
-    name: publish getmnemos to npm
+    name: publish mnestis to npm
     runs-on: ubuntu-latest
 
     steps:
@@ -30,13 +30,13 @@ jobs:
         run: npm ci
 
       - name: Build core package (dependency of CLI)
-        run: npm run build --workspace @mnemos/core
+        run: npm run build --workspace @mnestis/core
 
       - name: Build CLI package
-        run: npm run build --workspace getmnemos
+        run: npm run build --workspace mnestis
 
       - name: Prepare self-contained bundle
-        run: npm run prepare:publish --workspace getmnemos
+        run: npm run prepare:publish --workspace mnestis
 
       - name: Verify tag matches package version
         if: startsWith(github.ref, 'refs/tags/v')
@@ -56,6 +56,12 @@ jobs:
           else
             npm publish --access public --provenance
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish getmnemos deprecation shim
+        working-directory: packages/getmnemos-legacy
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

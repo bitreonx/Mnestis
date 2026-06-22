@@ -1,4 +1,4 @@
-# INFERNO-bench — Verified Results
+﻿# INFERNO-bench — Verified Results
 
 **Independent Framework for Evaluating Repository Navigation Objectives**
 
@@ -11,7 +11,7 @@ Pin fixtures first: `npm run bench:pin -- express nestjs`
 | Layer | Command | Purpose |
 |-------|---------|---------|
 | Harness tests | `npm run bench:verify` | OR/AND semantics, traps, tiers |
-| Independent grep | `npm run bench:verify-gt -- express` | Ground truth vs raw repo (no Mnemos) |
+| Independent grep | `npm run bench:verify-gt -- express` | Ground truth vs raw repo (no MNESTIS) |
 | Multi-signal score | `scorer/verify.mjs` | Keywords + paths + forbidden + context |
 | Regression gate | `npm run bench:regression` | Tier A + accuracy floors |
 
@@ -21,13 +21,13 @@ Pin fixtures first: `npm run bench:pin -- express nestjs`
 
 | Tool | Tier | Accuracy | Build | Tokens | Compression | TTU |
 |------|------|----------|-------|--------|-------------|-----|
-| **Mnemos** | **A** | **100%** | 500ms | 8,493 | 20.9× | 2 min |
-| Mnemos Full Burn | A | 100% | +instant | 11,734 | 15.1× | — |
+| **MNESTIS** | **A** | **100%** | 500ms | 8,493 | 20.9× | 2 min |
+| MNESTIS Full Burn | A | 100% | +instant | 11,734 | 15.1× | — |
 | Understand-Anything (structural) | B/C | 42% | 789ms | 14,981 | 11.9× | — |
 | Gitingest (digest search) | varies | digest-dependent | 14.6s | 1,100,000 | 0.16× | — |
 | Graphify (lib/) | F | 0% | 1.7s | 26 | — | — |
 
-Per-task (Mnemos): login · impact · critical · capabilities · explain · context export
+Per-task (MNESTIS): login · impact · critical · capabilities · explain · context export
 
 [express.json](./express.json)
 
@@ -35,13 +35,13 @@ Per-task (Mnemos): login · impact · critical · capabilities · explain · con
 
 | Tool | Tier | Accuracy | Build | Tokens | Compression | TTU |
 |------|------|----------|-------|--------|-------------|-----|
-| **Mnemos** | **A** | **100%** | 53s | 210,409 | 4.9× | 3 min |
-| Mnemos Full Burn | A | 100% | +instant | 40,507 | 25.3× | — |
+| **MNESTIS** | **A** | **100%** | 53s | 210,409 | 4.9× | 3 min |
+| MNESTIS Full Burn | A | 100% | +instant | 40,507 | 25.3× | — |
 | Understand-Anything (structural) | F | 17% | 3.6s | 496,748 | 2.1× | — |
 | Gitingest (digest search) | varies | digest-dependent | 373s | 6,500,000 | 0.16× | — |
 | Graphify | F | 0% | N/A | 0 | — | — |
 
-Per-task (Mnemos): login · impact · critical · capabilities · explain · context export
+Per-task (MNESTIS): login · impact · critical · capabilities · explain · context export
 
 [nestjs.json](./nestjs.json) · [nestjs-stress.json](./nestjs-stress.json)
 

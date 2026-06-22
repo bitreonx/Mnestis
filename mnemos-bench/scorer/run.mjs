@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * INFERNO-bench runner — objective, adversarial codebase understanding benchmark.
  * Harness: scorer/verify.mjs · Governance: GOVERNANCE.md · Dataset: dataset/v1.0.0.json
@@ -22,18 +22,18 @@ import { assertWithinBenchRoot } from './engines/specter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH_ROOT = path.resolve(__dirname, '..');
-const MNEMOS_ROOT = path.resolve(BENCH_ROOT, '..');
-const MNEMOS_CLI = path.join(MNEMOS_ROOT, 'packages', 'cli', 'dist', 'index.js');
+const MNESTIS_ROOT = path.resolve(BENCH_ROOT, '..');
+const MNESTIS_CLI = path.join(MNESTIS_ROOT, 'packages', 'cli', 'dist', 'index.js');
 
 function estimateTokens(text) {
   return Math.ceil(text.length / 4);
 }
 
-function runMnemosBuild(repoPath) {
+function runMNESTISBuild(repoPath) {
   const start = Date.now();
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'build', repoPath], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'build', repoPath], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 600_000,
   });
   const latencyMs = Date.now() - start;
@@ -45,30 +45,30 @@ function runMnemosBuild(repoPath) {
   return { ok: true, latencyMs: buildMs, stdout: r.stdout };
 }
 
-function runMnemosAsk(repoPath, question) {
+function runMNESTISAsk(repoPath, question) {
   const start = Date.now();
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'ask', question, '-p', repoPath], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'ask', question, '-p', repoPath], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 120_000,
   });
   const latencyMs = Date.now() - start;
-  const answer = (r.stdout || '').split('Mnemos Copilot')[1] ?? r.stdout ?? '';
+  const answer = (r.stdout || '').split('MNESTIS Copilot')[1] ?? r.stdout ?? '';
   return { ok: r.status === 0, answer, latencyMs, stderr: r.stderr };
 }
 
-function runMnemosExplain(repoPath) {
+function runMNESTISExplain(repoPath) {
   const start = Date.now();
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'explain', repoPath], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'explain', repoPath], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 120_000,
   });
   return { ok: r.status === 0, answer: r.stdout ?? '', latencyMs: Date.now() - start };
 }
 
-async function measureMnemosContext(repoPath) {
-  const mnemosDir = path.join(repoPath, '.mnemos');
+async function measureMNESTISContext(repoPath) {
+  const MNESTISDir = path.join(repoPath, '.MNESTIS');
   const files = [
     'project.dna.json',
     'agent_context.json',
@@ -79,14 +79,14 @@ async function measureMnemosContext(repoPath) {
   const sizes = {};
   for (const f of files) {
     try {
-      const content = await readFile(path.join(mnemosDir, f), 'utf-8');
+      const content = await readFile(path.join(MNESTISDir, f), 'utf-8');
       sizes[f] = content.length;
       totalChars += content.length;
     } catch {
       sizes[f] = 0;
     }
   }
-  const ctxDir = path.join(mnemosDir, 'context');
+  const ctxDir = path.join(MNESTISDir, 'context');
   try {
     const ctxFiles = await readdir(ctxDir);
     for (const cf of ctxFiles) {
@@ -104,7 +104,7 @@ async function measureMnemosContext(repoPath) {
 async function measureRawRepoTokens(repoPath) {
   let totalChars = 0;
   let fileCount = 0;
-  const IGNORE = /node_modules|\.git|\.mnemos|dist|build|coverage/;
+  const IGNORE = /node_modules|\.git|\.MNESTIS|dist|build|coverage/;
   async function walk(dir) {
     const entries = await readdir(dir, { withFileTypes: true });
     for (const e of entries) {
@@ -129,7 +129,7 @@ async function measureRawRepoTokens(repoPath) {
 }
 
 async function measureFullBurnContext(repoPath) {
-  const dir = path.join(repoPath, '.mnemos', 'fullburn');
+  const dir = path.join(repoPath, '.MNESTIS', 'fullburn');
   if (!existsSync(dir)) return { totalChars: 0, tokens: 0, files: 0 };
   let totalChars = 0;
   let files = 0;
@@ -146,21 +146,21 @@ async function measureFullBurnContext(repoPath) {
   return { totalChars, tokens: estimateTokens('x'.repeat(totalChars)), files };
 }
 
-function runMnemosFullBurn(repoPath) {
+function runMNESTISFullBurn(repoPath) {
   const start = Date.now();
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'fullburn', repoPath], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'fullburn', repoPath], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 120_000,
   });
   return { ok: r.status === 0, latencyMs: Date.now() - start, stderr: r.stderr };
 }
 
-function runMnemosSteer(repoPath, platform = 'cursor') {
+function runMNESTISSteer(repoPath, platform = 'cursor') {
   const start = Date.now();
-  const r = spawnSync(process.execPath, [MNEMOS_CLI, 'setup', repoPath, '--platform', platform], {
+  const r = spawnSync(process.execPath, [MNESTIS_CLI, 'setup', repoPath, '--platform', platform], {
     encoding: 'utf-8',
-    cwd: MNEMOS_ROOT,
+    cwd: MNESTIS_ROOT,
     timeout: 120_000,
   });
   const written = (r.stdout || '').match(/✓\s+(.+)/g)?.map((l) => l.replace(/^✓\s+/, '').trim()) ?? [];
@@ -173,8 +173,8 @@ function runMnemosSteer(repoPath, platform = 'cursor') {
   };
 }
 
-async function readMnemosSecurityAudit(repoPath) {
-  const auditPath = path.join(repoPath, '.mnemos', 'security-audit.json');
+async function readMNESTISSecurityAudit(repoPath) {
+  const auditPath = path.join(repoPath, '.MNESTIS', 'security-audit.json');
   if (!existsSync(auditPath)) return { ok: false, score: null, vulnerability_count: null };
   try {
     const audit = JSON.parse(await readFile(auditPath, 'utf-8'));
@@ -189,12 +189,12 @@ async function readMnemosSecurityAudit(repoPath) {
   }
 }
 
-function computeInfernoComposite(mnemos) {
-  const acc = (mnemos.accuracy ?? 0) / 100;
-  const comp = Math.min((mnemos.compression_ratio ?? 0) / 20, 1);
-  const sec = mnemos.security?.score != null ? mnemos.security.score / 100 : 0.75;
-  const steer = mnemos.steer?.ok ? 1 : 0;
-  const nova = mnemos.fullburn?.ok ? 1 : 0.5;
+function computeInfernoComposite(MNESTIS) {
+  const acc = (MNESTIS.accuracy ?? 0) / 100;
+  const comp = Math.min((MNESTIS.compression_ratio ?? 0) / 20, 1);
+  const sec = MNESTIS.security?.score != null ? MNESTIS.security.score / 100 : 0.75;
+  const steer = MNESTIS.steer?.ok ? 1 : 0;
+  const nova = MNESTIS.fullburn?.ok ? 1 : 0.5;
   return Math.round((acc * 0.45 + comp * 0.2 + sec * 0.15 + steer * 0.1 + nova * 0.1) * 100);
 }
 
@@ -367,8 +367,8 @@ async function runRepoBenchmark(repoId) {
   const raw = await measureRawRepoTokens(repoPath);
   console.log(`  Raw repo: ${raw.fileCount} source files, ~${raw.tokens.toLocaleString()} tokens`);
 
-  const build = runMnemosBuild(repoPath);
-  if (!build.ok) throw new Error(`Mnemos build failed: ${build.error}`);
+  const build = runMNESTISBuild(repoPath);
+  if (!build.ok) throw new Error(`MNESTIS build failed: ${build.error}`);
 
   const impactQ = groundTruth.task2_impact
     ? `What breaks if ${groundTruth.impact_target ?? 'application'} changes?`
@@ -384,7 +384,7 @@ async function runRepoBenchmark(repoId) {
   const taskResults = [];
   let askLatencyTotal = 0;
   for (const t of taskDefs) {
-    const res = runMnemosAsk(repoPath, t.q);
+    const res = runMNESTISAsk(repoPath, t.q);
     askLatencyTotal += res.latencyMs;
     const score = scoreTask(res.answer, { ...(t.gt ?? {}), intent: intents[t.id] ?? 'default' });
     taskResults.push({
@@ -397,13 +397,13 @@ async function runRepoBenchmark(repoId) {
     });
   }
 
-  const explain = runMnemosExplain(repoPath);
+  const explain = runMNESTISExplain(repoPath);
   const explainScore = scoreTask(explain.answer, {
     ...(groundTruth.task3_explain ?? {}),
     intent: intents.task3_explain ?? 'overview',
   });
 
-  const context = await measureMnemosContext(repoPath);
+  const context = await measureMNESTISContext(repoPath);
   const contextScore = scoreContextPackage(context, raw, groundTruth.task6_context ?? {});
 
   const allTaskScores = [
@@ -411,37 +411,37 @@ async function runRepoBenchmark(repoId) {
     explainScore,
     contextScore,
   ];
-  const mnemosAgg = aggregateVerification(allTaskScores);
+  const MNESTISAgg = aggregateVerification(allTaskScores);
 
   const compression = raw.tokens > 0 ? Math.round((raw.tokens / context.tokens) * 10) / 10 : 0;
 
-  const fullburnRun = runMnemosFullBurn(repoPath);
+  const fullburnRun = runMNESTISFullBurn(repoPath);
   const fullburnCtx = fullburnRun.ok ? await measureFullBurnContext(repoPath) : { tokens: 0, totalChars: 0, files: 0 };
 
-  const steerRun = runMnemosSteer(repoPath, 'cursor');
-  const security = await readMnemosSecurityAudit(repoPath);
+  const steerRun = runMNESTISSteer(repoPath, 'cursor');
+  const security = await readMNESTISSecurityAudit(repoPath);
   const inferno_composite = computeInfernoComposite({
-    accuracy: mnemosAgg.accuracy,
+    accuracy: MNESTISAgg.accuracy,
     compression_ratio: compression,
     security,
     steer: steerRun,
     fullburn: fullburnRun,
   });
 
-  const mnemos = {
-    tool: 'mnemos',
+  const MNESTIS = {
+    tool: 'MNESTIS',
     build_latency_ms: build.latencyMs,
     ask_latency_ms: askLatencyTotal,
     total_latency_ms: build.latencyMs + askLatencyTotal + explain.latencyMs,
     tokens: context.tokens,
     context_bytes: context.totalChars,
     compression_ratio: compression,
-    accuracy: mnemosAgg.accuracy,
-    verified: mnemosAgg.verified,
-    verification_tier: mnemosAgg.verification_tier,
-    tasks_verified: mnemosAgg.tasks_verified,
-    tasks_total: mnemosAgg.tasks_total,
-    min_task_accuracy: mnemosAgg.min_task_accuracy,
+    accuracy: MNESTISAgg.accuracy,
+    verified: MNESTISAgg.verified,
+    verification_tier: MNESTISAgg.verification_tier,
+    tasks_verified: MNESTISAgg.tasks_verified,
+    tasks_total: MNESTISAgg.tasks_total,
+    min_task_accuracy: MNESTISAgg.min_task_accuracy,
     coverage: taskResults.reduce((s, t) => s + t.coverage, 0),
     tasks: taskResults,
     explain: { ...explainScore, latency_ms: explain.latencyMs },
@@ -491,7 +491,7 @@ async function runRepoBenchmark(repoId) {
 
   const baseline = groundTruth.manual_baseline ?? {};
   const ttuWithout = (baseline.files_to_read_estimate ?? 20) * 90 + (baseline.grep_searches_estimate ?? 10) * 45;
-  const ttuWith = mnemos.ttu_seconds_with_tool;
+  const ttuWith = MNESTIS.ttu_seconds_with_tool;
   const ttuSavings = Math.round((1 - ttuWith / ttuWithout) * 100);
 
   const result = {
@@ -504,20 +504,20 @@ async function runRepoBenchmark(repoId) {
     engines: universal.engines,
     trials: universal.trials,
     raw_repo: raw,
-    tools: { mnemos, 'understand-anything': understandAnything, gitingest, graphify },
+    tools: { MNESTIS, 'understand-anything': understandAnything, gitingest, graphify },
     ttu: {
       without_tool_seconds: ttuWithout,
-      with_mnemos_seconds: ttuWith,
+      with_MNESTIS_seconds: ttuWith,
       savings_percent: ttuSavings,
       methodology: baseline.methodology ?? '90s/file + 45s/search',
     },
     winner: {
-      accuracy: 'mnemos',
-      verification_tier: mnemos.verification_tier,
-      inferno_composite: mnemos.inferno_composite,
-      compression: mnemos.compression_ratio >= (understandAnything.compression_ratio ?? 0) ? 'mnemos' : 'understand-anything',
-      latency: build.latencyMs < (understandAnything.latencyMs ?? Infinity) ? 'mnemos' : 'understand-anything',
-      steering: mnemos.steer?.ok ? 'mnemos' : 'none',
+      accuracy: 'MNESTIS',
+      verification_tier: MNESTIS.verification_tier,
+      inferno_composite: MNESTIS.inferno_composite,
+      compression: MNESTIS.compression_ratio >= (understandAnything.compression_ratio ?? 0) ? 'MNESTIS' : 'understand-anything',
+      latency: build.latencyMs < (understandAnything.latencyMs ?? Infinity) ? 'MNESTIS' : 'understand-anything',
+      steering: MNESTIS.steer?.ok ? 'MNESTIS' : 'none',
     },
   };
 
@@ -526,7 +526,7 @@ async function runRepoBenchmark(repoId) {
   const outPath = path.join(BENCH_ROOT, 'results', `${repoId}.json`);
   await writeFile(outPath, JSON.stringify(result, null, 2));
   console.log(
-    `  Mnemos: tier=${mnemos.verification_tier} accuracy=${mnemos.accuracy}% (${mnemos.tasks_verified}/${mnemos.tasks_total} verified) compression=${compression}x inferno=${mnemos.inferno_composite}`,
+    `  MNESTIS: tier=${MNESTIS.verification_tier} accuracy=${MNESTIS.accuracy}% (${MNESTIS.tasks_verified}/${MNESTIS.tasks_total} verified) compression=${compression}x inferno=${MNESTIS.inferno_composite}`,
   );
   if (security.ok) {
     console.log(`  Security: score=${security.score}/100 vulns=${security.vulnerability_count}`);

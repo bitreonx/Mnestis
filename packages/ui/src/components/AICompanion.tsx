@@ -6,8 +6,8 @@ import {
   classifyIntent,
   type SearchHit,
   type MemorySearchIndex,
-} from '@mnemos/core/search';
-import { askCopilot } from '@mnemos/core/copilot';
+} from '@mnestis/core/search';
+import { askCopilot } from '@mnestis/core/copilot';
 
 type CoreMemoryModel = Parameters<typeof buildSearchIndex>[0];
 import type {

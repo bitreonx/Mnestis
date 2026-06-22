@@ -1,12 +1,12 @@
 /**
- * @mnemos/sdk — Local-first AI memory client.
+ * @mnestis/sdk — Local-first AI memory client.
  *
  * Designed for Cursor, Claude Code, and any agent runtime that needs
  * privacy-first repository memory without cloud APIs.
  *
  * @example
  * ```ts
- * import { MnemosClient } from '@mnemos/sdk';
+ * import { MnemosClient } from '@mnestis/sdk';
  *
  * const client = new MnemosClient('.');
  * await client.build();
@@ -28,7 +28,7 @@ import {
   type EngineManifest,
   type RememberInput,
   type BuildResult,
-} from '@mnemos/core';
+} from '@mnestis/core';
 
 export interface MnemosClientOptions {
   /** Repository root. Default: process.cwd() */
@@ -135,6 +135,6 @@ export type {
   MemoryEpisode,
   EngineManifest,
   RememberInput,
-} from '@mnemos/core';
+} from '@mnestis/core';
 
-export { MnemosMemoryEngine, MEMORY_ENGINE_SCHEMA, EMBEDDING_DIMS } from '@mnemos/core';
+export { MnemosMemoryEngine, MEMORY_ENGINE_SCHEMA, EMBEDDING_DIMS } from '@mnestis/core';

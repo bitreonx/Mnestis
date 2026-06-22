@@ -1,7 +1,7 @@
-{
+﻿{
   "repo": "nestjs",
   "verified_at": "2026-06-20",
-  "verification_method": "Independent grep + Mnemos build on nestjs/nest @ 6859216",
+  "verification_method": "Independent grep + MNESTIS build on nestjs/nest @ 6859216",
   "commit_sha": "6859216d56e8f4e0e6e8d80035e48fce95f5311c",
   "independent_checks": [
     {

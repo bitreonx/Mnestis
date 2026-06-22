@@ -1,6 +1,6 @@
 /**
- * Produces a self-contained npm publish artifact for `getmnemos`.
- * Bundles @mnemos/core + CLI into dist/npm.cjs — no workspace deps on the registry.
+ * Produces a self-contained npm publish artifact for `mnestis`.
+ * Bundles @mnestis/core + CLI into dist/npm.cjs — no workspace deps on the registry.
  */
 import { build } from 'esbuild'
 import { cpSync, mkdirSync } from 'node:fs'

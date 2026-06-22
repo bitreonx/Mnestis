@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 /* ============================================================
-   MNEMOS DESIGN SYSTEM
+   MNESTIS DESIGN SYSTEM
    Brand: violet knot (#863bff) + cyan glow (#47bfff) + lilac
    Target feel: Apple × Notion × Cursor × OpenAI × Linear
    ============================================================ */
@@ -253,12 +253,12 @@
 ::-webkit-scrollbar-thumb:hover { background: var(--brand); background-clip: padding-box; }
 
 /* ---------- Prose (docs) ---------- */
-.prose-mnemos {
+.prose-MNESTIS {
   color: var(--text-dim);
   font-size: 1.0625rem;
   line-height: 1.78;
 }
-.prose-mnemos h2 {
+.prose-MNESTIS h2 {
   color: var(--text);
   font-size: 1.85rem;
   margin: 3rem 0 0.4rem;
@@ -267,7 +267,7 @@
   scroll-margin-top: 7rem;
   position: relative;
 }
-.prose-mnemos h2::before {
+.prose-MNESTIS h2::before {
   content: "";
   position: absolute;
   left: -1.4rem;
@@ -278,7 +278,7 @@
   background: var(--brand);
   box-shadow: 0 0 18px var(--glow);
 }
-.prose-mnemos h3 {
+.prose-MNESTIS h3 {
   color: var(--text);
   font-size: 1.22rem;
   margin: 2.1rem 0 0.55rem;
@@ -286,36 +286,36 @@
   font-weight: 600;
   scroll-margin-top: 7rem;
 }
-.prose-mnemos p {
+.prose-MNESTIS p {
   margin: 1rem 0;
   color: var(--text-dim);
 }
-.prose-mnemos p strong,
-.prose-mnemos li strong {
+.prose-MNESTIS p strong,
+.prose-MNESTIS li strong {
   color: var(--text);
   font-weight: 600;
 }
-.prose-mnemos a {
+.prose-MNESTIS a {
   color: var(--brand);
   text-decoration: none;
   border-bottom: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
   transition: border-color 0.2s, color 0.2s;
 }
-.prose-mnemos a:hover {
+.prose-MNESTIS a:hover {
   border-color: var(--brand);
   color: var(--text);
 }
-.prose-mnemos ul {
+.prose-MNESTIS ul {
   margin: 1rem 0;
   padding-left: 0;
   list-style: none;
 }
-.prose-mnemos ul li {
+.prose-MNESTIS ul li {
   margin: 0.55rem 0;
   padding-left: 1.4rem;
   position: relative;
 }
-.prose-mnemos ul li::before {
+.prose-MNESTIS ul li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -327,19 +327,19 @@
   transform: rotate(45deg);
   opacity: 0.7;
 }
-.prose-mnemos ol {
+.prose-MNESTIS ol {
   margin: 1rem 0;
   padding-left: 1.6rem;
 }
-.prose-mnemos ol li {
+.prose-MNESTIS ol li {
   margin: 0.45rem 0;
 }
-.prose-mnemos ol li::marker {
+.prose-MNESTIS ol li::marker {
   color: var(--brand);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
-.prose-mnemos code:not(pre code) {
+.prose-MNESTIS code:not(pre code) {
   font-family: var(--font-mono);
   font-size: 0.84em;
   background: color-mix(in srgb, var(--surface-2) 70%, transparent);
@@ -636,8 +636,8 @@
   transform: translateX(-4px);
   border: 0 !important;
 }
-.prose-mnemos h2:hover .docs-anchor,
-.prose-mnemos h3:hover .docs-anchor { opacity: 1; transform: translateX(0); }
+.prose-MNESTIS h2:hover .docs-anchor,
+.prose-MNESTIS h3:hover .docs-anchor { opacity: 1; transform: translateX(0); }
 .docs-anchor:hover { color: var(--cyan) !important; }
 
 /* ---------- Docs: progress bar ---------- */

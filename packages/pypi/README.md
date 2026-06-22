@@ -1,12 +1,12 @@
-# getmnemos
+# mnestis
 
-**Get Mnemos** — AI-ready codebase analysis for Python users.
+**Mnestis** — AI-ready codebase analysis for Python users.
 
 ```bash
-pip install getmnemos
-mnemos .
+pip install mnestis
+mnestis .
 ```
 
-npm: `npm install -g getmnemos`
+npm: `npm install -g mnestis`
 
-[getmnemos.vercel.app](https://getmnemos.vercel.app)
+[mnestis.vercel.app](https://mnestis.vercel.app)

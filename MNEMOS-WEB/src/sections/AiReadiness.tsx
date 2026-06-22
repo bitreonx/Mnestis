@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+﻿import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "../components/ui/SectionHeading";
 import Reveal from "../components/ui/Reveal";
@@ -192,7 +192,7 @@ export default function AiReadiness() {
         }
         subtitle={
           <>
-            Mnemos reads your codebase, understands it, and turns it into a durable memory layer your AI agents can query. No retraining. No setup.
+            MNESTIS reads your codebase, understands it, and turns it into a durable memory layer your AI agents can query. No retraining. No setup.
           </>
         }
       />

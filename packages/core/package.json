@@ -1,7 +1,7 @@
 {
-  "name": "@mnemos/core",
-  "version": "0.3.0",
-  "description": "Core library for Mnemos — the memory layer for software intelligence",
+  "name": "@mnestis/core",
+  "version": "0.3.3",
+  "description": "Core library for Mnestis — the memory layer for software intelligence",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -37,13 +37,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/bitreonx/mnemos.git",
+    "url": "https://github.com/bitreonx/mnestis.git",
     "directory": "packages/core"
   },
   "bugs": {
     "url": "https://github.com/bitreonx/mnemos/issues"
   },
-  "homepage": "https://getmnemos.vercel.app",
+  "homepage": "https://mnestis.vercel.app",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json && node -e \"const fs=require('fs');const p='dist/discipline';fs.mkdirSync(p,{recursive:true});fs.copyFileSync('src/discipline/fable-mindset.md',p+'/fable-mindset.md')\"",

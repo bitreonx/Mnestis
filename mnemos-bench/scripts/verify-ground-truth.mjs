@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
- * Independent ground-truth verification — grep fixture WITHOUT running Mnemos.
- * Usage: node mnemos-bench/scripts/verify-ground-truth.mjs [repoId]
+ * Independent ground-truth verification — grep fixture WITHOUT running MNESTIS.
+ * Usage: node MNESTIS-bench/scripts/verify-ground-truth.mjs [repoId]
  */
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
@@ -11,7 +11,7 @@ import { assertSafeRepoId, assertWithinBenchRoot } from '../scorer/engines/spect
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BENCH = path.resolve(__dirname, '..');
 
-const IGNORE = /node_modules|\.git|\.mnemos|dist|build|coverage/;
+const IGNORE = /node_modules|\.git|\.MNESTIS|dist|build|coverage/;
 
 async function walkSourceFiles(dir) {
   const files = [];

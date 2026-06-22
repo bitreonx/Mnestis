@@ -1,10 +1,10 @@
-/**
- * Brand mark (the real Mnemos knot) + real AI-tool brand icons (LobeHub).
+﻿/**
+ * Brand mark (the real MNESTIS knot) + real AI-tool brand icons (LobeHub).
  * Tool icons are official trademarks shown purely to reference the
  * AI-developer ecosystem — not endorsements.
  */
 import type { CSSProperties, SVGProps } from "react";
-import knotUrl from "../assets/mnemos-knot.png";
+import knotUrl from "../assets/MNESTIS-knot.png";
 
 import claudeSvg from "../assets/logos/claude-color.svg?raw";
 import cursorSvg from "../assets/logos/cursor.svg?raw";
@@ -16,10 +16,10 @@ import kiroSvg from "../assets/logos/kiro-color.svg?raw";
 export const KNOT_URL = knotUrl;
 
 /**
- * The Mnemos knot rendered from the real logo asset, tinted by `currentColor`
+ * The MNESTIS knot rendered from the real logo asset, tinted by `currentColor`
  * (so it themes automatically) or any color/gradient passed via `color`.
  */
-export function MnemosMark({
+export function MNESTISMark({
   size = 28,
   color = "currentColor",
   className,
@@ -53,12 +53,12 @@ export function MnemosMark({
   );
 }
 
-export function MnemosWordmark({ className }: { className?: string }) {
+export function MNESTISWordmark({ className }: { className?: string }) {
   return (
     <span className={className} style={{ display: "inline-flex", alignItems: "center", gap: 9 }}>
-      <MnemosMark size={26} color="var(--brand)" />
+      <MNESTISMark size={26} color="var(--brand)" />
       <span style={{ fontWeight: 700, fontSize: "1.18rem", letterSpacing: "-0.03em", color: "var(--text)" }}>
-        Mnemos
+        MNESTIS
       </span>
     </span>
   );

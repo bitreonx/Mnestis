@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /** Prepare anonymized blind-eval reports for a repository */
 import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -12,7 +12,7 @@ const sessionId = randomBytes(4).toString('hex');
 const sessionDir = path.join(__dirname, 'sessions', `${repoId}-${sessionId}`);
 
 const variants = [
-  { tool: 'mnemos', src: path.join(BENCH, 'repos', repoId, '.mnemos', 'project.dna.json') },
+  { tool: 'MNESTIS', src: path.join(BENCH, 'repos', repoId, '.MNESTIS', 'project.dna.json') },
   { tool: 'gitingest', src: path.join(BENCH, 'results', `${repoId}-gitingest.txt`) },
   { tool: 'graphify', src: path.join(BENCH, 'repos', repoId, 'lib', 'graphify-out', 'graph.json') },
 ];
@@ -30,7 +30,7 @@ for (let i = 0; i < variants.length; i++) {
   const dest = path.join(sessionDir, `report-${label}.${ext}`);
   try {
     let content = await readFile(v.src, 'utf-8');
-    content = content.replace(/mnemos|graphify|gitingest/gi, 'REDACTED');
+    content = content.replace(/MNESTIS|graphify|gitingest/gi, 'REDACTED');
     await writeFile(dest, content);
     key[label] = v.tool;
   } catch {

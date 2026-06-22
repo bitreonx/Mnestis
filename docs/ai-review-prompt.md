@@ -1,15 +1,15 @@
-# AI Review Prompt for Marketing Transparency
+﻿# AI Review Prompt for Marketing Transparency
 
-This document contains the exact prompt used to gather AI model reviews of Mnemos for our marketing materials. We believe in full transparency about how these reviews were generated.
+This document contains the exact prompt used to gather AI model reviews of MNESTIS for our marketing materials. We believe in full transparency about how these reviews were generated.
 
 ## The Prompt
 
-**Subject:** Honest Review of Mnemos - The Memory Layer for Software
+**Subject:** Honest Review of MNESTIS - The Memory Layer for Software
 
 **Instructions:**
-You are reviewing Mnemos (https://github.com/bitreon/mnemos), a tool that analyzes codebases to create architecture intelligence for both humans and AI. Your task is to provide a genuine, critical review based on these specific criteria:
+You are reviewing MNESTIS (https://github.com/bitreon/MNESTIS), a tool that analyzes codebases to create architecture intelligence for both humans and AI. Your task is to provide a genuine, critical review based on these specific criteria:
 
-1. **Analyze the actual project** - Review the README, documentation, and available information about Mnemos
+1. **Analyze the actual project** - Review the README, documentation, and available information about MNESTIS
 2. **Be completely honest** - If something seems overhyped, confusing, or needs improvement, say so directly
 3. **Focus on these evaluation dimensions:**
    - **Usefulness**: How valuable is this tool for developers and AI assistants?

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Cross-platform test runner for @mnemos/core.
+ * Cross-platform test runner for @mnestis/core.
  * `node --test dist/` does not recurse on all platforms; this finds every *.test.js under dist/.
  */
 import { readdir } from 'node:fs/promises'

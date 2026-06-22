@@ -1,4 +1,4 @@
-# INFERNO-bench
+﻿# INFERNO-bench
 
 **Independent Framework for Evaluating Repository Navigation Objectives**
 
@@ -17,7 +17,7 @@ INFERNO is designed for the same audience:
 - **Pinned fixtures** at exact commit SHAs (no drift)
 - **Multi-signal verification** (keywords AND/OR, path assertions, forbidden traps)
 - **Tier A/B/C/F gates** — report tier, not vibes
-- **Independent ground-truth checks** — grep evidence without running Mnemos
+- **Independent ground-truth checks** — grep evidence without running MNESTIS
 - **Fair competitor baselines** — digest keyword search, not hardcoded zeros
 
 Full governance: [GOVERNANCE.md](./GOVERNANCE.md) · Dataset: [dataset/v1.0.0.json](./dataset/v1.0.0.json)
@@ -25,7 +25,7 @@ Full governance: [GOVERNANCE.md](./GOVERNANCE.md) · Dataset: [dataset/v1.0.0.js
 ## Structure
 
 ```
-mnemos-bench/
+MNESTIS-bench/
 ├── dataset/         # Versioned INFERNO dataset (pinned SHAs)
 ├── GOVERNANCE.md    # Verification protocol (SWE-bench-style)
 ├── repos/           # Real cloned repositories (pinned, never simulated)
@@ -122,4 +122,4 @@ How long until a new developer understands the repository? Modeled baseline vs t
 
 ---
 
-*Mnemos Bench is the implementation harness. INFERNO-bench is the open standard name for enterprise model evaluation.*
+*MNESTIS Bench is the implementation harness. INFERNO-bench is the open standard name for enterprise model evaluation.*

@@ -1,10 +1,10 @@
-# Mnemos Language Support
+﻿# MNESTIS Language Support
 
-Mnemos analyzes **52 programming languages** with a production-grade lexical pipeline — not extension counting alone. Every supported language flows through comment/string-aware extraction before imports, symbols, and call edges reach the knowledge graph.
+MNESTIS analyzes **52 programming languages** with a production-grade lexical pipeline — not extension counting alone. Every supported language flows through comment/string-aware extraction before imports, symbols, and call edges reach the knowledge graph.
 
 ## Why this matters
 
-| Capability | Toy parser | Mnemos |
+| Capability | Toy parser | MNESTIS |
 |------------|------------|--------|
 | Comment-safe imports | Often false positives | `codeMask` rejects matches inside comments |
 | String-safe imports | Matches `import` inside strings | Lexical mask + validation |
@@ -73,7 +73,7 @@ flowchart TD
 
 ```mermaid
 mindmap
-  root((Mnemos 52 languages))
+  root((MNESTIS 52 languages))
     Web and mobile
       TypeScript
       JavaScript
@@ -179,5 +179,5 @@ import {
   SUPPORTED_LANGUAGES,
   inferLanguage,
   getLanguageDefinition,
-} from '@mnemos/core';
+} from '@mnestis/core';
 ```

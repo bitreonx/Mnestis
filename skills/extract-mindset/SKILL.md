@@ -1,4 +1,4 @@
----
+﻿---
 name: extract-mindset
 description: Mine your own Claude Code conversation logs to extract one model's reasoning discipline and port it to the model you run now. Use when someone wants to capture how a model like Fable 5 or Opus thinks, measure its working habits from real session logs, or turn that into a Mindset.md operating manual another model can adopt. Triggers include "extract the mindset", "study how Fable thinks", "port the discipline", "measure my model's habits", "what made that model good", "build a mindset file from my logs".
 ---
@@ -17,7 +17,7 @@ history, measures its habits against a baseline model so you have evidence and n
 vibes, then has the current model read that corpus and write a Mindset.md you point
 sessions at. It works for ANY model id on your disk, not just Fable.
 
-The scripts live in `scripts/discipline/` at the Mnemos repo root. The blank
+The scripts live in `scripts/discipline/` at the MNESTIS repo root. The blank
 manual to fill in lives in `skills/extract-mindset/references/mindset_template.md`.
 
 ---
@@ -79,9 +79,9 @@ Distill from the corpus — do not invent. Paste the measured table into the app
 ## Step 5. Wire it in
 
 Offer to:
-1. Reference the Mindset in `CLAUDE.md` or point Cursor at `.mnemos/integrations/fable-mindset.md`
+1. Reference the Mindset in `CLAUDE.md` or point Cursor at `.MNESTIS/integrations/fable-mindset.md`
 2. Set effort level to `max` on the adopting model
 3. Add a PostToolUse hook on Edit|Write|MultiEdit that runs the project test command
 
-Mnemos users can also run `mnemos setup --platform cursor` to install
-`mnemos-discipline.mdc` with Fable-grade habits baked in.
+MNESTIS users can also run `MNESTIS setup --platform cursor` to install
+`MNESTIS-discipline.mdc` with Fable-grade habits baked in.

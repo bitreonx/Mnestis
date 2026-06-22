@@ -6,10 +6,10 @@ The Mnemos dashboard is an **AI-native repository intelligence cockpit** for hum
 
 ```bash
 # Single repository (reads ./.mnemos/)
-MNEMOS_ROOT=/path/to/repo npm run dev --workspace=@mnemos/ui
+MNEMOS_ROOT=/path/to/repo npm run dev --workspace=@mnestis/ui
 
 # Multi-repo workspace (requires dabt.workspace.json or MNEMOS_WORKSPACE)
-MNEMOS_WORKSPACE=./dabt.workspace.json npm run dev --workspace=@mnemos/ui
+MNEMOS_WORKSPACE=./dabt.workspace.json npm run dev --workspace=@mnestis/ui
 ```
 
 Or via CLI: `mnemos ui`

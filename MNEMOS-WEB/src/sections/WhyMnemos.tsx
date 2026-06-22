@@ -1,4 +1,4 @@
-import {
+﻿import {
   Network,
   Dna,
   Bot,
@@ -20,18 +20,18 @@ const ICONS: Record<string, typeof Network> = {
   flows: GitBranch,
 };
 
-export default function WhyMnemos() {
+export default function WhyMNESTIS() {
   return (
     <section id="why" className="container-px mx-auto max-w-[1200px] scroll-mt-24 py-24 sm:py-32">
       <SectionHeading
-        eyebrow="Why Mnemos"
+        eyebrow="Why MNESTIS"
         title={
           <>
             Everything an agent needs,
             <br className="hidden sm:block" /> the moment it opens your repo.
           </>
         }
-        subtitle="AI tools and new teammates fail the same way — they grep random files instead of reading architecture. Mnemos gives every consumer the same ground truth."
+        subtitle="AI tools and new teammates fail the same way — they grep random files instead of reading architecture. MNESTIS gives every consumer the same ground truth."
       />
 
       <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

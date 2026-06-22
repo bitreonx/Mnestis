@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "../components/ui/SectionHeading";
@@ -60,7 +60,7 @@ function MemoryFunnel() {
           Shared Memory
         </text>
         <text x="180" y="128" textAnchor="middle" fontSize="9.5" fill="var(--text-faint)" fontFamily="var(--font-mono)">
-          .mnemos/auth.memory.json
+          .MNESTIS/auth.memory.json
         </text>
 
         {/* fan-out to agents */}
@@ -104,7 +104,7 @@ function CostStrip() {
     <div className="grid overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] sm:grid-cols-2">
       <div className="border-b border-[var(--border)] p-6 sm:border-b-0 sm:border-r sm:p-8">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--text-faint)]">
-          Without Mnemos
+          Without MNESTIS
         </p>
         <p className="mt-3 font-mono text-[2rem] font-semibold leading-none tracking-tight text-[var(--text)]">
           ~6,400<span className="ml-1 text-[0.45em] font-normal text-[var(--text-faint)]">t</span>
@@ -121,7 +121,7 @@ function CostStrip() {
 
       <div className="p-6 sm:p-8" style={{ background: "color-mix(in srgb, var(--brand) 5%, transparent)" }}>
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--brand)]">
-          With Mnemos
+          With MNESTIS
         </p>
         <p className="mt-3 font-mono text-[2rem] font-semibold leading-none tracking-tight text-[var(--text)]">
           ~480<span className="ml-1 text-[0.45em] font-normal text-[var(--text-faint)]">t</span>
@@ -151,7 +151,7 @@ export default function SharedAgentMemory() {
             requests.&rdquo;
           </p>
           <footer className="mt-2 text-[12px] text-[var(--text-faint)]">
-            — Claude Code usage insight · the problem Mnemos solves
+            — Claude Code usage insight · the problem MNESTIS solves
           </footer>
         </blockquote>
       </Reveal>
@@ -166,7 +166,7 @@ export default function SharedAgentMemory() {
               <span className="font-serif italic text-[var(--brand)]">Every agent</span> reuses it.
             </>
           }
-          subtitle="Subagents shouldn't rebuild the same understanding. Mnemos writes pre-sharded memory to .mnemos/ — one load, shared context, no duplicate exploration."
+          subtitle="Subagents shouldn't rebuild the same understanding. MNESTIS writes pre-sharded memory to .MNESTIS/ — one load, shared context, no duplicate exploration."
         />
       </div>
 
@@ -196,7 +196,7 @@ export default function SharedAgentMemory() {
       {/* CTA — one command, docs for depth */}
       <Reveal delay={0.1}>
         <div className="mt-12 flex flex-col items-center gap-5 sm:flex-row sm:justify-center">
-          <CopyCommand command="mnemos memory build ." />
+          <CopyCommand command="MNESTIS memory build ." />
           <Link
             to="/docs/shared-agent-memory"
             className="focus-ring inline-flex items-center gap-2 text-sm font-medium text-[var(--text-dim)] transition-colors hover:text-[var(--brand)]"

@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import InstallCard from "../components/ui/InstallCard";
-import { MnemosMark } from "../lib/logos";
+import { MNESTISMark } from "../lib/logos";
 
 const EASE = [0.22, 0.8, 0.18, 1] as const;
 
@@ -15,7 +15,7 @@ export default function Hero() {
           transition={{ duration: 1.4, ease: EASE }}
           className="-mt-10"
         >
-          <MnemosMark
+          <MNESTISMark
             size={620}
             color="var(--text)"
             style={{ opacity: 0.05 }}

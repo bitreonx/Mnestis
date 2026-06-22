@@ -1,4 +1,4 @@
-# INFERNO-bench Specification
+﻿# INFERNO-bench Specification
 
 **Independent Framework for Evaluating Repository Navigation Objectives**
 
@@ -72,7 +72,7 @@ npm run bench:submit -- express my-answers.json
 ## Security
 
 - Repo IDs validated against SPECTER allowlist (`express`, `nestjs`, `nextjs`, `vscode`)
-- All paths resolved within `mnemos-bench/` root — no traversal
+- All paths resolved within `MNESTIS-bench/` root — no traversal
 - Results include SPECTER SHA-256 integrity hash
 - BRIMSTONE blocks prompt injection patterns in answers
 

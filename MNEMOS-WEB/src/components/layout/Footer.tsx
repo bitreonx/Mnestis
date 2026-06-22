@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { SITE } from "../../lib/site";
-import { MnemosMark, GitHubIcon } from "../../lib/logos";
+import { MNESTISMark, GitHubIcon } from "../../lib/logos";
 
 const COLUMNS = [
   {
     title: "Product",
     links: [
-      { label: "Why Mnemos", href: "/#why" },
+      { label: "Why MNESTIS", href: "/#why" },
       { label: "Three Modes", href: "/#modes" },
       { label: "Benchmarks", href: "/#benchmarks" },
       { label: "Comparison", href: "/#compare" },
@@ -40,8 +40,8 @@ export default function Footer() {
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5 text-[var(--brand)]">
-              <MnemosMark size={26} />
-              <span className="text-lg font-bold tracking-tight text-[var(--text)]">Mnemos</span>
+              <MNESTISMark size={26} />
+              <span className="text-lg font-bold tracking-tight text-[var(--text)]">MNESTIS</span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[var(--text-dim)]">
               {SITE.tagline} Local-first, no cloud, no API keys.
@@ -89,7 +89,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 text-sm text-[var(--text-faint)] sm:flex-row">
-          <p>© {new Date().getFullYear()} Mnemos · MIT License</p>
+          <p>© {new Date().getFullYear()} MNESTIS · MIT License</p>
           <p className="flex items-center gap-1.5">
             Built by
             <a

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import type { Command } from 'commander';
-import { MnemosRuntime, MnemosAgentError } from '@mnemos/core';
+import { MnemosRuntime, MnemosAgentError } from '@mnestis/core';
 import { printWarnLine, printInfoLine } from '../output/terminal.js';
 import chalk from 'chalk';
 

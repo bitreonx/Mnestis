@@ -1,23 +1,23 @@
-# getmnemos
+# mnestis
 
-> **Get Mnemos** — the memory layer for software.
+> **Mnestis** — the memory layer for software.
 
 ## Install
 
 ```bash
-npm install -g getmnemos
-npx getmnemos .
+npm install -g mnestis
+npx mnestis .
 ```
 
 ## Commands
 
 ```bash
-getmnemos .              # analyze repo → .mnemos/
-getmnemos supernova .    # beast-mode intelligence pack
-getmnemos audit .        # security scan → security-audit.json
-getmnemos ui
+mnestis .              # analyze repo → .mnemos/
+mnestis supernova .    # beast-mode intelligence pack
+mnestis audit .        # security scan → security-audit.json
+mnestis ui
 ```
 
-Both `getmnemos` and `mnemos` commands work after install.
+Legacy `mnemos` and `getmnemos` commands print a migration notice — use `mnestis`.
 
-[getmnemos.vercel.app](https://getmnemos.vercel.app) · [GitHub](https://github.com/bitreonx/mnemos)
+[mnestis.vercel.app](https://mnestis.vercel.app) · [GitHub](https://github.com/bitreonx/mnemos)

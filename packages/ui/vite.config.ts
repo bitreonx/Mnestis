@@ -74,8 +74,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@mnemos/core/search': path.resolve(__dirname, '../core/src/search/index.ts'),
-      '@mnemos/core/copilot': path.resolve(__dirname, '../core/src/copilot.ts'),
+      '@mnestis/core/search': path.resolve(__dirname, '../core/src/search/index.ts'),
+      '@mnestis/core/copilot': path.resolve(__dirname, '../core/src/copilot.ts'),
     },
   },
 });

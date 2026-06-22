@@ -1,5 +1,5 @@
-import { SITE } from "../lib/site";
-import { MnemosMark } from "../lib/logos";
+﻿import { SITE } from "../lib/site";
+import { MNESTISMark } from "../lib/logos";
 import GitHubProfile from "../components/ui/GitHubProfile";
 import InstallCard from "../components/ui/InstallCard";
 import Reveal from "../components/ui/Reveal";
@@ -18,7 +18,7 @@ export default function CTA() {
           <div className="absolute inset-0 -z-10 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "22px 22px" }} aria-hidden />
 
           <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-[0_18px_60px_-18px_rgba(0,0,0,0.45)]">
-            <MnemosMark size={36} color="#ffffff" />
+            <MNESTISMark size={36} color="#ffffff" />
           </div>
 
           <h2 className="mx-auto max-w-2xl text-balance text-[2.3rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-[3rem]">

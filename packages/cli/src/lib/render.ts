@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { RoutedQueryResult } from '@mnemos/core';
+import type { RoutedQueryResult } from '@mnestis/core';
 
 export interface CliOutputOptions {
   json?: boolean;

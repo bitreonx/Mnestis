@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Pin benchmark fixtures to dataset commit SHAs.
- * Usage: node mnemos-bench/scripts/pin-fixtures.mjs [repoId...]
+ * Usage: node MNESTIS-bench/scripts/pin-fixtures.mjs [repoId...]
  */
 import { readFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';

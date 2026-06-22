@@ -1,16 +1,16 @@
-# Contributing To Mnemos
+﻿# Contributing To MNESTIS
 
-Thanks for contributing to Mnemos.
+Thanks for contributing to MNESTIS.
 
-Mnemos is a local-first architecture intelligence toolkit. The core product promise is simple: build once, then let humans, REST clients, and MCP clients consume the same repository memory without drift.
+MNESTIS is a local-first architecture intelligence toolkit. The core product promise is simple: build once, then let humans, REST clients, and MCP clients consume the same repository memory without drift.
 
 This guide explains how to work in the monorepo, how to validate changes, and what to update when you touch shared runtime, REST, or MCP behavior.
 
 ## Principles
 
-- **Local-first**: Mnemos should work from local repository artifacts in `.mnemos/`
+- **Local-first**: MNESTIS should work from local repository artifacts in `.MNESTIS/`
 - **No API keys**: core workflows should not require remote services
-- **One runtime**: `MnemosRuntime` is the source of truth for agent-facing behavior
+- **One runtime**: `MNESTISRuntime` is the source of truth for agent-facing behavior
 - **Protocol parity**: if a feature exists in MCP and should exist in REST, keep them aligned
 - **Actionable outputs**: prefer typed envelopes, explicit error codes, and concrete hints
 - **Docs are product surface**: update docs whenever setup, endpoints, tools, or workflows change
@@ -18,9 +18,9 @@ This guide explains how to work in the monorepo, how to validate changes, and wh
 ## Monorepo Layout
 
 - `packages/core`: analysis engine, shared runtime, REST server, MCP server
-- `packages/cli`: end-user commands such as `mnemos build`, `mnemos serve`, `mnemos mcp`, and `mnemos setup`
+- `packages/cli`: end-user commands such as `MNESTIS build`, `MNESTIS serve`, `MNESTIS mcp`, and `MNESTIS setup`
 - `packages/ui`: interactive dashboard
-- `mnemos-bench`: reproducible benchmark and regression evaluation suite
+- `MNESTIS-bench`: reproducible benchmark and regression evaluation suite
 
 ## Getting Started
 
@@ -33,19 +33,19 @@ npm test
 To test the full local flow against this repository:
 
 ```bash
-npx mnemos .
-mnemos serve
-mnemos mcp --setup
+npx MNESTIS .
+MNESTIS serve
+MNESTIS mcp --setup
 ```
 
 ## Shared Runtime Rules
 
 If you change agent-facing functionality, start with `packages/core/src/agent-runtime.ts`.
 
-- Add new repository intelligence to `MnemosRuntime` first
+- Add new repository intelligence to `MNESTISRuntime` first
 - Reuse runtime methods from both `serve.ts` and `mcp-server.ts`
 - Return typed `AgentEnvelope` responses for success cases
-- Throw `MnemosAgentError` for expected failure cases
+- Throw `MNESTISAgentError` for expected failure cases
 - Include actionable hints for user-fixable errors such as missing builds or unknown nodes
 
 ### Error codes
@@ -81,13 +81,13 @@ For runtime-facing changes, ask these questions:
 
 ## MCP Expectations
 
-Mnemos ships a production MCP server intended for community IDE integration.
+MNESTIS ships a production MCP server intended for community IDE integration.
 
 Keep these behaviors stable unless there is a strong reason to change them:
 
 - Tool names and descriptions should be clear and task-oriented
 - Server instructions should tell clients to read DNA first and use workflow-aware tools
-- Resources should stay discoverable under `mnemos://repository/*`
+- Resources should stay discoverable under `MNESTIS://repository/*`
 - Prompts should help a client bootstrap without guessing the repository workflow
 - Responses should preserve the markdown body plus structured JSON pattern
 
@@ -95,15 +95,15 @@ If you add or remove a tool, resource, or prompt:
 
 - update `README.md`
 - update `buildMcpSetupMarkdown()` text if needed
-- confirm `mnemos mcp --setup` still tells a correct story
+- confirm `MNESTIS mcp --setup` still tells a correct story
 
 ## Cursor Setup Expectations
 
-`mnemos setup --platform cursor` should continue to be the simplest supported path for IDE onboarding.
+`MNESTIS setup --platform cursor` should continue to be the simplest supported path for IDE onboarding.
 
 Today that setup writes:
 
-- `.cursor/rules/mnemos-architecture.mdc`
+- `.cursor/rules/MNESTIS-architecture.mdc`
 - `.cursor/mcp.json`
 
 If you change the setup format or supported workflow:
@@ -115,7 +115,7 @@ If you change the setup format or supported workflow:
 
 ## Language And Parser Changes
 
-Mnemos supports **52 programming languages** via `packages/core/src/languages/`. Changes here affect scanning, parsing, generated `.mnemos/context/languages.md`, and knowledge-graph quality.
+MNESTIS supports **52 programming languages** via `packages/core/src/languages/`. Changes here affect scanning, parsing, generated `.MNESTIS/context/languages.md`, and knowledge-graph quality.
 
 ### Architecture
 
@@ -138,7 +138,7 @@ When adding or changing language support:
 2. Add lexical tests in `languages/languages.test.ts`
 3. Run `npm test` in `packages/core`
 4. Update [docs/LANGUAGES.md](../docs/LANGUAGES.md) if the public language list changes — or run `npm run docs:sync`
-5. Run `npx mnemos .` and verify `.mnemos/context/graphs.md` and `.mnemos/context/languages.md` render Mermaid charts
+5. Run `npx MNESTIS .` and verify `.MNESTIS/context/graphs.md` and `.MNESTIS/context/languages.md` render Mermaid charts
 
 Dedicated extractors (14 legacy languages) live in `parser/index.ts`. Profile-based languages use `parser/profile-extractors.ts` with `codeMask` validation — do not regex raw files without the lexical pipeline.
 
@@ -174,16 +174,16 @@ npm test
 Use targeted validation when relevant:
 
 ```bash
-npx mnemos .
-mnemos serve
-mnemos mcp --setup
+npx MNESTIS .
+MNESTIS serve
+MNESTIS mcp --setup
 ```
 
-If your change affects benchmarks or regression logic, also run the relevant bench scripts from `mnemos-bench`.
+If your change affects benchmarks or regression logic, also run the relevant bench scripts from `MNESTIS-bench`.
 
 ## Pull Requests
 
-Good PRs for Mnemos usually include:
+Good PRs for MNESTIS usually include:
 
 - a clear problem statement
 - user-visible behavior change
@@ -195,7 +195,7 @@ If a PR changes the shared runtime, REST routes, or MCP tools, call that out exp
 
 ## Release Quality Bar
 
-Mnemos should feel like reference infrastructure for local IDE integration.
+MNESTIS should feel like reference infrastructure for local IDE integration.
 
 Before merging user-facing changes, check that:
 
@@ -210,10 +210,10 @@ Before merging user-facing changes, check that:
 We dogfood Claude Code on this repository. Recommended maintainer flow:
 
 ```bash
-npx mnemos .
-mnemos setup --platform claude   # .claude/skills/mnemos + CLAUDE.md
-mnemos mcp                       # MCP tools in Claude Code
-mnemos sync                      # keep .mnemos/ fresh while editing
+npx MNESTIS .
+MNESTIS setup --platform claude   # .claude/skills/MNESTIS + CLAUDE.md
+MNESTIS mcp                       # MCP tools in Claude Code
+MNESTIS sync                      # keep .MNESTIS/ fresh while editing
 ```
 
 When polishing the dashboard (preview), tag issues `[dashboard]`. Report and CLI are stable surfaces — prefer changes there for first contributions.

@@ -25,7 +25,7 @@ await build({
   format: 'cjs',
   outfile: out,
   external: NATIVE_EXTERNALS,
-  // Bundle everything in the workspace too, including @mnemos/core.
+  // Bundle everything in the workspace too, including @mnestis/core.
   nodePaths: [path.resolve(cliDir, '..', '..', 'node_modules')],
   banner: { js: '' },
   // CJS doesn't have import.meta — substitute with CJS __dirname so

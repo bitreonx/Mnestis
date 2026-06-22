@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build core package (must precede CLI)
-        run: npm run build --workspace @mnemos/core
+        run: npm run build --workspace @mnestis/core
 
       - name: Build CLI bundle + standalone binary
         shell: bash

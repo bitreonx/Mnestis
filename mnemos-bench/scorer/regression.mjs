@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * INFERNO regression gate — fails CI if verification tier or accuracy drops.
  */
@@ -40,7 +40,7 @@ async function check(repo) {
   const t = THRESHOLDS[repo];
   if (!t) return { repo, ok: true, skipped: true };
 
-  const m = data.tools?.mnemos;
+  const m = data.tools?.MNESTIS;
   const failures = [];
 
   if (m.accuracy < t.accuracy) failures.push(`accuracy ${m.accuracy}% < ${t.accuracy}%`);

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * INFERNO verification unit tests — EMBER · BRIMSTONE · CINDER · PANDEMONIUM · SPECTER
  */
@@ -106,7 +106,7 @@ const manifest = buildIntegrityManifest({
   commit_sha: 'abc',
   dataset_version: '1.0.0',
   measured_at: '2026-01-01',
-  tools: { mnemos: { accuracy: 100, verification_tier: 'A', tasks_verified: 6 } },
+  tools: { MNESTIS: { accuracy: 100, verification_tier: 'A', tasks_verified: 6 } },
 });
 assert(manifest.hash.length === 64, 'SPECTER SHA-256 manifest');
 

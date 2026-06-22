@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * CERBERUS — triple-headed verification runner.
  * 1. EMBER/BRIMSTONE/CINDER harness tests
@@ -24,7 +24,7 @@ function run(label, cmd, args) {
 
 let failed = false;
 
-if (!run('EMBER harness unit tests', 'node', ['mnemos-bench/scorer/verify.test.mjs'])) failed = true;
+if (!run('EMBER harness unit tests', 'node', ['MNESTIS-bench/scorer/verify.test.mjs'])) failed = true;
 
 for (const repo of ['express', 'nestjs']) {
   const repoPath = path.join(BENCH, 'repos', repo);
@@ -32,12 +32,12 @@ for (const repo of ['express', 'nestjs']) {
     console.log(`\n⏭  CERBERUS grep head: ${repo} fixture not cloned — skip`);
     continue;
   }
-  if (!run(`Independent grep (${repo})`, 'node', ['mnemos-bench/scripts/verify-ground-truth.mjs', repo])) {
+  if (!run(`Independent grep (${repo})`, 'node', ['MNESTIS-bench/scripts/verify-ground-truth.mjs', repo])) {
     failed = true;
   }
 }
 
-if (!run('Regression gate', 'node', ['mnemos-bench/scorer/regression.mjs'])) failed = true;
+if (!run('Regression gate', 'node', ['MNESTIS-bench/scorer/regression.mjs'])) failed = true;
 
 console.log(failed ? '\n✗ CERBERUS: one or more heads failed' : '\n✓ CERBERUS: all heads passed');
 process.exit(failed ? 1 : 0);

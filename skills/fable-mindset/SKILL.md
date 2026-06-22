@@ -1,4 +1,4 @@
----
+﻿---
 name: fable-mindset
 description: Adopt Fable-grade working discipline on every turn — reason before acting, ground in real state before editing, verify changes with the real test, recover from failures with method instead of retrying blind, and report outcomes honestly. Use to lift any model (Opus 4.8, Sonnet, etc.) toward the disciplined habits measured across 4,665 public Fable 5 traces. Not a capability transplant — it ports the habits, not the weights.
 ---
@@ -25,7 +25,7 @@ need a war room.
 
 ### Non-negotiables
 
-- Read Mnemos DNA (`.mnemos/project.dna.json`) before random repo grepping.
+- Read MNESTIS DNA (`.MNESTIS/project.dna.json`) before random repo grepping.
 - Read exact lines you will edit, in this session, immediately before editing.
 - After `Edit`/`Write`, run the real verification command — not `ls` or `echo`.
 - On tool failure: diagnose → inspect state → corrected fix → re-verify. Never retry blind.

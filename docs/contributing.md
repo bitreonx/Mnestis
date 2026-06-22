@@ -1,12 +1,12 @@
-# Contributing to Mnemos
+﻿# Contributing to MNESTIS
 
-Thank you for helping make Mnemos the memory layer for software.
+Thank you for helping make MNESTIS the memory layer for software.
 
 ## Dev setup
 
 ```bash
-git clone https://github.com/bitreonx/mnemos.git
-cd mnemos
+git clone https://github.com/bitreonx/mnestis.git
+cd MNESTIS
 npm install
 npm run build
 ```
@@ -19,18 +19,18 @@ Requirements: **Node.js ≥ 20**, npm 11+ (pnpm optional).
 |---------|-------------|
 | `npm run build` | Build all workspaces |
 | `npm run test` | Run workspace tests |
-| `npm run mnemos -- .` | Run CLI against current directory |
-| `npm run -w @mnemos/ui dev` | Dashboard dev server |
+| `npm run MNESTIS -- .` | Run CLI against current directory |
+| `npm run -w @mnestis/ui dev` | Dashboard dev server |
 | `npm run docs:sync` | Regenerate `docs/LANGUAGES.md`, `docs/GRAPHS.md`, `docs/architecture.md` from core generators |
 
 ## Project structure
 
 ```
 packages/core/   — scanner, analyzer, ai-pack, report, serve, mcp
-packages/cli/    — mnemos CLI
+packages/cli/    — MNESTIS CLI
 packages/ui/     — dashboard (Vite + React Router v7)
 docs/            — specifications and guides
-mnemos-bench/    — verified benchmarks
+MNESTIS-bench/    — verified benchmarks
 ```
 
 ## Pull requests
@@ -56,15 +56,15 @@ AI Pack **v1 is stable for 1.x**. Additive fields only in minor releases. Breaki
 After changing `packages/core/src/languages/` or Mermaid templates in `graph/mermaid.ts` or `context/graph-markdown.ts`:
 
 ```bash
-npm run test --workspace @mnemos/core
+npm run test --workspace @mnestis/core
 npm run docs:sync
-npx mnemos .
+npx MNESTIS .
 ```
 
-Open `.mnemos/context/graphs.md` and `.mnemos/context/languages.md` in preview to verify Mermaid renders.
+Open `.MNESTIS/context/graphs.md` and `.MNESTIS/context/languages.md` in preview to verify Mermaid renders.
 
 Catalog: [GRAPHS.md](./GRAPHS.md) · [LANGUAGES.md](./LANGUAGES.md) · [CONTRIBUTING.md](../CONTRIBUTING.md#language-and-parser-changes)
 
 ## Questions
 
-Open a [GitHub Discussion](https://github.com/bitreonx/mnemos/discussions) or issue with the `question` label.
+Open a [GitHub Discussion](https://github.com/bitreonx/mnestis/discussions) or issue with the `question` label.

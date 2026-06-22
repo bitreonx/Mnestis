@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import {
   Terminal,
   GitBranch,
@@ -15,7 +15,7 @@ import Reveal from "../components/ui/Reveal";
 import CopyCommand from "../components/ui/CopyCommand";
 
 /* Half-width feature previews — each one is a tiny, focused visual that
-   shows a real Mnemos surface, so the section reads as "what you actually
+   shows a real MNESTIS surface, so the section reads as "what you actually
    ship", not just marketing numbers. */
 function PreviewArchitecture() {
   const nodes = [
@@ -136,10 +136,10 @@ function PreviewHeatmap() {
 
 function PreviewTerminal() {
   const lines = [
-    { c: "var(--brand)", t: "$ npx mnemos ." },
+    { c: "var(--brand)", t: "$ npx MNESTIS ." },
     { c: "var(--text-faint)", t: "▸ scanning 1,247 files…" },
     { c: "var(--mint)", t: "✓ 31 domains · 268 flows · 412 apis" },
-    { c: "var(--brand)", t: "$ mnemos serve --port 4000" },
+    { c: "var(--brand)", t: "$ MNESTIS serve --port 4000" },
     { c: "var(--text-dim)", t: "▸ copilot ready · http://localhost:4000" },
   ];
   return (
@@ -225,7 +225,7 @@ export default function Benchmarks() {
       <SectionHeading
         eyebrow="Benchmarks"
         title="Numbers from real repositories."
-        subtitle="Reproducible locally from mnemos-bench. Less context, more signal — every build, every repo."
+        subtitle="Reproducible locally from MNESTIS-bench. Less context, more signal — every build, every repo."
       />
 
       {/* Verified repo scores */}

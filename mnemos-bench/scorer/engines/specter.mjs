@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SPECTER — Security Protocol for Evaluation Contamination & Tamper Evidence Recording.
  * Path sandboxing, repo allowlists, SHA-256 integrity manifests.
  */
@@ -36,10 +36,10 @@ export function buildIntegrityManifest(result) {
     commit_sha: result.commit_sha,
     dataset_version: result.dataset_version,
     measured_at: result.measured_at,
-    mnemos: {
-      accuracy: result.tools?.mnemos?.accuracy,
-      tier: result.tools?.mnemos?.verification_tier,
-      tasks_verified: result.tools?.mnemos?.tasks_verified,
+    MNESTIS: {
+      accuracy: result.tools?.MNESTIS?.accuracy,
+      tier: result.tools?.MNESTIS?.verification_tier,
+      tasks_verified: result.tools?.MNESTIS?.tasks_verified,
     },
   };
   return {

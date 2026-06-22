@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Understand-Anything benchmark adapter — code-only path (no LLM).
  * Mirrors UA's tree-sitter + heuristic tour/layer pipeline without token spend.
@@ -15,7 +15,7 @@ const UA_CORE = path.resolve(
   '../vendor/understand-anything/understand-anything-plugin/packages/core/dist/index.js',
 );
 
-const IGNORE = /node_modules|\.git|\.mnemos|\.understand-anything|dist|build|coverage|vendor/;
+const IGNORE = /node_modules|\.git|\.MNESTIS|\.understand-anything|dist|build|coverage|vendor/;
 const SOURCE_EXT = /\.(js|ts|tsx|jsx|mjs|cjs|py|go|rs|java|rb|php|cs|cpp|c|kt)$/i;
 
 async function walkSourceFiles(root) {
@@ -65,7 +65,7 @@ export async function runUnderstandAnythingBench(repoPath) {
       graphChars: 0,
       accuracy: 0,
       queries: [],
-      note: 'Understand-Anything core not built — run: cd mnemos-bench/vendor/understand-anything && npx pnpm install',
+      note: 'Understand-Anything core not built — run: cd MNESTIS-bench/vendor/understand-anything && npx pnpm install',
       stderr: 'missing @understand-anything/core dist',
     };
   }

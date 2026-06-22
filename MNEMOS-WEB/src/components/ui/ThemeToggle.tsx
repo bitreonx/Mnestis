@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Theme = "light" | "dark";
 
 function getInitial(): Theme {
   if (typeof window === "undefined") return "dark";
-  const stored = localStorage.getItem("mnemos-theme") as Theme | null;
+  const stored = localStorage.getItem("MNESTIS-theme") as Theme | null;
   if (stored === "light" || stored === "dark") return stored;
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
@@ -14,7 +14,7 @@ function apply(theme: Theme) {
   const root = document.documentElement;
   root.classList.toggle("light", theme === "light");
   root.classList.toggle("dark", theme === "dark");
-  localStorage.setItem("mnemos-theme", theme);
+  localStorage.setItem("MNESTIS-theme", theme);
 }
 
 /**

@@ -1,4 +1,4 @@
-"""Mnemos — the memory layer for software.
+"""Mnestis — the memory layer for software.
 
 This package is a thin shim around a prebuilt Node SEA binary.
 On `pip install`, it copies the right binary for the user's platform
@@ -15,7 +15,7 @@ import stat
 import sys
 from pathlib import Path
 
-__version__ = "0.3.0"
+__version__ = "0.3.2"
 
 # Map (system, machine) -> filename inside _bundled/
 _BINARY_MAP = {
@@ -49,7 +49,7 @@ def _install_binary() -> None:
         return
 
     exe_dir = Path(sys.executable).parent
-    dst_name = "mnemos.exe" if os.name == "nt" else "mnemos"
+    dst_name = "mnestis.exe" if os.name == "nt" else "mnestis"
     dst = exe_dir / dst_name
 
     try:
@@ -63,13 +63,13 @@ def _install_binary() -> None:
 
 
 def _run() -> None:
-    """Console-script entry point: `mnemos ...`."""
+    """Console-script entry point: `mnestis ...`."""
     src = _bundled_path()
     if not src or not src.exists():
         sys.stderr.write(
-            "mnemos: no prebuilt binary for this platform "
+            "mnestis: no prebuilt binary for this platform "
             f"({platform.system()} {platform.machine()}).\n"
-            "Install via npm instead: pip install getmnemos  # or: npm i -g getmnemos\n"
+            "Install via npm instead: npm install -g mnestis  # or: npx mnestis .\n"
         )
         sys.exit(1)
 

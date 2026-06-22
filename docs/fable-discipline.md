@@ -1,24 +1,24 @@
-# Fable 5 Agent Discipline
+﻿# Fable 5 Agent Discipline
 
-Mnemos ships **Fable-grade working habits** for coding agents — distilled from [Glint-Research Fable-5-traces](https://huggingface.co/datasets/Glint-Research/Fable-5-traces) and the public Fable Mindset operating manual.
+MNESTIS ships **Fable-grade working habits** for coding agents — distilled from [Glint-Research Fable-5-traces](https://huggingface.co/datasets/Glint-Research/Fable-5-traces) and the public Fable Mindset operating manual.
 
 ## What you get
 
-After `npx mnemos .`:
+After `npx MNESTIS .`:
 
 | Artifact | Path |
 |----------|------|
-| Full mindset manual | `.mnemos/integrations/fable-mindset.md` |
-| Cursor discipline rule | `.cursor/rules/mnemos-discipline.mdc` (via `mnemos setup`) |
-| Claude discipline skill | `.claude/skills/mnemos-discipline/SKILL.md` (via `mnemos setup --platform claude`) |
+| Full mindset manual | `.MNESTIS/integrations/fable-mindset.md` |
+| Cursor discipline rule | `.cursor/rules/MNESTIS-discipline.mdc` (via `MNESTIS setup`) |
+| Claude discipline skill | `.claude/skills/MNESTIS-discipline/SKILL.md` (via `MNESTIS setup --platform claude`) |
 | AGENTS.md section | Injected into generated `AGENTS.md` |
 
 ## Install
 
 ```bash
-npx mnemos .
-mnemos setup --platform all    # architecture + discipline for every platform
-mnemos setup --platform claude # Claude Code skill + CLAUDE.md + discipline skill
+npx MNESTIS .
+MNESTIS setup --platform all    # architecture + discipline for every platform
+MNESTIS setup --platform claude # Claude Code skill + CLAUDE.md + discipline skill
 ```
 
 ## The decision loop

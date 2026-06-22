@@ -1,6 +1,6 @@
-# Mnemos Modes
+﻿# MNESTIS Modes
 
-Mnemos ships three first-class cockpits. **Mode is a route**, not a toggle — the URL is canonical and persisted in `localStorage` as `mnemos.mode`.
+MNESTIS ships three first-class cockpits. **Mode is a route**, not a toggle — the URL is canonical and persisted in `localStorage` as `MNESTIS.mode`.
 
 ## The three modes
 
@@ -29,7 +29,7 @@ Every cockpit shows **“What am I looking at?”**:
 
 | Artifact | What it is | Best for |
 |----------|------------|----------|
-| **Dashboard** | Live React app at `mnemos ui` | Interactive exploration, comparison, score drill-down |
+| **Dashboard** | Live React app at `MNESTIS ui` | Interactive exploration, comparison, score drill-down |
 | **Report** | Static `report/index.html` | Async review, demos, stakeholders without dev tools |
 | **AI JSON** | AI Pack v1 at `/json/:repoId` | Copy-paste into Claude, Cursor, Trae |
 

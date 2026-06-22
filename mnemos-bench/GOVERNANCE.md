@@ -1,4 +1,4 @@
-# INFERNO-bench Governance
+﻿# INFERNO-bench Governance
 
 **INFERNO** — *Independent Framework for Evaluating Repository Navigation Objectives*
 
@@ -45,7 +45,7 @@ Every ground-truth file MUST include:
 
 ### Three-layer verification
 
-1. **Independent checks** — `scripts/verify-ground-truth.mjs` greps the fixture *without* running Mnemos. Ground truth must match raw repo evidence.
+1. **Independent checks** — `scripts/verify-ground-truth.mjs` greps the fixture *without* running MNESTIS. Ground truth must match raw repo evidence.
 2. **Harness scoring** — `scorer/verify.mjs` applies keyword AND/OR, path assertions, forbidden traps, and context artifact gates.
 3. **Regression gate** — `scorer/regression.mjs` fails CI if committed results drop below tier thresholds.
 

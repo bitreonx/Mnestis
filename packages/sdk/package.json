@@ -1,7 +1,7 @@
 {
-  "name": "@mnemos/sdk",
-  "version": "0.3.0",
-  "description": "Local-first AI memory SDK for Mnemos — hybrid retrieval, episodic memory, task context",
+  "name": "@mnestis/sdk",
+  "version": "0.3.2",
+  "description": "Local-first AI memory SDK for Mnestis — hybrid retrieval, episodic memory, task context",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,7 +16,7 @@
     "test": "npm run build && node --test dist/**/*.test.js"
   },
   "dependencies": {
-    "@mnemos/core": "*"
+    "@mnestis/core": "*"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",

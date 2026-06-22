@@ -1,7 +1,7 @@
-{
+﻿{
   "repo": "express",
   "verified_at": "2026-06-20",
-  "verification_method": "Independent grep + Mnemos build on expressjs/express @ 18e5985",
+  "verification_method": "Independent grep + MNESTIS build on expressjs/express @ 18e5985",
   "commit_sha": "18e5985b8a9d5e8423db0a9121f22bdaecd5b120",
   "independent_checks": [
     {

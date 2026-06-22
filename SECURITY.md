@@ -1,4 +1,4 @@
-# Security Policy
+﻿# Security Policy
 
 ## Supported versions
 
@@ -21,7 +21,7 @@ We aim to acknowledge within 48 hours and provide a fix timeline within 7 days f
 
 ## Scope
 
-Mnemos is **local-first**. It reads files on disk and writes to `.mnemos/` in the target repository. It does not:
+MNESTIS is **local-first**. It reads files on disk and writes to `.MNESTIS/` in the target repository. It does not:
 
 - Send repository data to external servers by default
 - Require API keys for core functionality
@@ -29,11 +29,11 @@ Mnemos is **local-first**. It reads files on disk and writes to `.mnemos/` in th
 
 Report issues in:
 
-- Path traversal in static file serving (`mnemos serve`, Vite dev middleware)
+- Path traversal in static file serving (`MNESTIS serve`, Vite dev middleware)
 - Command injection in CLI or workspace terminal
 - MCP tool handlers that escape repository boundaries
 
 ## Safe defaults
 
-- Run `mnemos serve` bound to `localhost` only unless you explicitly configure otherwise
-- Do not commit `.mnemos/` secrets if you store credentials in analyzed repos (Mnemos does not redact file contents)
+- Run `MNESTIS serve` bound to `localhost` only unless you explicitly configure otherwise
+- Do not commit `.MNESTIS/` secrets if you store credentials in analyzed repos (MNESTIS does not redact file contents)

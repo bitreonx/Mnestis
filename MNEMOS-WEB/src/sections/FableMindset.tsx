@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+﻿import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Lock, LockOpen, ShieldCheck, Zap } from "lucide-react";
 import { FABLE } from "../lib/site";
@@ -234,7 +234,7 @@ export default function FableMindset() {
             </span>
           </>
         }
-        subtitle="Mnemos ports the working discipline distilled from thousands of real Fable 5 traces into a skill your agent adopts on every turn — reason before acting, verify before claiming done, recover with method."
+        subtitle="MNESTIS ports the working discipline distilled from thousands of real Fable 5 traces into a skill your agent adopts on every turn — reason before acting, verify before claiming done, recover with method."
       />
 
       <div className="mt-14 grid items-stretch gap-6 lg:grid-cols-2">
@@ -250,7 +250,7 @@ export default function FableMindset() {
             </div>
             <p className="mt-2 text-sm text-[var(--text-dim)]">
               The gap between disciplined Fable habits and a strong baseline, measured the same way on both.
-              Run it on your own logs: <code className="rounded bg-[var(--surface-2)] px-1.5 py-0.5 text-xs">mnemos discipline --opus</code>
+              Run it on your own logs: <code className="rounded bg-[var(--surface-2)] px-1.5 py-0.5 text-xs">MNESTIS discipline --opus</code>
             </p>
             <div className="mt-6">
               <HabitBars />

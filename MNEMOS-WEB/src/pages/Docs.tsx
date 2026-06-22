@@ -1,5 +1,5 @@
-/**
- * The Mnemos docs page — redesigned from zero.
+﻿/**
+ * The MNESTIS docs page — redesigned from zero.
  * Aesthetic: "The Atlas" — editorial tech-print for a memory layer.
  *   • Chapter-numbered sidebar  (§ 01, § 02 …)
  *   • Editorial serif hero titles
@@ -623,7 +623,7 @@ function PageMeta({ readingMin, slug }: { readingMin: number; slug: string }) {
       </span>
       <a
         className="docs-hero__chip transition-colors hover:text-[var(--text)]"
-        href="https://github.com/bitreonx/mnemos/tree/main/docs"
+        href="https://github.com/bitreonx/mnestis/tree/main/docs"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -783,7 +783,7 @@ export default function Docs() {
             </header>
 
             {/* ARTICLE BODY */}
-            <div className="prose-mnemos">{page.blocks.map(renderBlock)}</div>
+            <div className="prose-MNESTIS">{page.blocks.map(renderBlock)}</div>
 
             {/* HELP / FEEDBACK */}
             <HelpFooter />
@@ -878,7 +878,7 @@ function HelpFooter() {
           <ThumbsDown size={13} /> Could be better
         </button>
         <a
-          href="https://github.com/bitreonx/mnemos/issues/new"
+          href="https://github.com/bitreonx/mnestis/issues/new"
           target="_blank"
           rel="noopener noreferrer"
           className="docs-help__btn"

@@ -1,10 +1,10 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * ASHES — AI Submission Harness for Evaluation Scoring.
  * Score external model/tool answers against INFERNO ground truth.
  *
  * Usage:
- *   node mnemos-bench/scorer/submit.mjs express answers.json
+ *   node MNESTIS-bench/scorer/submit.mjs express answers.json
  *
  * answers.json:
  * {
@@ -34,7 +34,7 @@ async function main() {
   const repoId = assertSafeRepoId(process.argv[2]);
   const answersPath = process.argv[3];
   if (!answersPath) {
-    console.error('Usage: node mnemos-bench/scorer/submit.mjs <repo> <answers.json>');
+    console.error('Usage: node MNESTIS-bench/scorer/submit.mjs <repo> <answers.json>');
     process.exit(1);
   }
 
@@ -67,7 +67,7 @@ async function main() {
     commit_sha: report.commit_sha,
     dataset_version: report.dataset_version,
     measured_at: report.evaluated_at,
-    tools: { mnemos: { accuracy: report.accuracy, verification_tier: report.verification_tier, tasks_verified: report.tasks_verified } },
+    tools: { MNESTIS: { accuracy: report.accuracy, verification_tier: report.verification_tier, tasks_verified: report.tasks_verified } },
   });
 
   await mkdir(path.join(BENCH, 'results', 'submissions'), { recursive: true });

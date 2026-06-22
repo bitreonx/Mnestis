@@ -1,4 +1,4 @@
-# Mnemos Roadmap (from INFERNO-bench / verified benchmarks)
+﻿# MNESTIS Roadmap (from INFERNO-bench / verified benchmarks)
 
 Ordered by impact. Weaknesses discovered during INFERNO-bench runs — not hidden.
 
@@ -76,7 +76,7 @@ Ordered by impact. Weaknesses discovered during INFERNO-bench runs — not hidde
 |--------|--------|-------------|
 | Raw repository | 177,553 | 1× |
 | Gitingest digest | 1,100,000 | 0.16× |
-| Mnemos DNA + context | 5,942 | **29.9×** |
+| MNESTIS DNA + context | 5,942 | **29.9×** |
 
 **NestJS (measured 2026-06-15 v2):**
 
@@ -84,7 +84,7 @@ Ordered by impact. Weaknesses discovered during INFERNO-bench runs — not hidde
 |--------|--------|-------------|
 | Raw repository | 1,024,722 | 1× |
 | Gitingest digest | 5,200,000 | 0.20× |
-| Mnemos DNA + context | 36,424 | **28.1×** |
+| MNESTIS DNA + context | 36,424 | **28.1×** |
 
 ## Signature metric: Time To Understanding (TTU)
 
@@ -93,5 +93,5 @@ Ordered by impact. Weaknesses discovered during INFERNO-bench runs — not hidde
 | Method | Time |
 |--------|------|
 | Manual onboarding (28 files + 12 searches) | 51 min (3,060s) |
-| Mnemos (build + ask + read DNA) | 2 min (122s) |
+| MNESTIS (build + ask + read DNA) | 2 min (122s) |
 | **Savings** | **96%** |

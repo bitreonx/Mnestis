@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+﻿import { motion, useReducedMotion } from "framer-motion";
 import { DNA_STRANDS } from "../lib/site";
 import SectionHeading from "../components/ui/SectionHeading";
 import Reveal from "../components/ui/Reveal";
@@ -76,7 +76,7 @@ export default function RepositoryDNA() {
                 <br className="hidden sm:block" /> your entire codebase.
               </>
             }
-            subtitle="Mnemos distills millions of lines into a few kilobytes of structured DNA. It's the first thing any agent should read — compressed, stable, and @-mention ready."
+            subtitle="MNESTIS distills millions of lines into a few kilobytes of structured DNA. It's the first thing any agent should read — compressed, stable, and @-mention ready."
           />
 
           <div className="mt-9 space-y-3">

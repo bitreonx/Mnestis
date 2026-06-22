@@ -9,8 +9,8 @@ const backupPath = path.join(__dirname, '..', 'package.json.publish-backup')
 
 export function backupPackageJson() {
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
-  if (pkg.name !== 'getmnemos') {
-    throw new Error(`[publish] refusing backup — expected name getmnemos, got ${pkg.name}`)
+  if (pkg.name !== 'mnestis') {
+    throw new Error(`[publish] refusing backup — expected name mnestis, got ${pkg.name}`)
   }
   copyFileSync(pkgPath, backupPath)
 }

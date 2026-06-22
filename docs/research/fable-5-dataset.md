@@ -1,7 +1,7 @@
-# The Open Fable 5 Dataset, and How to Compare It Against Your Own Opus 4.8
+﻿# The Open Fable 5 Dataset, and How to Compare It Against Your Own Opus 4.8
 
 You never needed Fable access to study how it worked. Someone published real Fable
-5 Claude Code traces as a public dataset. Mnemos ships a tool that profiles that
+5 Claude Code traces as a public dataset. MNESTIS ships a tool that profiles that
 public Fable behaviour, then profiles your own local Opus 4.8 sessions the exact
 same way, so you can read the behavioural gap with your own eyes.
 
@@ -16,7 +16,7 @@ from your own machine.
 
 License: AGPL-3.0. We link and read locally; we do not bundle or redistribute the data.
 
-## Quick start (Mnemos)
+## Quick start (MNESTIS)
 
 ```bash
 # Profile Fable from the public dataset
@@ -37,14 +37,14 @@ python3 scripts/discipline/analyze_discipline.py claude-fable-5 claude-opus-4-8
 
 ## Install discipline rules in your repo
 
-Mnemos embeds Fable-grade agent habits into generated AI integrations:
+MNESTIS embeds Fable-grade agent habits into generated AI integrations:
 
 ```bash
-npx mnemos .
-mnemos setup --platform cursor   # installs mnemos-discipline.mdc + architecture rule
+npx MNESTIS .
+MNESTIS setup --platform cursor   # installs MNESTIS-discipline.mdc + architecture rule
 ```
 
-Full operating manual: `.mnemos/integrations/fable-mindset.md`
+Full operating manual: `.MNESTIS/integrations/fable-mindset.md`
 
 ## Extract a custom mindset from your logs
 
@@ -62,7 +62,7 @@ to mine your own Claude Code history and write a `Mindset.md` for any model.
 | `output_type` | `text` or `tool_use` |
 | `output` | JSON `{tool, input}` for tool_use, `{text}` for text |
 
-## What Mnemos adds for weaker models
+## What MNESTIS adds for weaker models
 
 The Fable 5 traces show where discipline gaps hurt quality most:
 
@@ -73,6 +73,6 @@ The Fable 5 traces show where discipline gaps hurt quality most:
 | Read before edit | ~88% | varies | Always read exact region first |
 | Real test after edit | ~65% | varies | PostToolUse hook on Edit/Write |
 
-Mnemos `mnemos setup` writes these rules into `.cursor/rules/mnemos-discipline.mdc`,
+MNESTIS `MNESTIS setup` writes these rules into `.cursor/rules/MNESTIS-discipline.mdc`,
 `AGENTS.md`, and platform skills so Opus 4.8 (and other models) adopt Fable-grade
 habits without switching models.

@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "getmnemos"
-version = "0.3.0"
-description = "MnemosX — the memory layer for software. AI-ready codebase analysis."
+name = "mnestis"
+version = "0.3.2"
+description = "Mnestis — the memory layer for software. AI-ready codebase analysis."
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
-authors = [{ name = "Mnemos" }]
+authors = [{ name = "Mnestis" }]
 keywords = ["code-analysis", "ai", "codebase", "developer-tools"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -23,12 +23,12 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://getmnemos.vercel.app"
+Homepage = "https://mnestis.vercel.app"
 Repository = "https://github.com/bitreonx/mnemos"
 Issues = "https://github.com/bitreonx/mnemos/issues"
 
 [project.scripts]
-mnemos = "mnemos_cli:_run"
+mnestis = "mnemos_cli:_run"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mnemos_cli"]

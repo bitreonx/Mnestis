@@ -107,8 +107,8 @@ import {
   writeSecurityAuditReport,
   type AiPackSection,
   type Mode as AiPackMode,
-} from '@mnemos/core';
-import type { MnemosGraph } from '@mnemos/core';
+} from '@mnestis/core';
+import type { MnemosGraph } from '@mnestis/core';
 import { readGlobalFlags, resolveRepoRoot } from './lib/context.js';
 import { renderQueryResult } from './lib/render.js';
 
@@ -130,7 +130,7 @@ async function requireMemoryModel(root: string): Promise<NonNullable<Awaited<Ret
   if (!loaded) {
     console.log('');
     printWarnLine('No memory model found for this repository.');
-    printInfoLine(`Run ${chalk.cyan('mnemos build .')} first (or just ${chalk.cyan('npx mnemos .')} for the full experience).`);
+    printInfoLine(`Run ${chalk.cyan('mnestis build .')} first (or just ${chalk.cyan('npx mnemos .')} for the full experience).`);
     process.exit(1);
   }
   return loaded;
@@ -184,16 +184,16 @@ function printSteerSummary(platform: string, written: string[], skipped: string[
     console.log(chalk.dim('  · skipped (exists): ') + f);
   }
   console.log('');
-  console.log(chalk.bold('Your agent now knows how to use Mnemos'));
+  console.log(chalk.bold('Your agent now knows how to use Mnestis'));
   console.log(chalk.dim('  Open the repo in your editor — rules/skills load automatically.'));
-  console.log(chalk.dim(`  Try: ${chalk.cyan('mnemos ask "where does auth start?"')} or ${chalk.cyan('mnemos pack')}`));
+  console.log(chalk.dim(`  Try: ${chalk.cyan('mnestis ask "where does auth start?"')} or ${chalk.cyan('mnestis pack')}`));
 }
 
 program
-  .name('mnemos')
+  .name('mnestis')
   .description('Give AI a memory of your codebase — scan, compress, query.')
   .version(MNEMOS_VERSION, '-V, --version', 'Print version')
-  .showHelpAfterError('(run `mnemos --help` to see all commands)')
+  .showHelpAfterError('(run `mnestis --help` to see all commands)')
   .showSuggestionAfterError(true)
   .configureHelp({ sortSubcommands: true });
 
@@ -823,7 +823,7 @@ program
         return;
       }
       console.log('');
-      console.log(chalk.bold('Mnemos Focus Pack'));
+      console.log(chalk.bold('mnestis Focus Pack'));
       console.log(chalk.dim(envelope.summary));
       console.log('');
       console.log(envelope.markdown);
@@ -843,7 +843,7 @@ program
     try {
       const envelope = await runtime.getDnaDiff();
       console.log('');
-      console.log(chalk.bold('Mnemos DNA Diff'));
+      console.log(chalk.bold('mnestis DNA Diff'));
       if (envelope.data && typeof envelope.data === 'object' && 'regressionRisk' in envelope.data) {
         const risk = String((envelope.data as { regressionRisk: string }).regressionRisk);
         const color = risk === 'high' ? chalk.red : risk === 'medium' ? chalk.yellow : chalk.green;
@@ -881,7 +881,7 @@ program
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('--platform <name>', `Platform: ${ALL_PLATFORMS.join(', ')}, or all`, 'cursor')
   .option('-f, --force', 'Overwrite existing integration files')
-  .option('--uninstall', 'Remove all Mnemos platform integration files')
+  .option('--uninstall', 'Remove all Mnestis platform integration files')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
 
@@ -917,7 +917,7 @@ program
     console.log('');
     console.log(chalk.bold('Claude Code'));
     console.log(chalk.cyan('  mnemos setup --platform claude') + chalk.dim('  — skill + CLAUDE.md (recommended)'));
-    console.log(chalk.cyan('  mnemos mcp') + chalk.dim('                 — 15 MCP tools for Claude Code'));
+    console.log(chalk.cyan('  Mnestis MCP') + chalk.dim('                 — 15 MCP tools for Claude Code'));
     console.log(chalk.cyan('  mnemos wrap -- <cmd>') + chalk.dim('       — compress command output for agents'));
     console.log('');
     console.log(chalk.bold('Platforms'));
@@ -1041,7 +1041,7 @@ program
 
     const scriptsDir = findScriptsDir();
     if (!scriptsDir) {
-      console.log(chalk.yellow('scripts/discipline/ not found — clone the Mnemos repo to run analysis.'));
+      console.log(chalk.yellow('scripts/discipline/ not found — clone the Mnestis repo to run analysis.'));
       console.log(chalk.dim('  python3 scripts/discipline/fable_dataset_delta.py --sample 400'));
       return;
     }
@@ -1089,7 +1089,7 @@ program
 
 program
   .command('serve [path]')
-  .description('Start the Mnemos memory server for AI agents (localhost:4000)')
+  .description('Start the Mnestis Memory server for AI agents (localhost:4000)')
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('--port <port>', 'Port number', '4000')
   .option('--host <host>', 'Host', '127.0.0.1')
@@ -1099,7 +1099,7 @@ program
     const loaded = await requireMemoryModel(root);
 
     if (options.mcp) {
-      console.error(chalk.bold(`Mnemos MCP v${MNEMOS_VERSION} (stdio)`));
+      console.error(chalk.bold(`mnestis MCP v${MNEMOS_VERSION} (stdio)`));
       console.error(chalk.dim(`Repository: ${root}`));
       console.error(chalk.dim('Tools: query_graph · get_dna · impact_analysis · shortest_path · search · review_diff'));
       console.error(chalk.dim('Resources: mnemos://repository/dna · summary · domains · flows'));
@@ -1113,7 +1113,7 @@ program
       host: options.host,
     });
 
-    console.log(chalk.bold(`\nMnemos Memory Server v${MNEMOS_VERSION}`));
+    console.log(chalk.bold(`\nMnestis Memory Server v${MNEMOS_VERSION}`));
     console.log(chalk.green(`  http://${options.host}:${handle.port}`));
     console.log('');
     console.log('  Core endpoints:');
@@ -1128,7 +1128,7 @@ program
     console.log(`    POST /review { diff }      — PR diff review`);
     console.log(`    GET  /mcp-setup            — Cursor MCP config instructions`);
     console.log('');
-    console.log(chalk.dim('  MCP (Cursor/VS Code):  mnemos mcp'));
+    console.log(chalk.dim('  MCP (Cursor/VS Code):  Mnestis MCP'));
     console.log(chalk.dim('  Setup:                 mnemos setup --platform cursor'));
     console.log(chalk.dim('  Press Ctrl+C to stop.\n'));
 
@@ -1166,7 +1166,7 @@ memoryCmd
 
     const loaded = await loadMemoryModel(root);
     if (!loaded) {
-      console.log(chalk.yellow(`No memory model found at ${outputDir}. Run ${chalk.cyan('mnemos build .')} first.`));
+      console.log(chalk.yellow(`No memory model found at ${outputDir}. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
 
@@ -1188,9 +1188,9 @@ memoryCmd
       console.log(`  Path:  ${chalk.dim(outputDir)}`);
       console.log(`  Files: ${chalk.dim(String(files.length))} written`);
       console.log('');
-      console.log(chalk.dim('  Serve over HTTP:    mnemos memory serve'));
-      console.log(chalk.dim('  Inspect stats:      mnemos memory stats'));
-      console.log(chalk.dim('  Token budgeting:    mnemos memory budget 10000'));
+      console.log(chalk.dim('  Serve over HTTP:    Mnestis Memory serve'));
+      console.log(chalk.dim('  Inspect stats:      Mnestis Memory stats'));
+      console.log(chalk.dim('  Token budgeting:    Mnestis Memory budget 10000'));
     } catch (err) {
       spinner.fail(chalk.red('Shard write failed'));
       console.error(err);
@@ -1208,7 +1208,7 @@ memoryCmd
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
     const loaded = await loadMemoryModel(root);
     if (!loaded) {
-      console.log(chalk.yellow(`No memory model found for ${root}. Run ${chalk.cyan('mnemos build .')} first.`));
+      console.log(chalk.yellow(`No memory model found for ${root}. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
 
@@ -1218,7 +1218,7 @@ memoryCmd
       host: options.host,
     });
 
-    console.log(chalk.bold(`\nMnemos Shared Memory Server v${MNEMOS_VERSION}`));
+    console.log(chalk.bold(`\nMnestis Shared Memory Server v${MNEMOS_VERSION}`));
     console.log(chalk.green(`  http://${options.host}:${handle.port}`));
     console.log('');
     console.log('  Shard endpoints (read-only, fast):');
@@ -1234,7 +1234,7 @@ memoryCmd
     console.log('  Also available:');
     console.log(chalk.cyan('    GET /dna · /capabilities · /domains · /flows') + chalk.dim('    — canonical endpoints'));
     console.log('');
-    console.log(chalk.dim('  Re-run `mnemos memory build` after editing source files to refresh shards.'));
+    console.log(chalk.dim('  Re-run `mnestis memory build` after editing source files to refresh shards.'));
     console.log(chalk.dim('  Press Ctrl+C to stop.\n'));
 
     await new Promise(() => {});
@@ -1251,7 +1251,7 @@ memoryCmd
 
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
-      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnemos memory build .')} first.`));
+      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
       process.exit(1);
     }
     const stats = getMemoryStats(set);
@@ -1278,8 +1278,8 @@ memoryCmd
     }
     console.log('');
     console.log(chalk.bold('  Subagent savings'));
-    console.log(`    Without Mnemos:   ~${chalk.red(stats.subagentSavings.withoutMnemos.toLocaleString())} tokens / subagent`);
-    console.log(`    With Mnemos:      ~${chalk.green(stats.subagentSavings.withMnemos.toLocaleString())} tokens / subagent`);
+    console.log(`    Without Mnestis:   ~${chalk.red(stats.subagentSavings.withoutMnemos.toLocaleString())} tokens / subagent`);
+    console.log(`    With Mnestis:      ~${chalk.green(stats.subagentSavings.withMnemos.toLocaleString())} tokens / subagent`);
     console.log(`    Saved per run:    ${chalk.cyan(stats.subagentSavings.savedPerRun.toLocaleString())} tokens (${chalk.cyan(stats.subagentSavings.savedPercent + '%')})`);
     console.log('');
     console.log(chalk.bold('  Top shards'));
@@ -1300,13 +1300,13 @@ memoryCmd
     const outputDir = path.join(root, '.mnemos');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
-      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnemos memory build .')} first.`));
+      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
       process.exit(1);
     }
 
     const budget = Number(amount);
     if (!Number.isFinite(budget) || budget <= 0) {
-      console.log(chalk.red(`Invalid budget: ${amount}. Use a positive number, e.g. ${chalk.cyan('mnemos memory budget 10000')}`));
+      console.log(chalk.red(`Invalid budget: ${amount}. Use a positive number, e.g. ${chalk.cyan('mnestis memory budget 10000')}`));
       process.exit(1);
     }
     const allocation = allocateTokenBudget(set, budget);
@@ -1351,7 +1351,7 @@ memoryCmd
     const outputDir = path.join(root, '.mnemos');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
-      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnemos memory build .')} first.`));
+      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
       process.exit(1);
     }
 
@@ -1393,7 +1393,7 @@ memoryCmd
     const outputDir = path.join(root, '.mnemos');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
-      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnemos memory build .')} first.`));
+      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
       process.exit(1);
     }
 
@@ -1426,7 +1426,7 @@ memoryCmd
     const outputDir = path.join(root, '.mnemos');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
-      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnemos memory build .')} first.`));
+      console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
       process.exit(1);
     }
 
@@ -1468,7 +1468,7 @@ memoryCmd
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
     const outputDir = path.join(root, '.mnemos');
     if (!(await engineExists(outputDir))) {
-      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnemos build .')} first.`));
+      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
     const engine = new MnemosMemoryEngine(root, outputDir);
@@ -1515,7 +1515,7 @@ memoryCmd
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
     const outputDir = path.join(root, '.mnemos');
     if (!(await engineExists(outputDir))) {
-      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnemos build .')} first.`));
+      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
     const engine = new MnemosMemoryEngine(root, outputDir);
@@ -1537,7 +1537,7 @@ memoryCmd
     const outputDir = path.join(root, '.mnemos');
     const index = await loadEngineIndex(outputDir);
     if (!index) {
-      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnemos build .')} first.`));
+      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
     const m = index.manifest;
@@ -1546,7 +1546,7 @@ memoryCmd
       return;
     }
     console.log('');
-    console.log(chalk.bold(`Mnemos Memory Engine · ${MEMORY_ENGINE.codename}`));
+    console.log(chalk.bold(`mnestis Memory Engine · ${MEMORY_ENGINE.codename}`));
     console.log(chalk.dim('  100% local · SQLite + hybrid BM25 + embeddings'));
     console.log('');
     printMetricRow('Documents', String(m.documentCount));
@@ -1650,7 +1650,7 @@ memoryCmd
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
     const outputDir = path.join(root, '.mnemos');
     if (!(await engineExists(outputDir))) {
-      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnemos build .')} first.`));
+      console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
     const engine = new MnemosMemoryEngine(root, outputDir);
@@ -1688,7 +1688,7 @@ memoryCmd
       for (const e of result.errors.slice(0, 5)) console.log(chalk.dim(`    ${e}`));
     }
     if (!options.dryRun && result.episodesCreated > 0) {
-      console.log(chalk.dim('  Run `mnemos build .` to re-index episodes into hybrid search.'));
+      console.log(chalk.dim('  Run `mnestis build .` to re-index episodes into hybrid search.'));
     }
   });
 
@@ -1754,7 +1754,7 @@ memoryCmd
       console.log(chalk.dim('  Written to .mnemos/engine/frozen/{soul,user,memory,today}.md'));
       return;
     }
-    console.log(chalk.yellow('Use: spindle frozen — or: mnemos memory remember "..." for capture'));
+    console.log(chalk.yellow('Use: spindle frozen — or: Mnestis Memory remember "..." for capture'));
     process.exit(1);
   });
 
@@ -1863,10 +1863,10 @@ program
 
     const loaded = await requireMemoryModel(root);
 
-    console.error(chalk.bold(`Mnemos MCP v${MNEMOS_VERSION}`));
+    console.error(chalk.bold(`mnestis MCP v${MNEMOS_VERSION}`));
     console.error(chalk.dim(`Repository: ${loaded.memory.repository}`));
     console.error(chalk.dim(`${loaded.memory.stats.nodesCreated} nodes · ${loaded.memory.domains.length} domains · ${loaded.memory.flows.length} flows`));
-    console.error(chalk.dim('Run `mnemos mcp --setup` to print MCP client config'));
+    console.error(chalk.dim('Run `mnestis mcp --setup` to print MCP client config'));
     await startMcpServer({ root });
   });
 
@@ -1923,8 +1923,8 @@ program
     const root = path.resolve(options.path ?? targetPath);
     const loaded = await loadMemoryModel(root);
     if (!loaded) {
-      console.error(chalk.red('✗ No Mnemos memory model found.'));
-      console.error(chalk.dim('  Run `mnemos build` first.'));
+      console.error(chalk.red('✗ No Mnestis Memory model found.'));
+      console.error(chalk.dim('  Run `mnestis build` first.'));
       process.exit(1);
     }
     const section = String(options.section ?? 'all') as AiPackSection;
@@ -2104,7 +2104,7 @@ program
       console.log(chalk.dim(`Serving memory from: ${path.join(root, '.mnemos')}`));
     }
     printDashboardPreviewNote();
-    console.log(chalk.dim(`  Stable surfaces: mnemos report --open · mnemos pack · mnemos serve`));
+    console.log(chalk.dim(`  Stable surfaces: Mnestis report --open · mnemos pack · mnemos serve`));
 
     const env: Record<string, string> = { ...process.env as Record<string, string> };
     if (options.workspace || existsSync(workspaceFile)) {
@@ -2324,7 +2324,7 @@ program
       `  ${nodeOk ? chalk.green('✓') : chalk.red('✗')} Node.js ${process.versions.node}` +
         chalk.dim(nodeOk ? '' : '  (Mnemos needs Node 18+)'),
     );
-    printSuccessLine(`Mnemos · ${formatProductLabel()}`);
+    printSuccessLine(`mnestis · ${formatProductLabel()}`);
     printSuccessLine('Analysis engine is pure TypeScript — no Python, JVM, or other runtime needed.');
 
     printSection('Repository');
@@ -2344,18 +2344,18 @@ program
         printMetricRow('Store', idx?.manifest.stats.storeBackend ?? 'unknown');
         printMetricRow('Embeddings', idx?.manifest.stats.embeddingBackend ?? 'hash');
         if (trust.limitations.length) {
-          printWarnLine(`${trust.limitations.length} known limitation(s) — run ${chalk.cyan('mnemos memory trust')}`);
+          printWarnLine(`${trust.limitations.length} known limitation(s) — run ${chalk.cyan('mnestis memory trust')}`);
         }
       }
     } else {
       printWarnLine('No memory model built yet.');
-      printInfoLine(`Run ${chalk.cyan('mnemos build .')} to create one.`);
+      printInfoLine(`Run ${chalk.cyan('mnestis build .')} to create one.`);
     }
 
     printSection('Optional');
     console.log(
       `  ${chalk.dim('·')} Python is ${chalk.bold('not')} required for analysis. ` +
-        chalk.dim('It is only used by the optional `mnemos discipline` research kit.'),
+        chalk.dim('It is only used by the optional `mnestis discipline` research kit.'),
     );
 
     if (!nodeOk) process.exit(1);

@@ -1,0 +1,30 @@
+{
+  "name": "getmnemos",
+  "version": "0.3.3",
+  "description": "Deprecated — getmnemos was renamed to mnestis. This package only prints a migration notice.",
+  "bin": {
+    "getmnemos": "bin/legacy.cjs",
+    "mnemos": "bin/legacy.cjs"
+  },
+  "files": [
+    "bin"
+  ],
+  "keywords": [
+    "mnestis",
+    "mnemos",
+    "deprecated"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitreonx/mnemos.git",
+    "directory": "packages/getmnemos-legacy"
+  },
+  "homepage": "https://mnestis.vercel.app",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

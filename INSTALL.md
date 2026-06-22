@@ -1,32 +1,32 @@
-# Installing Get Mnemos
+# Installing Mnestis
 
-**Website:** [getmnemos.vercel.app](https://getmnemos.vercel.app)  
-**GitHub:** [github.com/bitreonx/mnemos](https://github.com/bitreonx/mnemos)
+**Website:** [mnestis.vercel.app](https://mnestis.vercel.app)  
+**GitHub:** [github.com/bitreonx/mnestis](https://github.com/bitreonx/mnestis)
 
 ## One command. One name. No guessing.
 
 **Recommended — build + auto-steer your AI editor:**
 
 ```bash
-npx getmnemos launch . --platform cursor   # Cursor rules + MCP
-npx getmnemos launch . --platform claude   # Claude skills + CLAUDE.md
+npx mnestis launch . --platform cursor   # Cursor rules + MCP
+npx mnestis launch . --platform claude   # Claude skills + CLAUDE.md
 ```
 
 **Quick scan only:**
 
 ```bash
-npx getmnemos .
+npx mnestis .
 ```
 
-The npm package is **`getmnemos`**. The command you type is the promise you get.
+The npm package is **`mnestis`**. The command you type is the promise you get.
 
 | Wrong | Right |
 |-------|-------|
-| `npm install mnemos` | `npm install -g getmnemos` |
-| `npm install @mnemos/cli` | `npx getmnemos launch . --platform cursor` |
-| `npm install mnemos-cli` (npm) | `pip install getmnemos` |
+| `npm install MNESTIS` | `npm install -g mnestis` |
+| `npm install @mnestis/cli` | `npx mnestis launch . --platform cursor` |
+| `npm install MNESTIS-cli` (npm) | `pip install mnestis` |
 
-After install, both `getmnemos` and `mnemos` work.
+After install, both `mnestis` and `MNESTIS` work.
 
 ---
 
@@ -35,17 +35,17 @@ After install, both `getmnemos` and `mnemos` work.
 Requires **Node 20+**.
 
 ```bash
-npx getmnemos .
-npm install -g getmnemos
-npm install -D getmnemos   # in your project
+npx mnestis .
+npm install -g mnestis
+npm install -D mnestis   # in your project
 ```
 
 ## Beast mode + security
 
 ```bash
-getmnemos launch . --platform cursor --supernova   # build + steer + Supernova pack
-getmnemos supernova .   # tours, layers, personas, AI pack — all fire
-getmnemos audit .       # npm audit → .mnemos/security-audit.json
+mnestis launch . --platform cursor --supernova   # build + steer + Supernova pack
+mnestis supernova .   # tours, layers, personas, AI pack — all fire
+mnestis audit .       # npm audit → .MNESTIS/security-audit.json
 ```
 
 ## First npm publish (maintainers)
@@ -55,20 +55,20 @@ See **[docs/NPM_FIRST_PUBLISH.md](./docs/NPM_FIRST_PUBLISH.md)** — step-by-ste
 ## Python
 
 ```bash
-pip install getmnemos
-mnemos .
+pip install mnestis
+MNESTIS .
 ```
 
 ## Verify
 
 ```bash
-getmnemos --version
+mnestis --version
 ```
 
 ## Dabt `@dabt/shared` 404?
 
-That error is from the **Dabt monorepo**, not Mnemos. Link or publish `@dabt/shared` first, then:
+That error is from the **Dabt monorepo**, not MNESTIS. Link or publish `@dabt/shared` first, then:
 
 ```bash
-npm install -D getmnemos
+npm install -D mnestis
 ```

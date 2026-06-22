@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build --workspace @mnemos/ui",
+  "buildCommand": "npm run build --workspace @mnestis/ui",
   "installCommand": "npm install",
   "outputDirectory": "packages/ui/dist",
   "framework": null,
@@ -17,7 +17,7 @@
       ]
     },
     {
-      "source": "/.mnemos/(.*)",
+      "source": "/.mnestis/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=3600" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }

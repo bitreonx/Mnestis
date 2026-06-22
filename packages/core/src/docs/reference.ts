@@ -174,9 +174,9 @@ All outputs call the same **\`buildAiPack\`** builder in \`packages/core/src/ai-
 
 | Package | Role |
 |---------|------|
-| \`@mnemos/core\` | Scanner, analyzer, memory, AI Pack, report, serve, MCP |
-| \`@mnemos/cli\` | \`mnemos\` command-line interface |
-| \`@mnemos/ui\` | Vite + React dashboard |
+| \`@mnestis/core\` | Scanner, analyzer, memory, AI Pack, report, serve, MCP |
+| \`@mnestis/cli\` | \`mnemos\` command-line interface |
+| \`@mnestis/ui\` | Vite + React dashboard |
 
 ## Design principles
 

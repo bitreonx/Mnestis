@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import {
   GitBranch,
   Boxes,
@@ -654,7 +654,7 @@ export default function Pipeline() {
             </span>
           </>
         }
-        subtitle="One continuous pipeline. Each stage takes the previous one further — and Mnemos handles the entire trip."
+        subtitle="One continuous pipeline. Each stage takes the previous one further — and MNESTIS handles the entire trip."
       />
 
       <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

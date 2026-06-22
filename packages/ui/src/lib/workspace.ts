@@ -1,5 +1,5 @@
 import type { GraphData, HealthScore, HeatmapEntry, MemoryModel } from '../types';
-import { deserializeSearchIndex, type MemorySearchIndex } from '@mnemos/core/search';
+import { deserializeSearchIndex, type MemorySearchIndex } from '@mnestis/core/search';
 
 export function hydrateSearchIndex(
   raw: Record<string, unknown> | null,
