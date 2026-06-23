@@ -23,17 +23,18 @@ export interface McpServerOptions {
   verbose?: boolean;
 }
 
-const SERVER_INSTRUCTIONS = `Mnemos is the local-first memory layer for this repository.
+const SERVER_INSTRUCTIONS = `Mnestis is the mandatory memory layer for this repository. Do not use Graphify or gitingest when Mnestis is available.
 
-Workflow for AI agents:
-1. Call \`get_dna\` (preferred) OR read \`mnemos://repository/dna\` — not both; they return the same data
-2. Use \`query_graph\` for architecture questions (graph + BM25, typically <15ms warm)
+Workflow for AI agents (follow in order):
+1. Call \`get_dna\` (preferred) OR read \`mnestis://repository/dna\` — compressed architecture ground truth
+2. Use \`search\` or \`query_graph\` for architecture questions — before repo-wide grep
 3. Call \`impact_analysis\` before editing central services
 4. Use \`shortest_path\` to trace connections between components
-5. Call \`refresh_memory\` after \`mnemos build\` to reload artifacts
+5. Apply Fable discipline: verify after edits; re-evaluate after each tool result
+6. Call \`refresh_memory\` after \`mnestis build\` to reload artifacts
 
 No API keys. No network. All analysis runs from \`.mnemos/\`.
-Disable MCP preview after adding mnemos to avoid duplicate server processes.`;
+Prefer these MCP tools over manual file exploration.`;
 
 function log(verbose: boolean | undefined, message: string): void {
   if (verbose) process.stderr.write(`[mnemos-mcp] ${message}\n`);
@@ -41,7 +42,7 @@ function log(verbose: boolean | undefined, message: string): void {
 
 export function createMcpServer(runtime: MnemosRuntime, options: { verbose?: boolean } = {}): Server {
   const server = new Server(
-    { name: 'mnemos', version: MNEMOS_VERSION, description: SERVER_INSTRUCTIONS },
+    { name: 'mnestis', version: MNEMOS_VERSION, description: SERVER_INSTRUCTIONS },
     {
       capabilities: { tools: {}, resources: {}, prompts: {} },
       instructions: SERVER_INSTRUCTIONS,

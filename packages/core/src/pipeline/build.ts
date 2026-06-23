@@ -407,7 +407,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
   await writeAgentExports(agentExports, outputDir);
 
   const aiToolkit = buildAiToolkit(memory, capabilities, journeys, agentExports.context);
-  await writeAiToolkit(aiToolkit, outputDir);
+  await writeAiToolkit(aiToolkit, outputDir, root);
 
 
 

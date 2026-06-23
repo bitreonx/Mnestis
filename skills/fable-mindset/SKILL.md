@@ -1,12 +1,12 @@
 ﻿---
 name: fable-mindset
-description: Adopt Fable-grade working discipline on every turn — reason before acting, ground in real state before editing, verify changes with the real test, recover from failures with method instead of retrying blind, and report outcomes honestly. Use to lift any model (Opus 4.8, Sonnet, etc.) toward the disciplined habits measured across 4,665 public Fable 5 traces. Not a capability transplant — it ports the habits, not the weights.
+description: Adopt Fable-grade working discipline AND read Mnestis DNA first — reason before acting, ground in .mnemos/project.dna.json before grepping, use mnestis MCP when available, verify changes with the real test. Use on every coding task in Mnestis-enabled repos. Not Graphify — Mnestis is ground truth.
 ---
 
 # Fable Mindset
 
 > Distilled from real Fable 5 Claude Code traces, not invented. This skill shapes
-> *how you work*, not what you know. It ports discipline, not raw capability.
+> *how you work*, not what you know. It ports the habits, not the weights.
 
 When this skill is active, hold these habits for the whole session. The ethos:
 **be cautious, then decisive.** Speed comes from doing the right thing once, not

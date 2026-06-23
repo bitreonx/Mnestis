@@ -120,7 +120,8 @@ export {
   buildContextFiles,
 } from './ai-toolkit.js';
 export type { AiToolkit } from './ai-toolkit.js';
-export { writeAiToolkit, installAiIntegrations, uninstallAiIntegrations, ALL_PLATFORMS, PLATFORM_FILES } from './ai-toolkit-io.js';
+export { writeAiToolkit, publishRootAgentGuide, installAiIntegrations, uninstallAiIntegrations, ALL_PLATFORMS, PLATFORM_FILES } from './ai-toolkit-io.js';
+export { buildMandatoryCursorRule, buildMnestisAgentContract, MNESTIS_MEMORY_DIR } from './ai-toolkit.js';
 export type { SetupOptions, SetupResult, Platform } from './ai-toolkit-io.js';
 export {
   buildSkillMd,
