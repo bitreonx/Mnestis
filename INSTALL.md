@@ -1,7 +1,7 @@
 # Installing Mnestis
 
 **Website:** [mnestis.vercel.app](https://mnestis.vercel.app)  
-**GitHub:** [github.com/bitreonx/mnestis](https://github.com/bitreonx/mnestis)
+**GitHub:** [github.com/bitreonx/Mnestis](https://github.com/bitreonx/Mnestis)
 
 ## One command. One name. No guessing.
 

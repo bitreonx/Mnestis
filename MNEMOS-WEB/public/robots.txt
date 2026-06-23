@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# AI / LLM discovery
+Allow: /llms.txt
+
 Sitemap: https://mnestis.vercel.app/sitemap.xml

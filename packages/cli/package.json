@@ -17,22 +17,24 @@
   ],
   "keywords": [
     "mnestis",
-    "mnemos",
-    "memory",
-    "ai",
-    "codebase",
-    "architecture",
-    "intelligence",
-    "cli",
-    "cursor",
-    "claude",
-    "mcp",
-    "security",
-    "knowledge-graph"
+    "codebase-memory",
+    "ai-coding",
+    "architecture-intelligence",
+    "cursor-mcp",
+    "claude-code",
+    "codex",
+    "local-first",
+    "dependency-graph",
+    "ai-pack",
+    "repository-dna",
+    "developer-tools",
+    "graphify-alternative",
+    "codebase-analysis",
+    "mcp-server"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitreonx/mnemos.git",
+    "url": "git+https://github.com/bitreonx/Mnestis.git",
     "directory": "packages/cli"
   },
   "bugs": {

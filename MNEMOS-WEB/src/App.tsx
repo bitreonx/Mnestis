@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import SeoHead from "./components/SeoHead";
 import Home from "./pages/Home";
 import Docs from "./pages/Docs";
 
@@ -19,6 +20,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <SeoHead />
       {/* solid base */}
       <div className="pointer-events-none fixed inset-0 -z-50" style={{ background: "var(--bg)" }} aria-hidden />
 

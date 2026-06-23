@@ -4,54 +4,101 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#060509" />
+    <meta name="theme-color" content="#863bff" />
     <meta name="color-scheme" content="dark light" />
 
     <title>Mnestis — Give AI a memory of your codebase</title>
     <meta
       name="description"
-      content="Mnestis is the memory layer for software. One command turns any codebase into architecture intelligence for humans and AI — local-first, no API keys. Built for Cursor, Claude Code, and Codex."
+      content="Mnestis is the local-first memory layer for software. Turn any repository into architecture DNA, dependency graphs, and AI Pack v1 for Cursor, Claude Code, and Codex — one command, no API keys."
     />
     <meta
       name="keywords"
-      content="Mnestis, codebase memory, AI coding, architecture intelligence, Cursor MCP, Claude Code, local-first, dependency graph, AI Pack, codebase analysis, developer tools"
+      content="Mnestis, codebase memory, AI coding assistant, architecture intelligence, Cursor MCP, Claude Code, Codex, local-first, dependency graph, AI Pack, codebase analysis, developer tools, Graphify alternative, repository DNA, Fable mindset"
     />
     <meta name="author" content="bitreonx" />
-    <meta name="robots" content="index, follow" />
+    <meta name="application-name" content="Mnestis" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
     <link rel="canonical" href="https://mnestis.vercel.app/" />
 
+    <!-- Open Graph -->
     <meta property="og:site_name" content="Mnestis" />
     <meta property="og:title" content="Mnestis — Give AI a memory of your codebase" />
     <meta
       property="og:description"
-      content="Transform repositories into understanding. One command builds architecture DNA, AI Pack v1, and shareable reports — local-first."
+      content="Transform repositories into understanding. One command builds architecture DNA, AI Pack v1, MCP tools, and shareable reports — local-first."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://mnestis.vercel.app/" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://mnestis.vercel.app/og.png" />
+    <meta property="og:image:alt" content="Mnestis — the memory layer for software" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@bitreonx" />
+    <meta name="twitter:creator" content="@bitreonx" />
     <meta name="twitter:title" content="Mnestis — Give AI a memory of your codebase" />
     <meta
       name="twitter:description"
       content="The memory layer for software. npx mnestis . — architecture intelligence for humans and AI."
     />
+    <meta name="twitter:image" content="https://mnestis.vercel.app/og.png" />
+    <meta name="twitter:image:alt" content="Mnestis — the memory layer for software" />
 
+    <!-- Structured data -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Mnestis",
-        "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Windows, macOS, Linux",
-        "description": "Local-first memory layer that turns codebases into architecture intelligence for humans and AI agents.",
-        "url": "https://mnestis.vercel.app/",
-        "downloadUrl": "https://www.npmjs.com/package/mnestis",
-        "softwareVersion": "0.3.3",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "author": { "@type": "Organization", "name": "bitreonx", "url": "https://github.com/bitreonx" },
-        "codeRepository": "https://github.com/bitreonx/Mnestis"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://mnestis.vercel.app/#website",
+            "url": "https://mnestis.vercel.app/",
+            "name": "Mnestis",
+            "description": "Local-first codebase memory and architecture intelligence for AI coding tools.",
+            "publisher": { "@id": "https://mnestis.vercel.app/#organization" },
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://mnestis.vercel.app/#organization",
+            "name": "Mnestis",
+            "url": "https://mnestis.vercel.app/",
+            "logo": "https://mnestis.vercel.app/favicon.svg",
+            "sameAs": [
+              "https://github.com/bitreonx/Mnestis",
+              "https://www.npmjs.com/package/mnestis"
+            ]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://mnestis.vercel.app/#software",
+            "name": "Mnestis",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Windows, macOS, Linux",
+            "description": "Local-first memory layer that turns codebases into architecture intelligence for humans and AI agents.",
+            "url": "https://mnestis.vercel.app/",
+            "downloadUrl": "https://www.npmjs.com/package/mnestis",
+            "softwareVersion": "0.3.3",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "author": { "@id": "https://mnestis.vercel.app/#organization" },
+            "codeRepository": "https://github.com/bitreonx/Mnestis",
+            "featureList": [
+              "Repository DNA",
+              "Dependency graph",
+              "AI Pack v1",
+              "MCP server for Cursor and Claude",
+              "Fable mindset discipline",
+              "Local-first — no API keys"
+            ]
+          }
+        ]
       }
     </script>
 
@@ -67,6 +114,22 @@
     </script>
   </head>
   <body>
+    <!-- Crawlable fallback for bots that skip JS -->
+    <noscript>
+      <header>
+        <h1>Mnestis — Give AI a memory of your codebase</h1>
+        <p>
+          Mnestis is the local-first memory layer for software. One command turns any repository into
+          architecture DNA, dependency graphs, and AI Pack v1 for Cursor, Claude Code, and Codex.
+        </p>
+        <p>
+          <a href="https://mnestis.vercel.app/docs">Documentation</a> ·
+          <a href="https://www.npmjs.com/package/mnestis">npm: mnestis</a> ·
+          <a href="https://github.com/bitreonx/Mnestis">GitHub</a>
+        </p>
+        <pre>npx mnestis launch . --platform cursor</pre>
+      </header>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

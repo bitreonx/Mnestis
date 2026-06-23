@@ -2,6 +2,8 @@
 
 **The memory layer for software.** One command turns a codebase into architecture intelligence that humans and AI can use immediately.
 
+**Website:** [mnestis.vercel.app](https://mnestis.vercel.app) · **npm:** [`mnestis`](https://www.npmjs.com/package/mnestis) · **GitHub:** [bitreonx/Mnestis](https://github.com/bitreonx/Mnestis)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ecf8e.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-6366f1.svg)](package.json)
 [![npm](https://img.shields.io/badge/npm-mnestis-e82127.svg)](https://www.npmjs.com/package/mnestis)
@@ -19,6 +21,22 @@ npx mnestis .
 > **Install:** npm package is **`mnestis`** — not the squatted `Mnestis` name. See [INSTALL.md](INSTALL.md).
 
 Local-first. No cloud. No API keys. No guesswork.
+
+---
+
+## What is Mnestis?
+
+**Mnestis** is a local-first **codebase memory** tool for **AI coding assistants** (Cursor, Claude Code, Codex). It replaces ad-hoc grepping and one-off tools like Graphify with a single **`npx mnestis .`** command that builds:
+
+- **Repository DNA** — compressed architecture fingerprint (`.mnemos/project.dna.json`)
+- **Dependency graph** — domains, flows, capabilities, critical paths
+- **AI Pack v1** — versioned JSON contract agents can reason from
+- **MCP server** — `get_dna`, `search`, `impact_analysis` for Cursor and Claude
+- **Fable mindset** — working discipline distilled from Fable 5 traces
+
+Use **`npx mnestis launch . --platform cursor`** to build memory and auto-install steering rules so agents actually read DNA instead of skipping it.
+
+**Keywords:** codebase analysis · architecture intelligence · Cursor MCP · Claude Code skill · local-first · AI agent memory · dependency graph · developer tools
 
 ---
 
