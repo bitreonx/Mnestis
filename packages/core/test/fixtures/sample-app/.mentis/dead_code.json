@@ -1,0 +1,26 @@
+[
+  {
+    "nodeId": "function:app/login/page.tsx:3",
+    "name": "LoginPage",
+    "kind": "function",
+    "path": "app/login/page.tsx:3",
+    "confidence": 0.55,
+    "reason": "Exported but never imported or called within analyzed scope"
+  },
+  {
+    "nodeId": "class:src/auth/service.ts:6",
+    "name": "UserService",
+    "kind": "class",
+    "path": "src/auth/service.ts:6",
+    "confidence": 0.55,
+    "reason": "Exported but never imported or called within analyzed scope"
+  },
+  {
+    "nodeId": "function:src/features/pickup/validate.ts:1",
+    "name": "validatePickup",
+    "kind": "function",
+    "path": "src/features/pickup/validate.ts:1",
+    "confidence": 0.55,
+    "reason": "Exported but never imported or called within analyzed scope"
+  }
+]

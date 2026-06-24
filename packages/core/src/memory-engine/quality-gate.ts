@@ -41,7 +41,7 @@ export function assessQueryQuality(
   if (hits.length === 0) {
     warnings.push({
       code: 'NO_HITS',
-      message: 'No memory hits — try broader terms or run mnemos build after recent changes.',
+      message: 'No memory hits — try broader terms or run mnestis build after recent changes.',
       severity: 'warn',
     });
   }

@@ -94,7 +94,7 @@ export function GraphView({ graph, highlightNodes }: GraphViewProps) {
   if (!graph) {
     return (
       <div className="flex items-center justify-center h-full text-[var(--color-text-muted)]">
-        No graph data available. Run <code className="mx-1 px-1.5 py-0.5 rounded bg-[var(--color-surface-overlay)]">mnemos build</code> first.
+        No graph data available. Run <code className="mx-1 px-1.5 py-0.5 rounded bg-[var(--color-surface-overlay)]">mnestis build</code> first.
       </div>
     );
   }

@@ -36,7 +36,7 @@ export function WorkspaceCopilot({
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: `Connected to ${repoName} via Mnemos memory. Ask about auth, flows, domains, impact, or routing — graph-aware, not raw grep.`,
+      content: `Connected to ${repoName} via Mnestis memory. Ask about auth, flows, domains, impact, or routing — graph-aware, not raw grep.`,
     },
   ]);
   const [input, setInput] = useState('');
@@ -55,7 +55,7 @@ export function WorkspaceCopilot({
         ...m,
         {
           role: 'assistant',
-          content: res.answer || 'No answer returned. Run Mnemos build first.',
+          content: res.answer || 'No answer returned. Run mnestis build first.',
           confidence: res.confidence,
         },
       ]);

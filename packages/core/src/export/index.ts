@@ -203,7 +203,7 @@ function slugify(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export type ExportFormat = 'svg' | 'graphml' | 'callflow' | 'wiki';
+export type ExportFormat = 'svg' | 'graphml' | 'callflow' | 'wiki' | 'vault';
 
 export async function runExport(
   format: ExportFormat,
@@ -216,7 +216,7 @@ export async function runExport(
 
   switch (format) {
     case 'svg': {
-      if (!graph) throw new Error('Graph required for SVG export. Run mnemos build first.');
+      if (!graph) throw new Error('Graph required for SVG export. Run mnestis build first.');
       const out = path.join(outputDir, 'graph.svg');
       await writeFile(out, exportGraphSvg(graph, memory), 'utf-8');
       return out;
@@ -240,6 +240,11 @@ export async function runExport(
         await writeFile(full, content, 'utf-8');
       }
       return wikiDir;
+    }
+    case 'vault': {
+      const { exportObsidianVault } = await import('../vault/obsidian.js');
+      const result = await exportObsidianVault(memory, outputDir);
+      return result.vaultDir;
     }
     default:
       throw new Error(`Unknown export format: ${format}`);

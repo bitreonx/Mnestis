@@ -10,8 +10,8 @@ import { useParams } from 'react-router-dom'
 const BENCH_COMMANDS = [
   { title: 'Regression suite', cmd: 'npm run bench:regression', desc: 'Verify Mnemos outputs have not regressed against fixtures.' },
   { title: 'Express benchmark', cmd: 'npm run bench:express', desc: 'Score Mnemos on the Express fixture repository.' },
-  { title: 'AI blind eval', cmd: 'npm run bench:ai-eval', desc: 'Measure how well an AI answers architecture questions from Mnemos context.' },
-  { title: 'Pack smoke test', cmd: 'npx mnemos pack --section=summary', desc: 'Print AI Pack v1 summary to stdout.' },
+  { title: 'AI blind eval', cmd: 'npm run bench:ai-eval', desc: 'Measure how well an AI answers architecture questions from Mnestis context.' },
+  { title: 'Pack smoke test', cmd: 'npx mnestis pack --section=summary', desc: 'Print AI Pack v1 summary to stdout.' },
 ]
 
 export const VerifySection = () => {

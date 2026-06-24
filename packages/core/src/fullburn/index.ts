@@ -280,7 +280,7 @@ export function formatFullBurnSummary(pack: FullBurnPack): string {
     `Stats: ${pack.stats.domains} domains · ${pack.stats.capabilities} capabilities · ${pack.stats.flows} flows · ${pack.stats.languages} languages (${pack.stats.supportedLanguageCatalog}+ catalog)`,
     '',
     'Persona exports: pm.json · dev.json · ai.json',
-    'Written to .mnemos/fullburn/',
+    'Written to .mentis/fullburn/',
   ];
   return lines.join('\n');
 }

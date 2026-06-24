@@ -155,7 +155,7 @@ export function buildSpindleHookScript(): string {
   if (process.platform === 'win32') {
     return `@echo off
 ${SPINDLE_MARKER}
-REM Spindle: optional stdin capture — pipe turn summary to mnemos memory spindle capture -
+REM Spindle: optional stdin capture — pipe turn summary to Mnestis memory spindle capture -
 where mnemos >nul 2>&1
 if %ERRORLEVEL% NEQ 0 exit /b 0
 exit /b 0
@@ -163,7 +163,7 @@ exit /b 0
   }
   return `#!/bin/sh
 ${SPINDLE_MARKER}
-# Spindle turn-capture hook placeholder — use: mnemos memory spindle capture "fact"
+# Spindle turn-capture hook placeholder — use: Mnestis memory spindle capture "fact"
 exit 0
 `;
 }

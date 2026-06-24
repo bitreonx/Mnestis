@@ -84,7 +84,7 @@ export const JsonPackView = () => {
           <div className="mx-auto max-w-lg">
             <EmptyState
               title="AI Pack unavailable"
-              description="Run mnemos build on this repository, then reload this page."
+              description="Run mnestis build on this repository, then reload this page."
               action={
                 <Link to={buildModePath('coder', repoId, 'overview')}>
                   <Button size="sm">

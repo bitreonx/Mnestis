@@ -22,7 +22,7 @@ import {
 } from '../languages/docs.js';
 import { SUPPORTED_LANGUAGE_COUNT } from '../languages/registry.js';
 
-/** Master graphs index — `.mnemos/context/graphs.md` */
+/** Master graphs index — `.mentis/context/graphs.md` */
 export function buildGraphsIndexMarkdown(memory: MemoryModel): string {
   const sections = buildGraphIndexSections(memory);
   const { architecture } = memory;
@@ -93,7 +93,7 @@ ${sections.risk}
 
 ${sections.smells}
 
-## Mnemos build pipeline
+## mnestis build pipeline
 
 ${sections.pipeline}
 

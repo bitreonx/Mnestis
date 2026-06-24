@@ -183,7 +183,7 @@ export const CoderOverview = () => {
           {packIssues.length > 0 ? (
             packIssues.map((issue) => <IssueCard key={issue.id} issue={issue} repoId={repoId} />)
           ) : (
-            <EmptyState title="No major issues detected" description="Repository looks clean from Mnemos analysis." />
+            <EmptyState title="No major issues detected" description="Repository looks clean from Mnestis analysis." />
           )}
         </div>
       </section>

@@ -216,7 +216,7 @@ export const IntelligenceProvider = ({ repo, mode, children }: IntelligenceProvi
 
   useEffect(() => {
     if (aiView !== 'docs') return
-    const base = repo.id === 'local' ? '/.mnemos/context' : `/.mnemos/${repo.id}/context`
+    const base = repo.id === 'local' ? '/.mentis/context' : `/.mentis/${repo.id}/context`
     fetch(`${base}/${contextDoc}`)
       .then((r) => (r.ok ? r.text() : 'Document not found'))
       .then(setContextContent)

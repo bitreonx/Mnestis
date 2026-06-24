@@ -8,12 +8,15 @@ import type {
   MemoryDocument,
   TaskContextPack,
 } from './types.js';
+import type { MnemosGraph } from '../graph/graph.js';
 import { cosineSimilarity } from './embeddings.js';
 import { embedDocument, type EmbeddingMode } from './onnx-embeddings.js';
 import { reciprocalRankFusion, rankHits, snippet } from './ranking.js';
 import { attachQualityWarnings, formatWarningsMarkdown } from './quality-gate.js';
 import { estimateTokens } from '../proxy/compress-output.js';
 import { applyVeilToEpisodes } from './veil.js';
+import { hybridRecall } from '../recall/hybrid-recall.js';
+import { pack, formatPackSavings } from '../recall/pack.js';
 
 export interface QueryOptions {
   limit?: number;
@@ -153,36 +156,61 @@ export async function compileTaskContext(
   task: string,
   tokenBudget = 8000,
   embeddingMode?: EmbeddingMode,
+  graph: MnemosGraph | null = null,
 ): Promise<TaskContextPack> {
-  const result = await hybridQuery(index, searchIndex, task, { limit: 20, includeContradictions: true, embeddingMode });
-  const selected: TaskContextPack['documents'] = [];
-  let tokens = 0;
+  const recallResult = graph
+    ? await hybridRecall(index, searchIndex, task, graph, { limit: 24 })
+    : null;
+  const result = recallResult
+    ? {
+        query: task,
+        hits: recallResult.hits,
+        contradictions: index.contradictions.filter((c) => !c.resolved).slice(0, 5),
+        tookMs: recallResult.tookMs,
+        retrievers: { bm25: 0, vector: 0, fused: recallResult.hits.length },
+        warnings: undefined as HybridQueryResult['warnings'],
+      }
+    : await hybridQuery(index, searchIndex, task, { limit: 24, includeContradictions: true, embeddingMode });
 
-  for (const hit of result.hits) {
-    const structural = index.documents.find((d) => d.id === hit.id);
-    const episodic = index.episodes.find((e) => e.id === hit.id);
-    const content = structural?.body ?? episodic?.content;
-    if (!content) continue;
-    const est = estimateTokens(content);
-    if (tokens + est > tokenBudget && selected.length > 0) break;
-    selected.push({
-      id: hit.id,
-      kind: hit.kind,
-      title: hit.title,
-      content: content.slice(0, Math.min(content.length, tokenBudget * 4)),
-      score: hit.score,
-    });
-    tokens += est;
-  }
+  const candidates = result.hits
+    .map((hit) => {
+      const structural = index.documents.find((d) => d.id === hit.id);
+      const episodic = index.episodes.find((e) => e.id === hit.id);
+      const content = structural?.body ?? episodic?.content;
+      if (!content) return null;
+      return { id: hit.id, content, relevance: hit.score, hit, kind: hit.kind, title: hit.title };
+    })
+    .filter((c): c is NonNullable<typeof c> => c !== null);
+
+  const packResult = pack(
+    candidates.map((c) => ({ id: c.id, content: c.content, relevance: c.relevance })),
+    tokenBudget,
+  );
+
+  const includedIds = new Set(packResult.included.map((m) => m.id));
+  const selected: TaskContextPack['documents'] = candidates
+    .filter((c) => includedIds.has(c.id))
+    .map((c) => ({
+      id: c.id,
+      kind: c.kind,
+      title: c.title,
+      content: c.content.slice(0, Math.min(c.content.length, tokenBudget * 4)),
+      score: c.relevance,
+    }));
+
+  const savingsPercent =
+    packResult.tokensTotal > 0 ? Math.round((packResult.tokensSaved / packResult.tokensTotal) * 100) : 0;
+  const savingsLine = formatPackSavings(packResult);
 
   const markdown = [
     `# Task Context: ${task}`,
     '',
-    `Budget: ~${tokenBudget} tokens · Selected: ~${tokens} tokens · ${selected.length} documents`,
+    `> **${savingsLine}**`,
     '',
-    ...(result.warnings?.length
-      ? [formatWarningsMarkdown(result.warnings), '']
-      : []),
+    `Budget: ${tokenBudget} tokens · Used: ${packResult.tokensUsed} · Included: ${packResult.included.length} · Dropped: ${packResult.dropped.length}`,
+    graph ? '_Hybrid recall: vector + BM25 + graph BFS_' : '_Hybrid recall: vector + BM25_',
+    '',
+    ...(result.warnings?.length ? [formatWarningsMarkdown(result.warnings), ''] : []),
     ...(result.contradictions.length
       ? ['## ⚠ Contradictions detected', ...result.contradictions.map((c) => formatContradiction(c)), '']
       : []),
@@ -193,10 +221,19 @@ export async function compileTaskContext(
   return {
     task,
     tokenBudget,
-    estimatedTokens: tokens,
+    estimatedTokens: packResult.tokensUsed,
     documents: selected,
     contradictions: result.contradictions,
     markdown,
+    pack: {
+      tokensUsed: packResult.tokensUsed,
+      tokensSaved: packResult.tokensSaved,
+      tokensTotal: packResult.tokensTotal,
+      savingsPercent,
+      savingsLine,
+      includedCount: packResult.included.length,
+      droppedCount: packResult.dropped.length,
+    },
   };
 }
 

@@ -1,0 +1,380 @@
+{
+  "repository": "sample-app",
+  "builtAt": "2026-06-24T11:40:03.432Z",
+  "stats": {
+    "filesScanned": 3,
+    "nodesCreated": 15,
+    "edgesCreated": 15,
+    "domainsFound": 2,
+    "flowsFound": 2,
+    "durationMs": 132
+  },
+  "architecture": {
+    "name": "sample-app",
+    "type": "Single Package",
+    "layers": [
+      "Feature Modules"
+    ],
+    "packages": [],
+    "languages": {
+      "typescript": 3
+    },
+    "summary": "Single Package with 3 source files across typescript. 0 packages detected. 2 execution flows; core domains: Source, Pickup."
+  },
+  "domains": [
+    {
+      "id": "domain:path:0",
+      "name": "Source",
+      "confidence": 0.85,
+      "nodes": [
+        "file:src/auth/service.ts"
+      ],
+      "description": "Feature module detected from directory structure: Source",
+      "entryPoints": []
+    },
+    {
+      "id": "domain:path:1",
+      "name": "Pickup",
+      "confidence": 0.85,
+      "nodes": [
+        "file:src/features/pickup/validate.ts"
+      ],
+      "description": "Feature module detected from directory structure: Pickup",
+      "entryPoints": []
+    }
+  ],
+  "flows": [
+    {
+      "id": "flow:request:app/login/page.tsx",
+      "name": "/login",
+      "type": "request",
+      "confidence": 0.9,
+      "steps": [
+        {
+          "nodeId": "file:app/login/page.tsx",
+          "name": "app/login/page.tsx",
+          "kind": "file",
+          "path": "app/login/page.tsx"
+        },
+        {
+          "nodeId": "api:app/login/page.tsx",
+          "name": "/login",
+          "kind": "api",
+          "path": "app/login/page.tsx"
+        },
+        {
+          "nodeId": "function:src/auth/service.ts:7",
+          "name": "login",
+          "kind": "function",
+          "path": "src/auth/service.ts:7"
+        },
+        {
+          "nodeId": "route:app/login/page.tsx:1",
+          "name": "/login",
+          "kind": "route",
+          "path": "app/login/page.tsx:1"
+        },
+        {
+          "nodeId": "function:app/login/page.tsx:3",
+          "name": "LoginPage",
+          "kind": "function",
+          "path": "app/login/page.tsx:3"
+        }
+      ],
+      "entryPoint": "app/login/page.tsx",
+      "description": "HTTP request: 5 steps through file → api → function → route"
+    },
+    {
+      "id": "flow:journey:login_flow",
+      "name": "Login Flow",
+      "type": "user_journey",
+      "confidence": 0.65,
+      "steps": [
+        {
+          "nodeId": "file:app/login/page.tsx",
+          "name": "app/login/page.tsx",
+          "kind": "file",
+          "path": "app/login/page.tsx"
+        },
+        {
+          "nodeId": "api:app/login/page.tsx",
+          "name": "/login",
+          "kind": "api",
+          "path": "app/login/page.tsx"
+        },
+        {
+          "nodeId": "function:src/auth/service.ts:7",
+          "name": "login",
+          "kind": "function",
+          "path": "src/auth/service.ts:7"
+        },
+        {
+          "nodeId": "route:app/login/page.tsx:1",
+          "name": "/login",
+          "kind": "route",
+          "path": "app/login/page.tsx:1"
+        },
+        {
+          "nodeId": "function:app/login/page.tsx:3",
+          "name": "LoginPage",
+          "kind": "function",
+          "path": "app/login/page.tsx:3"
+        }
+      ],
+      "entryPoint": "app/login/page.tsx",
+      "description": "Login Flow spanning 1 related files"
+    }
+  ],
+  "services": [
+    {
+      "id": "service:app",
+      "name": "app",
+      "path": "app",
+      "exports": [],
+      "dependencies": [],
+      "dependents": [
+        "app"
+      ]
+    },
+    {
+      "id": "service:src",
+      "name": "src",
+      "path": "src",
+      "domain": "Source",
+      "exports": [],
+      "dependencies": [],
+      "dependents": [
+        "src"
+      ]
+    }
+  ],
+  "apis": [
+    {
+      "id": "api:app/login/page.tsx",
+      "method": "PAGE",
+      "path": "/login",
+      "handler": "app/login/page.tsx",
+      "file": "app/login/page.tsx"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "app/login/page.tsx",
+      "to": "login",
+      "kind": "CALLS",
+      "weight": 1
+    },
+    {
+      "from": "src/auth/service.ts",
+      "to": "authenticate",
+      "kind": "CALLS",
+      "weight": 1
+    }
+  ],
+  "criticalPaths": [
+    {
+      "id": "critical:journey:flow:journey:login_flow",
+      "name": "Login Flow",
+      "nodes": [
+        "file:app/login/page.tsx",
+        "api:app/login/page.tsx",
+        "function:src/auth/service.ts:7",
+        "route:app/login/page.tsx:1",
+        "function:app/login/page.tsx:3"
+      ],
+      "risk": "high",
+      "description": "Login Flow spanning 1 related files"
+    }
+  ],
+  "deadCode": [
+    {
+      "nodeId": "function:app/login/page.tsx:3",
+      "name": "LoginPage",
+      "kind": "function",
+      "path": "app/login/page.tsx:3",
+      "confidence": 0.55,
+      "reason": "Exported but never imported or called within analyzed scope"
+    },
+    {
+      "nodeId": "class:src/auth/service.ts:6",
+      "name": "UserService",
+      "kind": "class",
+      "path": "src/auth/service.ts:6",
+      "confidence": 0.55,
+      "reason": "Exported but never imported or called within analyzed scope"
+    },
+    {
+      "nodeId": "function:src/features/pickup/validate.ts:1",
+      "name": "validatePickup",
+      "kind": "function",
+      "path": "src/features/pickup/validate.ts:1",
+      "confidence": 0.55,
+      "reason": "Exported but never imported or called within analyzed scope"
+    }
+  ],
+  "smells": [],
+  "capabilities": [
+    {
+      "id": "capability:authentication",
+      "signature": {
+        "id": "authentication",
+        "name": "Authentication & Identity",
+        "purpose": "Manages user identity, sign-in, sign-up, sessions, and access control.",
+        "keywords": [
+          "auth",
+          "login",
+          "signin",
+          "sign-in",
+          "signup",
+          "sign-up",
+          "register",
+          "session",
+          "token",
+          "jwt",
+          "oauth",
+          "sso",
+          "credential",
+          "password",
+          "logout",
+          "saml",
+          "passport"
+        ],
+        "actors": [
+          "End user",
+          "Auth provider"
+        ],
+        "data": [
+          "Credentials",
+          "Session token",
+          "Profile"
+        ],
+        "outcomes": [
+          "User authenticated",
+          "Session established",
+          "Access granted or denied"
+        ],
+        "category": "identity",
+        "weight": 1.2
+      },
+      "confidence": 0.27,
+      "actors": [
+        "End user",
+        "Auth provider"
+      ],
+      "data": [
+        "Credentials",
+        "Session token",
+        "Profile"
+      ],
+      "outcomes": [
+        "User authenticated",
+        "Session established",
+        "Access granted or denied"
+      ],
+      "services": [],
+      "apis": [
+        "API app/login/page.tsx",
+        "ROUTE /login"
+      ],
+      "domains": [],
+      "evidence": [
+        "endpoint: API app/login/page.tsx",
+        "endpoint: ROUTE /login",
+        "file: app/login/page.tsx",
+        "file: src/auth/service.ts"
+      ],
+      "reasons": [
+        "Endpoint app/login/page.tsx matches capability keywords",
+        "Endpoint /login matches capability keywords"
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "id": "journey:login",
+      "signature": {
+        "id": "login",
+        "name": "Sign-In",
+        "purpose": "User authenticates and receives a session.",
+        "patterns": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "actors": [
+          "End user",
+          "Auth provider"
+        ],
+        "systems": [
+          "Auth"
+        ],
+        "data": [
+          "Email or username",
+          "Password",
+          "OAuth token"
+        ],
+        "outcomes": [
+          "Authenticated session established"
+        ],
+        "preconditions": [
+          "Account exists"
+        ]
+      },
+      "confidence": 0.99,
+      "entryPoint": "app/login/page.tsx",
+      "entryRoute": "/login",
+      "steps": [
+        {
+          "nodeId": "file:app/login/page.tsx",
+          "name": "app/login/page.tsx",
+          "kind": "file",
+          "path": "app/login/page.tsx"
+        },
+        {
+          "nodeId": "function:app/login/page.tsx:3",
+          "name": "LoginPage",
+          "kind": "function",
+          "path": "app/login/page.tsx:3"
+        },
+        {
+          "nodeId": "route:app/login/page.tsx:1",
+          "name": "/login",
+          "kind": "route",
+          "path": "app/login/page.tsx:1"
+        },
+        {
+          "nodeId": "api:app/login/page.tsx",
+          "name": "/login",
+          "kind": "api",
+          "path": "app/login/page.tsx"
+        },
+        {
+          "nodeId": "function:src/auth/service.ts:7",
+          "name": "login",
+          "kind": "function",
+          "path": "src/auth/service.ts:7"
+        }
+      ],
+      "actors": [
+        "End user",
+        "Auth provider"
+      ],
+      "systems": [],
+      "data": [
+        "Email or username",
+        "Password",
+        "OAuth token"
+      ],
+      "outcomes": [
+        "Authenticated session established"
+      ],
+      "preconditions": [
+        "Account exists"
+      ],
+      "reason": "Detected 1 file related to \"Sign-In\" — entry at /login."
+    }
+  ]
+}

@@ -121,7 +121,10 @@ export {
 } from './ai-toolkit.js';
 export type { AiToolkit } from './ai-toolkit.js';
 export { writeAiToolkit, publishRootAgentGuide, installAiIntegrations, uninstallAiIntegrations, ALL_PLATFORMS, PLATFORM_FILES } from './ai-toolkit-io.js';
-export { buildMandatoryCursorRule, buildMnestisAgentContract, MNESTIS_MEMORY_DIR } from './ai-toolkit.js';
+export { buildMandatoryCursorRule, buildMnestisAgentContract, MNESTIS_MEMORY_DIR, LEGACY_MEMORY_DIR } from './ai-toolkit.js';
+export { resolveMemoryDir, memoryDirForRoot } from './mentis-path.js';
+export { listPlaybooks, getPlaybook, formatPlaybookMarkdown, PLAYBOOKS } from './mcp/playbooks.js';
+export type { Playbook, PlaybookStep } from './mcp/playbooks.js';
 export type { SetupOptions, SetupResult, Platform } from './ai-toolkit-io.js';
 export {
   buildSkillMd,
@@ -144,7 +147,7 @@ export type { ServeOptions, ServeHandle } from './serve.js';
 export { startMemoryServer } from './serve.js';
 export { startMcpServer } from './mcp-server.js';
 export type { McpServerOptions } from './mcp-server.js';
-export { MnemosRuntime, MNEMOS_VERSION, MNEMOS_MCP_URI, MnemosAgentError, envelopeToMcpContent, errorToMcpContent, invalidateMnemosRuntime } from './agent-runtime.js';
+export { MnemosRuntime, MNEMOS_VERSION, MNESTIS_VERSION, MNESTIS_MCP_URI, MNEMOS_MCP_URI, MnemosAgentError, envelopeToMcpContent, errorToMcpContent, invalidateMnemosRuntime } from './agent-runtime.js';
 export type { MnemosArtifacts, AgentEnvelope, MnemosResourceDescriptor, AgentErrorCode } from './agent-runtime.js';
 export {
   buildMcpServerConfig,
@@ -158,6 +161,8 @@ export { queryGraph, findGraphPath, explainNode, formatPathResult, formatNodeExp
 export type { GraphQueryResult, PathResult, NodeExplainResult } from './graph-query.js';
 export { generateCallflowHtml, writeCallflowHtml } from './callflow.js';
 export type { CallflowOptions } from './callflow.js';
+export { exportObsidianVault } from './vault/obsidian.js';
+export type { ObsidianVaultResult } from './vault/obsidian.js';
 export { runExport, exportGraphSvg, exportGraphml, exportWiki } from './export/index.js';
 export type { ExportFormat } from './export/index.js';
 export { installHooks, uninstallHooks, getHookStatus } from './hooks.js';
@@ -205,6 +210,39 @@ export { startGraphSync } from './sync/graph-sync.js';
 export type { GraphSyncOptions, GraphSyncHandle } from './sync/graph-sync.js';
 export { compressCommandOutput, estimateTokens } from './proxy/compress-output.js';
 export type { CompressStats, CompressOptions } from './proxy/compress-output.js';
+export {
+  hybridRecall,
+  personalizedPageRank,
+  decayScore,
+  evictByDecay,
+  pack,
+  formatPackSavings,
+  summarizeCold,
+} from './recall/index.js';
+export type {
+  MemoryNode,
+  HybridRecallOptions,
+  HybridRecallHit,
+  HybridRecallResult,
+  DecayScoreOptions,
+  PackableMemory,
+  PackResult,
+  SummarizeColdOptions,
+  ColdSummary,
+} from './recall/index.js';
+export {
+  createLangChainRetriever,
+  buildVercelAiContext,
+  OPENAI_AGENTS_MEMORY_TOOL,
+  handleOpenAiAgentsRecall,
+} from './adapters/index.js';
+export type {
+  LangChainMemoryInput,
+  LangChainMemoryOutput,
+  VercelAiMemoryOptions,
+  VercelAiContextBlock,
+  OpenAiAgentsRecallArgs,
+} from './adapters/index.js';
 export { compactJson, compactMarkdown } from './util/compact-json.js';
 export { routeQuery, buildRoutePlan } from './routing/route-query.js';
 export { optimizeContextWindow, extractSummary } from './routing/optimize-context.js';

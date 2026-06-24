@@ -19,7 +19,7 @@ const moduleDir = (() => {
 
 let cachedMindset: string | undefined
 
-/** Full Fable mindset operating manual for `.mnemos/integrations/fable-mindset.md`. */
+/** Full Fable mindset operating manual for `.mentis/integrations/fable-mindset.md`. */
 export async function loadFableMindsetMd(): Promise<string> {
   if (cachedMindset) return cachedMindset
   const candidates = [

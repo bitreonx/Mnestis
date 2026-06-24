@@ -309,9 +309,9 @@ function buildAgentContext(
     suggested_prompts: buildSuggestedPrompts(memory),
     context_files: buildContextFiles(memory),
     integrations: {
-      dna: '.mnemos/project.dna.json',
-      agent_context: '.mnemos/agent_context.json',
-      agents_md: '.mnemos/integrations/AGENTS.md',
+      dna: '.mentis/project.dna.json',
+      agent_context: '.mentis/agent_context.json',
+      agents_md: '.mentis/integrations/AGENTS.md',
       cursor_rule: '.cursor/rules/mnemos-architecture.mdc',
       memory_server: 'http://localhost:4000',
     },

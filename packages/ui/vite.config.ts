@@ -8,7 +8,7 @@ import { workspacePlugin, resolveCliPath, resolveWorkspaceFile } from './vite.wo
 import { buildAiPackFromDir, aiPackHeaders, parseAiPackQuery } from './vite.ai-pack';
 
 function mnemosStaticPlugin(): Plugin {
-  const mnemosRoot = process.env.MNEMOS_ROOT ?? process.cwd();
+  const mnemosRoot = process.env.mentis_ROOT ?? process.cwd();
 
   return {
     name: 'mnemos-static',
@@ -20,7 +20,7 @@ function mnemosStaticPlugin(): Plugin {
         if (jsonMatch && req.method === 'GET') {
           const repoId = jsonMatch[1];
           const { section, mode } = parseAiPackQuery(req.url);
-          const mnemosDir = path.join(mnemosRoot, '.mnemos');
+          const mnemosDir = path.join(mnemosRoot, '.mentis');
           const { body, status } = await buildAiPackFromDir(mnemosDir, {
             repoId,
             root: mnemosRoot,
@@ -33,12 +33,12 @@ function mnemosStaticPlugin(): Plugin {
           return;
         }
 
-        if (!req.url.startsWith('/.mnemos/')) return next();
-        if (req.url.match(/^\/\.mnemos\/[^/]+\//)) return next();
+        if (!req.url.startsWith('/.mentis/')) return next();
+        if (req.url.match(/^\/\.mentis\/[^/]+\//)) return next();
 
         const filePath = path.join(mnemosRoot, req.url);
         if (!existsSync(filePath)) {
-          // Fall through so Vite can serve a bundled copy from public/.mnemos/.
+          // Fall through so Vite can serve a bundled copy from public/.mentis/.
           // This keeps dev behavior identical to the static (Vercel) deploy.
           return next();
         }

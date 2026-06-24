@@ -1,0 +1,30 @@
+[
+  {
+    "domain": "Source",
+    "domainId": "domain:path:0",
+    "riskScore": 13,
+    "risk": "low",
+    "problems": [
+      "2 dead modules"
+    ],
+    "circularDependencies": 0,
+    "deadModules": 2,
+    "highSmells": 0,
+    "coupling": 0,
+    "services": 1,
+    "apis": 0
+  },
+  {
+    "domain": "Pickup",
+    "domainId": "domain:path:1",
+    "riskScore": 5,
+    "risk": "low",
+    "problems": [],
+    "circularDependencies": 0,
+    "deadModules": 0,
+    "highSmells": 0,
+    "coupling": 0,
+    "services": 0,
+    "apis": 0
+  }
+]

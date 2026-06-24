@@ -13,7 +13,7 @@ export const JourneysSection = () => {
       <PageLayout>
         <EmptyState
           title="No journey data"
-          description={error ?? 'Run Mnemos build on this repository first.'}
+          description={error ?? 'Run mnestis build on this repository first.'}
           action={
             <Button onClick={handleBuild} disabled={building}>
               {building ? 'Building…' : 'Run Mnemos'}

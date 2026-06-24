@@ -135,7 +135,7 @@ export function buildRepositoryLanguagePieMermaid(languages: Record<string, numb
     .slice(0, 12);
 
   if (entries.length === 0) {
-    return '_No language statistics available — run `mnemos build`._';
+    return '_No language statistics available — run `mnestis build`._';
   }
 
   const lines = ['```mermaid', 'pie showData title Files by language'];
@@ -263,7 +263,7 @@ import {
 `;
 }
 
-/** Per-repository \`.mnemos/context/languages.md\` generated at build time. */
+/** Per-repository \`.mentis/context/languages.md\` generated at build time. */
 export function buildRepositoryLanguagesMarkdown(memory: MemoryModel): string {
   const { architecture } = memory;
   const langs = architecture.languages ?? {};
@@ -338,7 +338,7 @@ Full list: [docs/LANGUAGES.md](https://github.com/mnemos/mnemos/blob/main/docs/L
 
 - Prefer language stats here over guessing stack from folder names
 - Cross-reference \`architecture.md\` for services and \`dependencies.md\` for cross-language edges
-- Re-run \`mnemos build\` after adding files in a new language
+- Re-run \`mnestis build\` after adding files in a new language
 `;
 }
 

@@ -1,0 +1,17 @@
+{
+  "scannedAt": "2026-06-24T11:40:03.453Z",
+  "root": "F:\\mnemos\\packages\\core\\test\\fixtures\\sample-app",
+  "hasPackageJson": false,
+  "npmAuditAvailable": false,
+  "totalVulnerabilities": 0,
+  "critical": 0,
+  "high": 0,
+  "moderate": 0,
+  "low": 0,
+  "advisories": [],
+  "onnxOptionalRisk": "Optional ONNX embeddings (@xenova/transformers) load only when installed. Default hash embeddings avoid protobuf/onnx transitive risk.",
+  "recommendations": [
+    "No package.json — dependency audit skipped (non-Node repo)."
+  ],
+  "score": 100
+}

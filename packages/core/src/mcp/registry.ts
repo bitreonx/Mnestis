@@ -397,7 +397,7 @@ export const TOOL_REGISTRY: ToolRegistration<any>[] = [
   {
     definition: {
       name: 'build_history',
-      description: 'Timeline of DNA snapshots from each mnemos build.',
+      description: 'Timeline of DNA snapshots from each mnestis build.',
       inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false },
       outputSchema: ENVELOPE_OUTPUT_SCHEMA,
       annotations: READONLY_TOOL_ANNOTATIONS,
@@ -544,8 +544,45 @@ export const TOOL_REGISTRY: ToolRegistration<any>[] = [
   },
   {
     definition: {
+      name: 'list_playbooks',
+      description: 'Problem shortcuts — auth bugs, test failures, refactors, new features, performance, security. Returns ids and summaries.',
+      inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false },
+      outputSchema: ENVELOPE_OUTPUT_SCHEMA,
+      annotations: READONLY_TOOL_ANNOTATIONS,
+    },
+    normalize: (raw) => {
+      const args = expectArgsObject(raw);
+      assertNoUnknownFields(args, []);
+      return {};
+    },
+    run: async (runtime) => runtime.listPlaybooks(),
+  },
+  {
+    definition: {
+      name: 'playbook',
+      description: 'Get steps, MCP tool sequence, context files, and fill-in template for a problem type (e.g. auth-bug, test-failure, refactor-service).',
+      inputSchema: {
+        type: 'object' as const,
+        properties: {
+          id: { type: 'string' as const, minLength: 1, description: 'Playbook id or keyword (auth, test, refactor, feature, perf, security)' },
+        },
+        required: ['id'],
+        additionalProperties: false,
+      },
+      outputSchema: ENVELOPE_OUTPUT_SCHEMA,
+      annotations: READONLY_TOOL_ANNOTATIONS,
+    },
+    normalize: (raw) => {
+      const args = expectArgsObject(raw);
+      assertNoUnknownFields(args, ['id']);
+      return { id: stringArg(args, 'id') };
+    },
+    run: async (runtime, args: { id: string }) => runtime.getPlaybook(args.id),
+  },
+  {
+    definition: {
       name: 'refresh_memory',
-      description: 'Invalidate cache and reload from .mnemos/ after mnemos build.',
+      description: 'Invalidate cache and reload from .mentis/ after mnestis build.',
       inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false },
       outputSchema: ENVELOPE_OUTPUT_SCHEMA,
       annotations: {
@@ -663,7 +700,7 @@ export async function buildPromptMessages(
             '',
             node?.markdown ?? `_Node not found: ${target}_`,
             '',
-            impact?.markdown ?? `_Impact unavailable — run mnemos build_`,
+            impact?.markdown ?? `_Impact unavailable — run mnestis build_`,
           ].join('\n'),
         },
       }],

@@ -1,0 +1,30 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "kind": "domain",
+  "name": "Source",
+  "filename": "source.memory.json",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "repository": "sample-app",
+  "data": {
+    "id": "domain:path:0",
+    "name": "Source",
+    "description": "Feature module detected from directory structure: Source",
+    "confidence": 0.85,
+    "entryPoints": [],
+    "services": [
+      {
+        "id": "service:src",
+        "name": "src",
+        "path": "src",
+        "dependencies": [],
+        "exports": []
+      }
+    ],
+    "apis": [],
+    "capabilities": [],
+    "journeys": [],
+    "nodeCount": 1
+  },
+  "estimatedTokens": 144,
+  "bytes": 466
+}

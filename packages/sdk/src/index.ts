@@ -33,7 +33,7 @@ import {
 export interface MnemosClientOptions {
   /** Repository root. Default: process.cwd() */
   root?: string;
-  /** Output directory for .mnemos artifacts. Default: `<root>/.mnemos` */
+  /** Output directory for .mentis artifacts. Default: `<root>/.mentis` */
   outputDir?: string;
 }
 
@@ -43,7 +43,7 @@ export interface QueryOptions {
 }
 
 /**
- * High-level SDK for Mnemos Memory Engine (Labyrinth).
+ * High-level SDK for Mnestis memory Engine (Labyrinth).
  * Product release: Mneme 0.3.0 · Ariadne's Thread
  */
 export class MnemosClient {
@@ -54,7 +54,7 @@ export class MnemosClient {
   constructor(options: MnemosClientOptions | string = {}) {
     const opts = typeof options === 'string' ? { root: options } : options;
     this.root = path.resolve(opts.root ?? process.cwd());
-    this.outputDir = opts.outputDir ?? path.join(this.root, '.mnemos');
+    this.outputDir = opts.outputDir ?? path.join(this.root, '.mentis');
     this.engine = new MnemosMemoryEngine(this.root, this.outputDir);
   }
 

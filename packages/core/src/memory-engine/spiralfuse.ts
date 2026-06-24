@@ -80,7 +80,7 @@ export async function spiralfuseTick(
 ): Promise<SpiralfuseTickResult> {
   const budget = await spiralfuseLoad(engineDir);
   if (!budget) {
-    throw new Error('No active Spiralfuse loop. Run `mnemos memory loop start` first.');
+    throw new Error('No active Spiralfuse loop. Run `Mnestis memory loop start` first.');
   }
 
   if (budget.fused) {

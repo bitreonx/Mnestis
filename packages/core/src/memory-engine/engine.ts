@@ -57,7 +57,7 @@ export interface BuildEngineOptions {
 }
 
 /**
- * Mnemos Memory Engine — release codename: Labyrinth
+ * Mnestis memory Engine — release codename: Labyrinth
  * M2 SQLite · M3 edge confidence · M4 ONNX · M5 sessions · M6 encrypted sync
  */
 export class MnemosMemoryEngine {
@@ -70,7 +70,7 @@ export class MnemosMemoryEngine {
 
   constructor(root: string, outputDir?: string, options: BuildEngineOptions = {}) {
     this.root = path.resolve(root);
-    this.outputDir = outputDir ?? path.join(this.root, '.mnemos');
+    this.outputDir = outputDir ?? path.join(this.root, '.mentis');
     this.embeddingMode = options.embeddingMode ?? 'auto';
   }
 
@@ -91,7 +91,7 @@ export class MnemosMemoryEngine {
     if (this.cachedIndex && !force) return this.cachedIndex;
     const index = await loadEngineIndex(this.outputDir);
     if (!index) {
-      throw new Error('Memory engine not built. Run `mnemos build .` first.');
+      throw new Error('Memory engine not built. Run `mnestis build .` first.');
     }
     this.cachedIndex = index;
     return index;
@@ -159,6 +159,21 @@ export class MnemosMemoryEngine {
     const searchIndex = await this.getSearchIndex();
     const veil = await loadVeilPolicy(this.engineDir);
     await logSessionEventAuto(this.engineDir, 'query', { text, limit: options?.limit });
+    const { loadPersistedGraph } = await import('../pipeline/build.js');
+    const graph = await loadPersistedGraph(this.outputDir);
+    if (graph) {
+      const { hybridRecall } = await import('../recall/hybrid-recall.js');
+      const recalled = await hybridRecall(index, searchIndex, text, graph, {
+        limit: options?.limit ?? 12,
+      });
+      return {
+        query: text,
+        hits: recalled.hits,
+        contradictions: index.contradictions.filter((c) => !c.resolved).slice(0, 5),
+        tookMs: recalled.tookMs,
+        retrievers: { bm25: 0, vector: 0, fused: recalled.hits.length },
+      };
+    }
     return hybridQuery(index, searchIndex, text, {
       ...options,
       embeddingMode: options?.embeddingMode ?? this.embeddingMode,
@@ -204,7 +219,9 @@ export class MnemosMemoryEngine {
     const index = await this.load();
     const searchIndex = await this.getSearchIndex();
     await logSessionEventAuto(this.engineDir, 'context', { task, tokenBudget });
-    return compileTaskContext(index, searchIndex, task, tokenBudget, this.embeddingMode);
+    const { loadPersistedGraph } = await import('../pipeline/build.js');
+    const graph = await loadPersistedGraph(this.outputDir);
+    return compileTaskContext(index, searchIndex, task, tokenBudget, this.embeddingMode, graph ?? null);
   }
 
   async getTrustManifest() {

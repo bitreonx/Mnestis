@@ -60,7 +60,7 @@ export function AIInspector({ repo, memory, onNavigate, onAsk, onQuickInsight }:
         <section className="inspector-section">
           <h4>How agents use Mnemos</h4>
           <ol className="inspector-steps">
-            <li>Read <code>.mnemos/project.dna.json</code> first</li>
+            <li>Read <code>.mentis/project.dna.json</code> first</li>
             <li>Use AI Inspector for auth, routes, flows</li>
             <li>Run <code>ask "question"</code> in terminal</li>
             <li>Check impact before editing core services</li>
@@ -85,7 +85,7 @@ export function AIInspector({ repo, memory, onNavigate, onAsk, onQuickInsight }:
     <aside className="cockpit-inspector">
       <header className="inspector-header">
         <h3>AI Context</h3>
-        <p>{repo.name} · agent-ready summaries from Mnemos memory</p>
+        <p>{repo.name} · agent-ready summaries from Mnestis memory</p>
       </header>
 
       <section className="inspector-section">

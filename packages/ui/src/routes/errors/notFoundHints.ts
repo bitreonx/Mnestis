@@ -15,29 +15,29 @@ export const hintForPath = (pathname: string): NotFoundHint | null => {
       description:
         'The interactive dashboard is separate from the static HTML report. This URL is not a React route.',
       reasons: [
-        'You may not have run a Mnemos build yet — the report is generated into `.mnemos/report/`.',
-        'The correct URL is `/.mnemos/report/index.html`, not `/report/index.html`.',
-        'If you moved or deleted `.mnemos/`, regenerate intelligence first.',
+        'You may not have run a mnestis build yet — the report is generated into `.mentis/report/`.',
+        'The correct URL is `/.mentis/report/index.html`, not `/report/index.html`.',
+        'If you moved or deleted `.mentis/`, regenerate intelligence first.',
       ],
       commands: [
-        { label: 'Analyze repository', cmd: 'npx mnemos .' },
-        { label: 'Rebuild memory', cmd: 'npx mnemos build' },
+        { label: 'Analyze repository', cmd: 'npx mnestis .' },
+        { label: 'Rebuild memory', cmd: 'npx mnestis build' },
       ],
-      openPath: { label: 'Open report at /.mnemos/report/index.html', href: '/.mnemos/report/index.html' },
+      openPath: { label: 'Open report at /.mentis/report/index.html', href: '/.mentis/report/index.html' },
     }
   }
 
-  if (path.includes('.mnemos') || path.includes('memory.json')) {
+  if (path.includes('.mentis') || path.includes('memory.json')) {
     return {
       title: "Mnemos artifacts aren't available at this URL",
-      description: 'Static files are served from `/.mnemos/` after a successful build.',
+      description: 'Static files are served from `/.mentis/` after a successful build.',
       reasons: [
         'Run Mnemos against your repository root first.',
-        'In workspace mode, artifacts live under `/.mnemos/{repoId}/`.',
+        'In workspace mode, artifacts live under `/.mentis/{repoId}/`.',
       ],
       commands: [
-        { label: 'Build intelligence', cmd: 'npx mnemos build' },
-        { label: 'Analyze + build', cmd: 'npx mnemos .' },
+        { label: 'Build intelligence', cmd: 'npx mnestis build' },
+        { label: 'Analyze + build', cmd: 'npx mnestis .' },
       ],
     }
   }

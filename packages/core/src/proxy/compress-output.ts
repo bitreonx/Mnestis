@@ -11,6 +11,7 @@ export interface CompressStats {
     noiseStripped: number
     pathsShortened: number
     stackFramesFolded: number
+    testRunsCollapsed: number
     duplicatesRemoved: number
     budgetDropped: number
   }
@@ -255,6 +256,59 @@ function truncateLine(line: string, maxLineLength: number): string {
   return `${line.slice(0, maxLineLength - 1)}…`
 }
 
+/** Collapse long runs of identical pass/fail test lines into a summary. */
+function collapseTestRuns(lines: ScoredLine[]): { lines: ScoredLine[]; collapsed: number } {
+  const out: ScoredLine[] = []
+  let collapsed = 0
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i]!
+    const isPass = PASS_SIGNAL_RE.test(line.text) && !ERROR_SIGNAL_RE.test(line.text)
+    const isFail = ERROR_SIGNAL_RE.test(line.text)
+
+    if (!isPass && !isFail) {
+      out.push(line)
+      i += 1
+      continue
+    }
+
+    const kind = isPass ? 'pass' : 'fail'
+    const run: ScoredLine[] = [line]
+    let j = i + 1
+    while (j < lines.length) {
+      const next = lines[j]!
+      const nextPass = PASS_SIGNAL_RE.test(next.text) && !ERROR_SIGNAL_RE.test(next.text)
+      const nextFail = ERROR_SIGNAL_RE.test(next.text)
+      if ((kind === 'pass' && nextPass) || (kind === 'fail' && nextFail)) {
+        run.push(next)
+        j += 1
+      } else {
+        break
+      }
+    }
+
+    if (run.length >= 5) {
+      collapsed += run.length - 2
+      out.push(run[0]!)
+      out.push({
+        text: `  … ${run.length - 2} more ${kind} line${run.length - 2 === 1 ? '' : 's'} …`,
+        score: kind === 'fail' ? 90 : 35,
+        fingerprint: `test-${kind}-run-${run.length}`,
+        index: run.at(-1)!.index,
+        isStack: false,
+      })
+      out.push(run.at(-1)!)
+    } else {
+      out.push(...run)
+    }
+
+    i = j
+  }
+
+  return { lines: out, collapsed }
+}
+
 /**
  * Multi-pass, importance-weighted output compression for agent-facing command results.
  *
@@ -279,6 +333,7 @@ export function compressCommandOutput(
     noiseStripped: 0,
     pathsShortened: 0,
     stackFramesFolded: 0,
+    testRunsCollapsed: 0,
     duplicatesRemoved: 0,
     budgetDropped: 0,
   }
@@ -319,6 +374,12 @@ export function compressCommandOutput(
     const folded = foldStackTraces(working)
     working = folded.lines
     phaseStats.stackFramesFolded = folded.folded
+  }
+
+  {
+    const collapsed = collapseTestRuns(working)
+    working = collapsed.lines
+    phaseStats.testRunsCollapsed = collapsed.collapsed
   }
 
   if (dedupe || fuzzyDedupe) {

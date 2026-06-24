@@ -14,7 +14,7 @@ export function buildGraphsReferenceMarkdown(): string {
 
 # Mnemos Architecture Graphs
 
-Mnemos embeds **Mermaid diagrams** in markdown everywhere architecture matters — repo docs, \`.mnemos/context/\`, \`AGENTS.md\`, MCP resources, and the dashboard.
+Mnemos embeds **Mermaid diagrams** in markdown everywhere architecture matters — repo docs, \`.mentis/context/\`, \`AGENTS.md\`, MCP resources, and the dashboard.
 
 ## Where graphs appear
 
@@ -23,14 +23,14 @@ Mnemos embeds **Mermaid diagrams** in markdown everywhere architecture matters �
 | [\`docs/GRAPHS.md\`](./GRAPHS.md) | \`npm run docs:sync\` | This catalog (static) |
 | [\`docs/LANGUAGES.md\`](./LANGUAGES.md) | \`npm run docs:sync\` | ${SUPPORTED_LANGUAGE_COUNT}-language pipeline + families |
 | [\`docs/architecture.md\`](./architecture.md) | Hand-maintained + sync sections | System pipeline |
-| \`.mnemos/context/graphs.md\` | \`mnemos build\` | **Per-repo** domain, flow, dependency, risk charts |
-| \`.mnemos/context/languages.md\` | \`mnemos build\` | **Per-repo** language pie + parsing pipeline |
-| \`.mnemos/context/architecture.md\` | \`mnemos build\` | Layers + services + language section |
-| \`.mnemos/context/domains.md\` | \`mnemos build\` | Domain interaction graph |
-| \`.mnemos/context/flows.md\` | \`mnemos build\` | Flow overview + step diagrams |
-| \`.mnemos/context/dependencies.md\` | \`mnemos build\` | Top edges + service graph |
-| \`.mnemos/context/critical_paths.md\` | \`mnemos build\` | High-risk path diagram |
-| \`.mnemos/context/smells.md\` | \`mnemos build\` | Smell severity pie |
+| \`.mentis/context/graphs.md\` | \`mnestis build\` | **Per-repo** domain, flow, dependency, risk charts |
+| \`.mentis/context/languages.md\` | \`mnestis build\` | **Per-repo** language pie + parsing pipeline |
+| \`.mentis/context/architecture.md\` | \`mnestis build\` | Layers + services + language section |
+| \`.mentis/context/domains.md\` | \`mnestis build\` | Domain interaction graph |
+| \`.mentis/context/flows.md\` | \`mnestis build\` | Flow overview + step diagrams |
+| \`.mentis/context/dependencies.md\` | \`mnestis build\` | Top edges + service graph |
+| \`.mentis/context/critical_paths.md\` | \`mnestis build\` | High-risk path diagram |
+| \`.mentis/context/smells.md\` | \`mnestis build\` | Smell severity pie |
 | \`AGENTS.md\` | \`mnemos setup\` | Domain graph + language pipeline |
 
 ## End-to-end build pipeline
@@ -51,7 +51,7 @@ ${buildLanguageFamiliesMermaid()}
 
 ## Per-repository diagram types
 
-After \`npx mnemos .\`, open \`.mnemos/context/graphs.md\` for repo-specific charts:
+After \`npx mnestis .\`, open \`.mentis/context/graphs.md\` for repo-specific charts:
 
 | Diagram | Source data | Markdown section |
 |---------|-------------|------------------|
@@ -71,7 +71,7 @@ After \`npx mnemos .\`, open \`.mnemos/context/graphs.md\` for repo-specific cha
 
 - **GitHub / GitLab** — Mermaid renders natively in \`.md\` files
 - **Cursor / VS Code** — Markdown preview with Mermaid extension
-- **Agents** — Point at \`.mnemos/context/graphs.md\` before editing cross-cutting code
+- **Agents** — Point at \`.mentis/context/graphs.md\` before editing cross-cutting code
 
 ## Implementation
 
@@ -79,7 +79,7 @@ After \`npx mnemos .\`, open \`.mnemos/context/graphs.md\` for repo-specific cha
 |--------|------|
 | \`packages/core/src/graph/mermaid.ts\` | Domain, flow, service, risk diagrams |
 | \`packages/core/src/languages/docs.ts\` | Language pipeline + pie charts |
-| \`packages/core/src/context/graph-markdown.ts\` | Composes \`.mnemos/context/graphs.md\` |
+| \`packages/core/src/context/graph-markdown.ts\` | Composes \`.mentis/context/graphs.md\` |
 | \`packages/core/src/context/compiler.ts\` | Writes all \`context/*.md\` at build time |
 `;
 }
@@ -134,7 +134,7 @@ flowchart LR
 
 ## Memory
 
-Written to \`.mnemos/\` after \`mnemos build\`:
+Written to \`.mentis/\` after \`mnestis build\`:
 
 | File | Purpose |
 |------|---------|
@@ -159,7 +159,7 @@ Written to \`.mnemos/\` after \`mnemos build\`:
 | \`smells.md\` | Smell severity pie |
 | \`repository_summary.md\` | Layers + language pie + domain snapshot |
 
-Run \`npx mnemos .\` on any repo to generate the full set under \`.mnemos/context/\`.
+Run \`npx mnestis .\` on any repo to generate the full set under \`.mentis/context/\`.
 
 ## Outputs
 

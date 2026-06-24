@@ -71,7 +71,7 @@ export function HeatmapView({ heatmap }: HeatmapViewProps) {
 
         {sorted.length === 0 && (
           <p className="text-sm text-[var(--color-text-muted)]">
-            No heatmap data. Run mnemos build to generate heatmap.json.
+            No heatmap data. Run mnestis build to generate heatmap.json.
           </p>
         )}
       </div>

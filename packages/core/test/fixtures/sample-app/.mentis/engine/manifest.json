@@ -1,0 +1,21 @@
+{
+  "$schema": "mnemos/memory-engine/labyrinth",
+  "codename": "Labyrinth",
+  "generation": 3,
+  "repository": "sample-app",
+  "builtAt": "2026-06-24T11:40:03.586Z",
+  "documentCount": 18,
+  "episodeCount": 6,
+  "factCount": 5,
+  "contradictionCount": 0,
+  "embeddingDims": 384,
+  "bm25DocumentCount": 13,
+  "stats": {
+    "buildDurationMs": 21,
+    "hybridIndexReady": true,
+    "storeBackend": "node-sqlite",
+    "incrementalUpserted": 1,
+    "incrementalSkipped": 17,
+    "embeddingBackend": "hash"
+  }
+}

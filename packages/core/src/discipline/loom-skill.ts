@@ -6,7 +6,7 @@
 export function buildLoomSkillMd(): string {
   return `---
 name: mnemos-loom
-description: Design dynamic agent loops that prompt themselves — PR stacks, review cycles, heartbeat monitors. Uses Mnemos memory shards, Spiralfuse token budgets, and Provenance honest recall. Use when building multi-PR workflows, overnight agent runs, or review-fix-merge loops. No fixed personas — shape follows the work.
+description: Design dynamic agent loops that prompt themselves — PR stacks, review cycles, heartbeat monitors. Uses Mnestis memory shards, Spiralfuse token budgets, and Provenance honest recall. Use when building multi-PR workflows, overnight agent runs, or review-fix-merge loops. No fixed personas — shape follows the work.
 ---
 
 # The Loom
@@ -16,16 +16,16 @@ description: Design dynamic agent loops that prompt themselves — PR stacks, re
 ## Before any loop
 
 \`\`\`bash
-npx mnemos .
-npx mnemos memory build .
-npx mnemos memory loop start --max-tokens 250000 --label "my-workflow"
+npx mnestis .
+npx mnestis memory build .
+npx mnestis memory loop start --max-tokens 250000 --label "my-workflow"
 \`\`\`
 
-Read \`.mnemos/project.dna.json\` first. Load shards — never grep the whole repo:
+Read \`.mentis/project.dna.json\` first. Load shards — never grep the whole repo:
 
 \`\`\`bash
 curl -s http://127.0.0.1:4000/domain/auth | jq '.estimatedTokens'
-mnemos memory context "task description" --budget 8000
+Mnestis memory context "task description" --budget 8000
 \`\`\`
 
 ## Dynamic workflow (no hardcoded reviewers)
@@ -41,8 +41,8 @@ When given a multi-stage task:
 Record failures for the next loop:
 
 \`\`\`bash
-mnemos memory remember "PR2 failed because X" --tag loop,postmortem
-mnemos memory ask "what went wrong with PR2?"
+Mnestis memory remember "PR2 failed because X" --tag loop,postmortem
+Mnestis memory ask "what went wrong with PR2?"
 \`\`\`
 
 ## Spiralfuse (token fuse)
@@ -50,7 +50,7 @@ mnemos memory ask "what went wrong with PR2?"
 Every sub-loop tick:
 
 \`\`\`bash
-mnemos memory loop tick --tokens <estimate>
+Mnestis memory loop tick --tokens <estimate>
 \`\`\`
 
 If fused — stop, summarize for human. Do not burn 3M tokens on three comments.
@@ -73,7 +73,7 @@ mnemos wrap -- npm test
 every 5-10 min:
   check PR / CI status
   if comments → load domain shard → fix → mnemos sync → re-review
-  mnemos memory loop tick --tokens <used>
+  Mnestis memory loop tick --tokens <used>
 \`\`\`
 
 ## Ashfall (post-mortem)
@@ -81,19 +81,19 @@ every 5-10 min:
 On human intervention or fuse:
 
 \`\`\`bash
-mnemos memory remember "Loop fused: <reason>. Next time: <fix>" --tag ashfall,loop
+Mnestis memory remember "Loop fused: <reason>. Next time: <fix>" --tag ashfall,loop
 \`\`\`
 
 ## Frozen snapshot (session start)
 
-Inject at session start from \`.mnemos/engine/frozen/\`:
+Inject at session start from \`.mentis/engine/frozen/\`:
 
 - \`soul.md\` — discipline
 - \`user.md\` — who you work for
 - \`memory.md\` — capped recent decisions
 - \`today.md\` — today's captures
 
-Regenerate: \`mnemos memory frozen\`
+Regenerate: \`Mnestis memory frozen\`
 `;
 }
 
@@ -107,11 +107,11 @@ alwaysApply: false
 
 When running multi-step agent workflows:
 
-1. Read \`.mnemos/project.dna.json\` before exploring source
-2. Use \`mnemos memory context\` or domain shards — not whole-repo grep
-3. Tick Spiralfuse: \`mnemos memory loop tick --tokens N\` each iteration
-4. On failure: \`mnemos memory remember\` with tag \`ashfall\`
-5. Ask with honesty: \`mnemos memory ask "question"\` — admit gaps if confidence low
+1. Read \`.mentis/project.dna.json\` before exploring source
+2. Use \`Mnestis memory context\` or domain shards — not whole-repo grep
+3. Tick Spiralfuse: \`Mnestis memory loop tick --tokens N\` each iteration
+4. On failure: \`Mnestis memory remember\` with tag \`ashfall\`
+5. Ask with honesty: \`Mnestis memory ask "question"\` — admit gaps if confidence low
 6. Human merges production PRs; agent stops at "ready to merge"
 `;
 }

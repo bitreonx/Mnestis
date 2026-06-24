@@ -38,7 +38,7 @@ export async function startMemoryServer(options: ServeOptions): Promise<ServeHan
   const port = options.port ?? 4000;
   const host = options.host ?? '127.0.0.1';
   const runtime = new MnemosRuntime(root);
-  const outputDir = path.join(root, '.mnemos');
+  const outputDir = path.join(root, '.mentis');
   let cachedShards: { set: MemoryShardSet | null; loadedAt: number } | null = null;
   const loadShardsCached = async (): Promise<MemoryShardSet | null> => {
     const now = Date.now();
@@ -92,7 +92,7 @@ export async function startMemoryServer(options: ServeOptions): Promise<ServeHan
       const resourceMatch = pathname.match(/^\/resource\/(.+)$/);
       if (resourceMatch) {
         const uri = decodeURIComponent(resourceMatch[1]!);
-        const resource = await runtime.readResource(uri.startsWith('mnemos://') ? uri : `mnemos://repository/${uri}`);
+        const resource = await runtime.readResource(uri.startsWith('mentis://') ? uri : `mentis://repository/${uri}`);
         res.setHeader('Content-Type', resource.mimeType);
         res.end(resource.text);
         return;
@@ -101,7 +101,7 @@ export async function startMemoryServer(options: ServeOptions): Promise<ServeHan
       // -------- Shared Memory (shard-based) endpoints --------
       if (pathname === '/shards' || pathname === '/memory') {
         const set = await loadShardsCached();
-        if (!set) return json(res, { error: 'Shared memory shards not built yet. Run `mnemos memory build`.' }, 404);
+        if (!set) return json(res, { error: 'Shared memory shards not built yet. Run `Mnestis memory build`.' }, 404);
         return json(res, {
           $schema: set.$schema,
           repository: set.repository,
@@ -155,7 +155,7 @@ export async function startMemoryServer(options: ServeOptions): Promise<ServeHan
       const domainShardMatch = pathname.match(/^\/domain\/(.+)$/);
       if (domainShardMatch) {
         const set = await loadShardsCached();
-        if (!set) return json(res, { error: 'Shared memory shards not built yet. Run `mnemos memory build`.' }, 404);
+        if (!set) return json(res, { error: 'Shared memory shards not built yet. Run `Mnestis memory build`.' }, 404);
         const name = decodeURIComponent(domainShardMatch[1]!);
         const shard = findDomainShard(set, name);
         if (!shard) return json(res, { error: `No domain shard matching "${name}".` }, 404);
@@ -165,7 +165,7 @@ export async function startMemoryServer(options: ServeOptions): Promise<ServeHan
       const flowShardMatch = pathname.match(/^\/flow\/(.+)$/);
       if (flowShardMatch) {
         const set = await loadShardsCached();
-        if (!set) return json(res, { error: 'Shared memory shards not built yet. Run `mnemos memory build`.' }, 404);
+        if (!set) return json(res, { error: 'Shared memory shards not built yet. Run `Mnestis memory build`.' }, 404);
         const name = decodeURIComponent(flowShardMatch[1]!);
         const shard = findFlowShard(set, name);
         if (!shard) return json(res, { error: `No flow shard matching "${name}".` }, 404);

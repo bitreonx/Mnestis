@@ -1,0 +1,46 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "kind": "flow",
+  "name": "Login Flow",
+  "filename": "login-flow.memory.json",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "repository": "sample-app",
+  "data": {
+    "id": "flow:journey:login_flow",
+    "name": "Login Flow",
+    "type": "user_journey",
+    "description": "Login Flow spanning 1 related files",
+    "confidence": 0.65,
+    "entryPoint": "app/login/page.tsx",
+    "steps": [
+      {
+        "name": "app/login/page.tsx",
+        "kind": "file",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "name": "/login",
+        "kind": "api",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "name": "login",
+        "kind": "function",
+        "path": "src/auth/service.ts:7"
+      },
+      {
+        "name": "/login",
+        "kind": "route",
+        "path": "app/login/page.tsx:1"
+      },
+      {
+        "name": "LoginPage",
+        "kind": "function",
+        "path": "app/login/page.tsx:3"
+      }
+    ],
+    "stepCount": 5
+  },
+  "estimatedTokens": 243,
+  "bytes": 710
+}

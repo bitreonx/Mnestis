@@ -1,0 +1,80 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "repository": "sample-app",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "totalShards": 10,
+  "totalBytes": 5167,
+  "totalEstimatedTokens": 1657,
+  "shards": [
+    {
+      "kind": "service",
+      "name": "app",
+      "filename": "app.memory.json",
+      "estimatedTokens": 89,
+      "bytes": 266
+    },
+    {
+      "kind": "capability",
+      "name": "Authentication & Identity",
+      "filename": "authentication-identity.memory.json",
+      "estimatedTokens": 134,
+      "bytes": 481
+    },
+    {
+      "kind": "flow",
+      "name": "Login Flow",
+      "filename": "login-flow.memory.json",
+      "estimatedTokens": 243,
+      "bytes": 710
+    },
+    {
+      "kind": "flow",
+      "name": "/login",
+      "filename": "login.memory.json",
+      "estimatedTokens": 251,
+      "bytes": 723
+    },
+    {
+      "kind": "api",
+      "name": "PAGE /login",
+      "filename": "page-login.memory.json",
+      "estimatedTokens": 104,
+      "bytes": 301
+    },
+    {
+      "kind": "domain",
+      "name": "Pickup",
+      "filename": "pickup.memory.json",
+      "estimatedTokens": 116,
+      "bytes": 389
+    },
+    {
+      "kind": "dna",
+      "name": "repository.dna",
+      "filename": "repository-dna.memory.json",
+      "estimatedTokens": 221,
+      "bytes": 777
+    },
+    {
+      "kind": "journey",
+      "name": "Sign-In",
+      "filename": "sign-in.memory.json",
+      "estimatedTokens": 260,
+      "bytes": 770
+    },
+    {
+      "kind": "domain",
+      "name": "Source",
+      "filename": "source.memory.json",
+      "estimatedTokens": 144,
+      "bytes": 466
+    },
+    {
+      "kind": "service",
+      "name": "src",
+      "filename": "src.memory.json",
+      "estimatedTokens": 95,
+      "bytes": 284
+    }
+  ]
+}

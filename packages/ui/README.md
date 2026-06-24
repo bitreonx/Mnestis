@@ -5,7 +5,7 @@ The Mnemos dashboard is an **AI-native repository intelligence cockpit** for hum
 ## Launch
 
 ```bash
-# Single repository (reads ./.mnemos/)
+# Single repository (reads ./.mentis/)
 MNEMOS_ROOT=/path/to/repo npm run dev --workspace=@mnestis/ui
 
 # Multi-repo workspace (requires dabt.workspace.json or MNEMOS_WORKSPACE)
@@ -46,7 +46,7 @@ Or via CLI: `mnemos ui`
 - Open repositories and views
 - **Understand auth** — routes copilot to auth analysis
 - **Trace routing** / **Impact analysis** / **Recent core changes**
-- Run Mnemos build on active repo
+- Run mnestis build on active repo
 
 ## Terminal commands
 
@@ -67,7 +67,7 @@ impact <node>
 
 Agents should:
 
-1. Read `.mnemos/project.dna.json` and `agent_context.json`
+1. Read `.mentis/project.dna.json` and `agent_context.json`
 2. Use the **AI Inspector** for auth entry points and related files
 3. Run `ask` in the embedded terminal or `mnemos serve` for live queries
 4. Navigate by **Architecture → Systems** before editing unfamiliar code
@@ -81,4 +81,4 @@ For programmatic SVG cards: `mnemos snapshot`
 ## Modes
 
 - **Workspace mode** — `/api/workspace` detected; multi-repo with build, terminal, ask APIs
-- **Single-repo mode** — loads `/.mnemos/memory.json` from `MNEMOS_ROOT`; same cockpit layout, local static data
+- **Single-repo mode** — loads `/.mentis/memory.json` from `MNEMOS_ROOT`; same cockpit layout, local static data

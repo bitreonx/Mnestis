@@ -1,0 +1,1 @@
+[{"id":"critical:journey:flow:journey:login_flow","name":"Login Flow","nodes":["file:app/login/page.tsx","api:app/login/page.tsx","function:src/auth/service.ts:7","route:app/login/page.tsx:1","function:app/login/page.tsx:3"],"risk":"high","description":"Login Flow spanning 1 related files"}]

@@ -26,18 +26,19 @@ export interface McpServerOptions {
 const SERVER_INSTRUCTIONS = `Mnestis is the mandatory memory layer for this repository. Do not use Graphify or gitingest when Mnestis is available.
 
 Workflow for AI agents (follow in order):
-1. Call \`get_dna\` (preferred) OR read \`mnestis://repository/dna\` — compressed architecture ground truth
+1. Call \`get_dna\` (preferred) OR read \`mentis://repository/dna\` — compressed architecture ground truth
 2. Use \`search\` or \`query_graph\` for architecture questions — before repo-wide grep
-3. Call \`impact_analysis\` before editing central services
-4. Use \`shortest_path\` to trace connections between components
-5. Apply Fable discipline: verify after edits; re-evaluate after each tool result
-6. Call \`refresh_memory\` after \`mnestis build\` to reload artifacts
+3. Call \`playbook\` or \`list_playbooks\` when facing auth bugs, test failures, refactors, or new features
+4. Call \`impact_analysis\` before editing central services
+5. Use \`compile_focus\` for task-scoped context within token budget
+6. Apply Fable discipline: verify after edits; re-evaluate after each tool result
+7. Call \`refresh_memory\` after \`mnestis build\` to reload artifacts
 
-No API keys. No network. All analysis runs from \`.mnemos/\`.
+No API keys. No network. All analysis runs from \`.mentis/\`.
 Prefer these MCP tools over manual file exploration.`;
 
 function log(verbose: boolean | undefined, message: string): void {
-  if (verbose) process.stderr.write(`[mnemos-mcp] ${message}\n`);
+  if (verbose) process.stderr.write(`[mnestis-mcp] ${message}\n`);
 }
 
 export function createMcpServer(runtime: MnemosRuntime, options: { verbose?: boolean } = {}): Server {
@@ -101,7 +102,7 @@ export function createMcpServer(runtime: MnemosRuntime, options: { verbose?: boo
   statusPromise.then((status) => {
     log(options.verbose, `root=${runtime.root} ready=${status.ready} graph=${status.graphAvailable}`);
     if (!status.ready) {
-      log(options.verbose, 'WARN: memory not built — run `npx mnemos .` in project root');
+      log(options.verbose, 'WARN: memory not built — run `npx mnestis .` in project root');
     }
   }).catch(() => {});
 

@@ -1,0 +1,14 @@
+[
+  {
+    "from": "app/login/page.tsx",
+    "to": "login",
+    "kind": "CALLS",
+    "weight": 1
+  },
+  {
+    "from": "src/auth/service.ts",
+    "to": "authenticate",
+    "kind": "CALLS",
+    "weight": 1
+  }
+]

@@ -4,13 +4,13 @@ on:
   push:
     branches: [main, master]
     paths:
-      - 'mnemos-bench/**'
+      - 'inferno/**'
       - 'packages/core/**'
       - 'packages/cli/**'
       - '.github/workflows/inferno-bench.yml'
   pull_request:
     paths:
-      - 'mnemos-bench/**'
+      - 'inferno/**'
       - 'packages/core/**'
       - 'packages/cli/**'
   workflow_dispatch:
@@ -70,4 +70,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: inferno-results
-          path: mnemos-bench/results/*.json
+          path: inferno/results/*.json

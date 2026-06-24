@@ -1,0 +1,82 @@
+[
+  {
+    "id": "flow:request:app/login/page.tsx",
+    "name": "/login",
+    "type": "request",
+    "confidence": 0.9,
+    "steps": [
+      {
+        "nodeId": "file:app/login/page.tsx",
+        "name": "app/login/page.tsx",
+        "kind": "file",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "nodeId": "api:app/login/page.tsx",
+        "name": "/login",
+        "kind": "api",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "nodeId": "function:src/auth/service.ts:7",
+        "name": "login",
+        "kind": "function",
+        "path": "src/auth/service.ts:7"
+      },
+      {
+        "nodeId": "route:app/login/page.tsx:1",
+        "name": "/login",
+        "kind": "route",
+        "path": "app/login/page.tsx:1"
+      },
+      {
+        "nodeId": "function:app/login/page.tsx:3",
+        "name": "LoginPage",
+        "kind": "function",
+        "path": "app/login/page.tsx:3"
+      }
+    ],
+    "entryPoint": "app/login/page.tsx",
+    "description": "HTTP request: 5 steps through file → api → function → route"
+  },
+  {
+    "id": "flow:journey:login_flow",
+    "name": "Login Flow",
+    "type": "user_journey",
+    "confidence": 0.65,
+    "steps": [
+      {
+        "nodeId": "file:app/login/page.tsx",
+        "name": "app/login/page.tsx",
+        "kind": "file",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "nodeId": "api:app/login/page.tsx",
+        "name": "/login",
+        "kind": "api",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "nodeId": "function:src/auth/service.ts:7",
+        "name": "login",
+        "kind": "function",
+        "path": "src/auth/service.ts:7"
+      },
+      {
+        "nodeId": "route:app/login/page.tsx:1",
+        "name": "/login",
+        "kind": "route",
+        "path": "app/login/page.tsx:1"
+      },
+      {
+        "nodeId": "function:app/login/page.tsx:3",
+        "name": "LoginPage",
+        "kind": "function",
+        "path": "app/login/page.tsx:3"
+      }
+    ],
+    "entryPoint": "app/login/page.tsx",
+    "description": "Login Flow spanning 1 related files"
+  }
+]

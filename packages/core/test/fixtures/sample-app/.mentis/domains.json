@@ -1,0 +1,22 @@
+[
+  {
+    "id": "domain:path:0",
+    "name": "Source",
+    "confidence": 0.85,
+    "nodes": [
+      "file:src/auth/service.ts"
+    ],
+    "description": "Feature module detected from directory structure: Source",
+    "entryPoints": []
+  },
+  {
+    "id": "domain:path:1",
+    "name": "Pickup",
+    "confidence": 0.85,
+    "nodes": [
+      "file:src/features/pickup/validate.ts"
+    ],
+    "description": "Feature module detected from directory structure: Pickup",
+    "entryPoints": []
+  }
+]

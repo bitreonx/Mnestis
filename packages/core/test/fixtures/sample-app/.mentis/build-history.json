@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "snapshots": [
+    {
+      "builtAt": "2026-06-23T03:21:01.677Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 155
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    },
+    {
+      "builtAt": "2026-06-23T03:21:28.118Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 401
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    },
+    {
+      "builtAt": "2026-06-24T11:10:19.590Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 218
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    },
+    {
+      "builtAt": "2026-06-24T11:10:55.373Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 500
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    },
+    {
+      "builtAt": "2026-06-24T11:11:24.466Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 284
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    },
+    {
+      "builtAt": "2026-06-24T11:24:38.710Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 188
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    },
+    {
+      "builtAt": "2026-06-24T11:40:03.432Z",
+      "repository": "sample-app",
+      "stats": {
+        "filesScanned": 3,
+        "nodesCreated": 15,
+        "edgesCreated": 15,
+        "domainsFound": 2,
+        "flowsFound": 2,
+        "durationMs": 132
+      },
+      "healthScore": 88,
+      "domainNames": [
+        "Pickup",
+        "Source"
+      ],
+      "flowNames": [
+        "/login",
+        "Login Flow"
+      ],
+      "capabilityNames": [
+        "Authentication & Identity"
+      ],
+      "smellCount": 0,
+      "highSmellCount": 0,
+      "apiCount": 1,
+      "serviceCount": 2
+    }
+  ],
+  "updatedAt": "2026-06-24T11:40:03.590Z"
+}

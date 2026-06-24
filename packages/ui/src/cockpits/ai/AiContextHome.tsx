@@ -11,10 +11,10 @@ const FEED_METHODS = [
   {
     icon: FileJson,
     title: 'project.dna.json',
-    description: 'Compressed repository DNA written to .mnemos/ after every build.',
+    description: 'Compressed repository DNA written to .mentis/ after every build.',
     action: 'Open DNA file',
     resolve: (repoId: string) =>
-      repoId === 'local' ? '/.mnemos/project.dna.json' : `/.mnemos/${repoId}/project.dna.json`,
+      repoId === 'local' ? '/.mentis/project.dna.json' : `/.mentis/${repoId}/project.dna.json`,
     external: true,
   },
   {

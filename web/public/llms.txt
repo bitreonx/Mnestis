@@ -1,0 +1,23 @@
+# Mnestis
+
+> The memory layer for software — local-first codebase intelligence for humans and AI.
+
+- Website: https://mnestis.vercel.app
+- GitHub: https://github.com/bitreonx/Mnestis
+- npm: https://www.npmjs.com/package/mnestis
+- Install: npx mnestis launch . --platform cursor
+
+## What it does
+
+Mnestis scans a repository, builds a dependency graph, discovers domains, capabilities, and user journeys, and writes structured memory to `.mnemos/`. It produces a dashboard, HTML report, AI Pack v1 JSON, and MCP tools for Cursor and Claude Code.
+
+## Primary commands
+
+- `npx mnestis .` — analyze repo and generate DNA
+- `npx mnestis launch . --platform cursor` — build + install Cursor rules + MCP
+- `npx mnestis launch . --platform claude` — build + Claude skills + Fable mindset
+- `mnestis mcp` — stdio MCP server for architecture queries
+
+## Docs
+
+- https://mnestis.vercel.app/docs

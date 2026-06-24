@@ -46,8 +46,8 @@ export function MnemosBanner({ className = '' }: { className?: string }) {
 }
 
 const AI_FLOW = [
-  { step: '1', title: 'Build memory', cmd: 'npx mnemos .', desc: 'Scans repo → DNA + graphs + SVG snapshots' },
-  { step: '2', title: 'Wire your AI', cmd: '@.mnemos/project.dna.json', desc: 'Cursor, Claude, Codex read structured context' },
+  { step: '1', title: 'Build memory', cmd: 'npx mnestis .', desc: 'Scans repo → DNA + graphs + SVG snapshots' },
+  { step: '2', title: 'Wire your AI', cmd: '@.mentis/project.dna.json', desc: 'Cursor, Claude, Codex read structured context' },
   { step: '3', title: 'Query live', cmd: 'mnemos serve', desc: 'Agents hit localhost:4000 for impact & search' },
   { step: '4', title: 'Share visually', cmd: 'mnemos snapshot', desc: 'Drop animated SVG cards into README & PRs' },
 ];

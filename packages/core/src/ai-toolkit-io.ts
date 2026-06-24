@@ -247,8 +247,8 @@ export async function uninstallAiIntegrations(root: string): Promise<SetupResult
       try {
         const content = await readFile(full, 'utf-8');
         const parsed = JSON.parse(content) as { mcpServers?: Record<string, unknown> };
-        if (parsed.mcpServers?.mnemos) {
-          delete parsed.mcpServers.mnemos;
+        if (parsed.mcpServers?.mentis) {
+          delete parsed.mcpServers.mentis;
           if (Object.keys(parsed.mcpServers).length === 0) {
             await unlink(full);
           } else {
@@ -312,14 +312,14 @@ async function mergeMcpConfig(
   }
 
   const hasMnestis = existing.mcpServers?.mnestis;
-  const hasLegacyMnemos = existing.mcpServers?.mnemos;
+  const hasLegacyMnemos = existing.mcpServers?.mentis;
   if ((hasMnestis || hasLegacyMnemos) && !force) {
     skipped.push(relPath);
     return;
   }
 
   const merged = { ...existing.mcpServers };
-  delete merged.mnemos;
+  delete merged.mentis;
   merged.mnestis = mnemosEntry;
 
   await mkdir(path.dirname(full), { recursive: true });

@@ -137,7 +137,7 @@ function makeShard(
   return { shard, serialized };
 }
 
-/** Resolve the file path a shard will be written to inside the .mnemos dir. */
+/** Resolve the file path a shard will be written to inside the .mentis dir. */
 export function shardFilePath(outputDir: string, shard: MemoryShard): string {
   return `${outputDir.replace(/\\/g, '/')}/${shard.filename}`;
 }

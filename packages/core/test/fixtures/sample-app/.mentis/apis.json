@@ -1,0 +1,9 @@
+[
+  {
+    "id": "api:app/login/page.tsx",
+    "method": "PAGE",
+    "path": "/login",
+    "handler": "app/login/page.tsx",
+    "file": "app/login/page.tsx"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "kind": "service",
+  "name": "app",
+  "filename": "app.memory.json",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "repository": "sample-app",
+  "data": {
+    "id": "service:app",
+    "name": "app",
+    "path": "app",
+    "exports": [],
+    "dependencies": [],
+    "dependents": [
+      "app"
+    ]
+  },
+  "estimatedTokens": 89,
+  "bytes": 266
+}

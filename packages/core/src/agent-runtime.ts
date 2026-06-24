@@ -28,7 +28,9 @@ import { buildHealthGraphBundle } from './context/graph-markdown.js';
 export const MNEMOS_VERSION = '0.3.3';
 export const MNESTIS_VERSION = MNEMOS_VERSION;
 export { PRODUCT, MEMORY_ENGINE, formatProductLabel, formatEngineLabel } from './release/codenames.js';
-export const MNEMOS_MCP_URI = 'mnemos://';
+export const MNESTIS_MCP_URI = 'mentis://';
+/** @deprecated Use MNESTIS_MCP_URI */
+export const MNEMOS_MCP_URI = MNESTIS_MCP_URI;
 
 export type AgentErrorCode =
   | 'NOT_BUILT'
@@ -126,8 +128,8 @@ export class MnemosRuntime {
     if (!loaded) {
       throw new MnemosAgentError(
         'NOT_BUILT',
-        'No Mnemos memory model found for this repository.',
-        'Run `npx mnemos .` or `mnemos build` in the project root first.',
+        'No Mnestis memory model found for this repository.',
+        'Run `npx mnestis .` or `mnestis build` in the project root first.',
       );
     }
 
@@ -188,7 +190,7 @@ export class MnemosRuntime {
     const status = await this.getStatus();
     const summary = status.ready
       ? `Ready · graph ${status.graphAvailable ? 'available' : 'unavailable'}`
-      : 'Not ready (run mnemos build)';
+      : 'Not ready (run mnestis build)';
     const markdown = [
       '# Mnemos Status',
       '',
@@ -206,7 +208,7 @@ export class MnemosRuntime {
   }
 
   listResources(): MnemosResourceDescriptor[] {
-    const base = `${MNEMOS_MCP_URI}repository/`;
+    const base = `${MNESTIS_MCP_URI}repository/`;
     const resources: MnemosResourceDescriptor[] = [
       {
         uri: `${base}dna`,
@@ -262,7 +264,7 @@ export class MnemosRuntime {
     const artifacts = await this.load();
     const { memory, outputDir } = artifacts;
 
-    if (uri === `${MNEMOS_MCP_URI}repository/dna`) {
+    if (uri === `${MNESTIS_MCP_URI}repository/dna`) {
       try {
         const raw = await readFile(path.join(outputDir, 'project.dna.json'), 'utf-8');
         return { mimeType: 'application/json', text: raw };
@@ -272,12 +274,12 @@ export class MnemosRuntime {
       }
     }
 
-    if (uri === `${MNEMOS_MCP_URI}repository/summary`) {
+    if (uri === `${MNESTIS_MCP_URI}repository/summary`) {
       const explain = explainRepository(memory);
       return { mimeType: 'text/markdown', text: formatExplainReport(explain, memory) };
     }
 
-    if (uri === `${MNEMOS_MCP_URI}repository/agent-context`) {
+    if (uri === `${MNESTIS_MCP_URI}repository/agent-context`) {
       const exports = buildAgentExports({
         memory,
         capabilities: memory.capabilities ?? [],
@@ -290,21 +292,21 @@ export class MnemosRuntime {
       };
     }
 
-    if (uri === `${MNEMOS_MCP_URI}repository/domains`) {
+    if (uri === `${MNESTIS_MCP_URI}repository/domains`) {
       return {
         mimeType: 'application/json',
         text: JSON.stringify(memory.domains, null, 2),
       };
     }
 
-    if (uri === `${MNEMOS_MCP_URI}repository/flows`) {
+    if (uri === `${MNESTIS_MCP_URI}repository/flows`) {
       return {
         mimeType: 'application/json',
         text: JSON.stringify(memory.flows, null, 2),
       };
     }
 
-    if (uri === `${MNEMOS_MCP_URI}repository/health`) {
+    if (uri === `${MNESTIS_MCP_URI}repository/health`) {
       const score = computeMemoryScore(memory);
       const ai = computeAiReadiness(memory);
       const heatmap = computeDomainHeatmap(memory);
@@ -314,7 +316,7 @@ export class MnemosRuntime {
       };
     }
 
-    const contextMatch = uri.match(/^mnemos:\/\/repository\/context\/(.+)$/);
+    const contextMatch = uri.match(/^mentis:\/\/repository\/context\/(.+)$/) ?? uri.match(/^mnemos:\/\/repository\/context\/(.+)$/);
     if (contextMatch) {
       const file = contextMatch[1]!;
       if (!CONTEXT_FILES.includes(file as (typeof CONTEXT_FILES)[number])) {
@@ -402,7 +404,7 @@ export class MnemosRuntime {
       throw new MnemosAgentError(
         'NOT_FOUND',
         `No node matching "${name}".`,
-        'Try mnemos search or list_domains to find valid names.',
+        'Try mnestis search or list_domains to find valid names.',
       );
     }
     return this.envelope('get_node', `${result.name} — ${result.domain ?? 'unknown domain'}`, result.text, result);
@@ -410,7 +412,7 @@ export class MnemosRuntime {
 
   async getNeighbors(name: string, direction: 'in' | 'out' | 'both' = 'both'): Promise<AgentEnvelope> {
     const { memory, graph } = await this.load();
-    if (!graph) throw new MnemosAgentError('GRAPH_UNAVAILABLE', 'Knowledge graph not available.', 'Run mnemos build to generate graph.json.');
+    if (!graph) throw new MnemosAgentError('GRAPH_UNAVAILABLE', 'Knowledge graph not available.', 'Run mnestis build to generate graph.json.');
 
     const nodeId = resolveNodeQuery(graph, name);
     if (!nodeId) throw new MnemosAgentError('NOT_FOUND', `Node not found: ${name}`);
@@ -615,9 +617,10 @@ export class MnemosRuntime {
     if (await engineExists(outputDir)) {
       const engine = new MnemosMemoryEngine(this.root, outputDir);
       const ctx = await engine.compileContext(task, tokenBudget);
+      const savings = ctx.pack?.savingsLine ?? `~${ctx.estimatedTokens} tokens`;
       return this.envelope(
         'compile_focus',
-        `Memory engine context for "${task}" (~${ctx.estimatedTokens} tokens)`,
+        `${savings} · "${task}"`,
         ctx.markdown,
         ctx,
         { tookMs: Date.now() - start },
@@ -644,7 +647,7 @@ export class MnemosRuntime {
       throw new MnemosAgentError(
         'NOT_BUILT',
         'Memory engine not built.',
-        'Run `mnemos build .` to build the hybrid memory index.',
+        'Run `mnestis build .` to build the hybrid memory index.',
       );
     }
     const engine = new MnemosMemoryEngine(this.root, outputDir);
@@ -652,9 +655,9 @@ export class MnemosRuntime {
     const markdown = [
       `# Memory Query: "${question}"`,
       '',
-      `_Hybrid BM25 + local embeddings · ${result.tookMs}ms · fully on-device_`,
+      `_Hybrid vector + BM25 + graph BFS · ${result.tookMs}ms · fully on-device_`,
       '',
-      ...result.hits.map((h) => `- **${h.title}** (${h.kind}) — ${h.snippet}`),
+      ...result.hits.map((h) => `- **${h.title}** (${h.kind}, ${h.score.toFixed(3)}) — ${h.snippet}`),
       result.contradictions.length ? `\n## Contradictions\n${result.contradictions.map((c) => `- ${c.subject}: ${c.severity}`).join('\n')}` : '',
     ].join('\n');
     return this.envelope('memory_query', `${result.hits.length} memories for "${question}"`, markdown, result, {
@@ -681,7 +684,7 @@ export class MnemosRuntime {
     const { outputDir } = await this.load();
     const { engineExists, loadEngineIndex } = await import('./memory-engine/engine.js');
     if (!(await engineExists(outputDir))) {
-      return this.envelope('memory_engine_status', 'Memory engine not built', 'Run `mnemos build .` first.', { ready: false });
+      return this.envelope('memory_engine_status', 'Memory engine not built', 'Run `mnestis build .` first.', { ready: false });
     }
     const index = await loadEngineIndex(outputDir);
     const m = index!.manifest;
@@ -698,6 +701,33 @@ export class MnemosRuntime {
       `- **Incremental:** ${m.stats.incrementalUpserted ?? 0} upserted, ${m.stats.incrementalSkipped ?? 0} skipped`,
     ].join('\n');
     return this.envelope('memory_engine_status', `Engine ready · ${m.documentCount} docs`, markdown, m);
+  }
+
+  async getPlaybook(idOrQuery: string): Promise<AgentEnvelope> {
+    const { getPlaybook, formatPlaybookMarkdown } = await import('./mcp/playbooks.js');
+    const playbook = getPlaybook(idOrQuery);
+    if (!playbook) {
+      throw new MnemosAgentError(
+        'NOT_FOUND',
+        `No playbook matched "${idOrQuery}"`,
+        'Try list_playbooks for auth-bug, test-failure, refactor-service, new-feature, performance, security-review',
+      );
+    }
+    const markdown = formatPlaybookMarkdown(playbook);
+    return this.envelope('playbook', playbook.title, markdown, playbook);
+  }
+
+  async listPlaybooks(): Promise<AgentEnvelope> {
+    const { listPlaybooks } = await import('./mcp/playbooks.js');
+    const playbooks = listPlaybooks();
+    const markdown = [
+      '# Problem playbooks',
+      '',
+      ...playbooks.map((p) => `- **${p.id}** — ${p.title}: ${p.summary}`),
+      '',
+      'Call `playbook` with an id or keyword to get steps and a fill-in template.',
+    ].join('\n');
+    return this.envelope('list_playbooks', `${playbooks.length} playbooks`, markdown, playbooks);
   }
 
   async getTrustManifest(): Promise<AgentEnvelope> {

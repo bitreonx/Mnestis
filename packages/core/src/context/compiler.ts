@@ -89,7 +89,7 @@ function compileContextReadme(memory: MemoryModel): string {
 
 ${buildLanguagePipelineMermaid()}
 
-Re-run \`mnemos build\` after structural changes to refresh every chart.
+Re-run \`mnestis build\` after structural changes to refresh every chart.
 `;
 }
 

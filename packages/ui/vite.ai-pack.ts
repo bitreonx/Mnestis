@@ -32,7 +32,7 @@ export async function buildAiPackFromDir(
 ): Promise<{ body: string; status: number }> {
   const memory = await readJsonSafe<MemoryModel>(path.join(mnemosDir, 'memory.json'))
   if (!memory) {
-    return { status: 404, body: JSON.stringify({ error: 'Memory not found. Run mnemos build first.' }) }
+    return { status: 404, body: JSON.stringify({ error: 'Memory not found. Run mnestis build first.' }) }
   }
 
   const dna = await readJsonSafe<Record<string, unknown>>(path.join(mnemosDir, 'project.dna.json'))

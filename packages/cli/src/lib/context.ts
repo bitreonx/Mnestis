@@ -51,5 +51,5 @@ export function readGlobalFlags(options: Record<string, unknown>): GlobalCliFlag
 }
 
 export function hintBuild(): void {
-  printInfoLine(`Run ${chalk.cyan('mnemos build .')} first.`);
+  printInfoLine(`Run ${chalk.cyan('mnestis build .')} first.`);
 }

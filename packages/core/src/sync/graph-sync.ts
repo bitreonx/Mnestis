@@ -18,7 +18,7 @@ export interface GraphSyncHandle {
   stop: () => void;
 }
 
-const IGNORE = ['node_modules', '.mnemos', '.git', 'dist', 'build', '.next', 'coverage'];
+const IGNORE = ['node_modules', '.mentis', '.git', 'dist', 'build', '.next', 'coverage'];
 
 function shouldIgnore(filename: string): boolean {
   const f = filename.replace(/\\/g, '/');
@@ -32,7 +32,7 @@ function shouldIgnore(filename: string): boolean {
  */
 export async function startGraphSync(options: GraphSyncOptions): Promise<GraphSyncHandle> {
   const root = path.resolve(options.root);
-  const outputDir = options.outputDir ?? path.join(root, '.mnemos');
+  const outputDir = options.outputDir ?? path.join(root, '.mentis');
   const debounceMs = options.debounceMs ?? 400;
   let debounce: ReturnType<typeof setTimeout> | null = null;
   let running = false;

@@ -9,6 +9,13 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import { openInBrowser } from './lib/browser.js';
 import {
+  maybeFirstRunNudge,
+  trackRecallMilestone,
+  trackPackMilestone,
+  openStarRepo,
+  printLocalStats,
+} from './lib/nudges.js';
+import {
   printCheck,
   printArtifactLegend,
   printReaderModes,
@@ -106,6 +113,8 @@ import {
   auditRepositorySecurity,
   formatSecurityAuditReport,
   writeSecurityAuditReport,
+  pack as packMemories,
+  formatPackSavings,
   type AiPackSection,
   type Mode as AiPackMode,
 } from '@mnestis/core';
@@ -131,7 +140,7 @@ async function requireMemoryModel(root: string): Promise<NonNullable<Awaited<Ret
   if (!loaded) {
     console.log('');
     printWarnLine('No memory model found for this repository.');
-    printInfoLine(`Run ${chalk.cyan('mnestis build .')} first (or just ${chalk.cyan('npx mnemos .')} for the full experience).`);
+    printInfoLine(`Run ${chalk.cyan('mnestis build .')} first (or just ${chalk.cyan('npx mnestis .')} for the full experience).`);
     process.exit(1);
   }
   return loaded;
@@ -196,13 +205,20 @@ program
   .version(MNEMOS_VERSION, '-V, --version', 'Print version')
   .showHelpAfterError('(run `mnestis --help` to see all commands)')
   .showSuggestionAfterError(true)
-  .configureHelp({ sortSubcommands: true });
+  .configureHelp({
+    sortSubcommands: true,
+    helpWidth: 100,
+  })
+  .addHelpText('after', () => {
+    if (process.env.CI || process.env.MNESTIS_NO_NUDGE === '1') return '';
+    return '\n★ https://github.com/bitreonx/Mnestis';
+  });
 
 program
   .command('build [path]')
   .description('Build a complete mental model of a repository')
   .option('-v, --verbose', 'Show detailed progress')
-  .option('-o, --output <dir>', 'Output directory', '.mnemos')
+  .option('-o, --output <dir>', 'Output directory', '.mentis')
   .option('--incremental', 'Use incremental cache when rebuilding', true)
   .option('--no-incremental', 'Force full rebuild')
   .option('--watch', 'Re-build when source files change', false)
@@ -242,7 +258,7 @@ program
         (_event, filename) => {
           if (!filename) return;
           const f = String(filename);
-          if (f.includes('node_modules') || f.includes('.mnemos') || f.includes('.git')) return;
+          if (f.includes('node_modules') || f.includes('.mentis') || f.includes('.git')) return;
           if (f.includes('package-lock.json') || f.endsWith('.map')) return;
           trigger();
         },
@@ -455,7 +471,7 @@ program
 
 program
   .command('context [path]')
-  .description('Build or export the AI context protocol package (.mnemos/)')
+  .description('Build or export the AI context protocol package (.mentis/)')
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('--no-build', 'Skip rebuild; use existing memory model')
   .action(async (targetPath = '.', options) => {
@@ -676,20 +692,20 @@ for (const [name, description] of [
     .description(description)
     .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
     .option('--json', 'Output pack JSON only')
-    .option('--build', 'Run mnemos build first if .mnemos is missing')
+    .option('--build', 'Run mnestis build first if .mentis is missing')
     .action(async (targetPath = '.', options) => runSupernovaCommand(targetPath, options));
   void cmd;
 }
 
 program
   .command('audit [path]')
-  .description('Dependency security scan — npm audit + .mnemos/security-audit.json')
+  .description('Dependency security scan — npm audit + .mentis/security-audit.json')
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('--json', 'Output JSON only')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
     const result = await auditRepositorySecurity(root);
-    const outPath = await writeSecurityAuditReport(root, path.join(root, '.mnemos'));
+    const outPath = await writeSecurityAuditReport(root, path.join(root, '.mentis'));
 
     if (options.json) {
       console.log(JSON.stringify(result, null, 2));
@@ -937,7 +953,7 @@ program
   .option('--no-open', 'Do not open report after launch')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const platform = options.platform as string;
 
     printMnemosBanner(`Launch — build · audit · steer (${platform})`);
@@ -1030,12 +1046,12 @@ program
     console.log(chalk.dim(`Dataset: ${FABLE_DATASET_URL}`));
     console.log('');
     console.log(chalk.bold('Install rules in your repo'));
-    console.log(chalk.dim('  npx mnemos . && mnemos setup --platform cursor'));
+    console.log(chalk.dim('  npx mnestis . && mnemos setup --platform cursor'));
     console.log(chalk.dim('  Writes .cursor/rules/mnemos-discipline.mdc + fable-mindset.md'));
     console.log('');
     console.log(chalk.bold('Docs'));
     console.log(chalk.dim('  docs/research/fable-5-dataset.md'));
-    console.log(chalk.dim('  .mnemos/integrations/fable-mindset.md (after build)'));
+    console.log(chalk.dim('  .mentis/integrations/fable-mindset.md (after build)'));
     console.log('');
 
     if (options.guide) return;
@@ -1103,7 +1119,7 @@ program
       console.error(chalk.bold(`mnestis MCP v${MNEMOS_VERSION} (stdio)`));
       console.error(chalk.dim(`Repository: ${root}`));
       console.error(chalk.dim('Tools: query_graph · get_dna · impact_analysis · shortest_path · search · review_diff'));
-      console.error(chalk.dim('Resources: mnemos://repository/dna · summary · domains · flows'));
+      console.error(chalk.dim('Resources: mentis://repository/dna · summary · domains · flows'));
       await startMcpServer({ root, verbose: true });
       return;
     }
@@ -1145,9 +1161,9 @@ const memoryCmd = program
 
 memoryCmd
   .command('build [path]')
-  .description('Analyze the repository and write pre-shared memory shards to .mnemos/')
+  .description('Analyze the repository and write pre-shared memory shards to .mentis/')
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
-  .option('-o, --output <dir>', 'Output directory', '.mnemos')
+  .option('-o, --output <dir>', 'Output directory', '.mentis')
   .option('--no-build', 'Skip full build; only (re)write shards from existing memory.json')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
@@ -1248,7 +1264,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
 
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
@@ -1298,7 +1314,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (amount, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
       console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
@@ -1343,13 +1359,13 @@ memoryCmd
 
 memoryCmd
   .command('shard [path]')
-  .description('List every memory shard written to .mnemos/')
+  .description('List every memory shard written to .mentis/')
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .option('--kind <kind>', 'Filter by kind: domain|flow|api|service|capability|journey|critical-path|dna')
   .option('--json', 'Output as JSON')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
       console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
@@ -1391,7 +1407,7 @@ memoryCmd
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .action(async (kind, name, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
       console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
@@ -1424,7 +1440,7 @@ memoryCmd
   .option('-p, --path <path>', 'Repository path (alias of positional)', '.')
   .action(async (node, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const set = await loadMemoryShardSet(outputDir);
     if (!set) {
       console.log(chalk.yellow(`No shared memory shards at ${outputDir}. Run ${chalk.cyan('mnestis memory build .')} first.`));
@@ -1467,7 +1483,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (question, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     if (!(await engineExists(outputDir))) {
       console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
@@ -1490,6 +1506,7 @@ memoryCmd
       console.log('');
       console.log(chalk.yellow(`  ⚠ ${result.contradictions.length} contradiction(s) detected`));
     }
+    await trackRecallMilestone();
   });
 
 memoryCmd
@@ -1499,7 +1516,7 @@ memoryCmd
   .option('-t, --tag <tag>', 'Tag (repeatable)', collectTags, [] as string[])
   .action(async (content, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const engine = new MnemosMemoryEngine(root, outputDir);
     const episode = await engine.remember({ content, tags: options.tag, source: 'user' });
     console.log(chalk.green(`Remembered · ${episode.id}`));
@@ -1514,18 +1531,30 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (task, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     if (!(await engineExists(outputDir))) {
       console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
     }
     const engine = new MnemosMemoryEngine(root, outputDir);
-    const ctx = await engine.compileContext(task, parseInt(options.budget, 10));
+    const budget = parseInt(options.budget, 10);
+    const ctx = await engine.compileContext(task, budget);
+    const packResult = packMemories(
+      ctx.documents.map((d) => ({ id: d.id, content: d.content, relevance: d.score })),
+      budget,
+    );
+    const savingsPct = packResult.tokensTotal > 0
+      ? Math.round((packResult.tokensSaved / packResult.tokensTotal) * 100)
+      : 0;
     if (options.json) {
-      console.log(JSON.stringify(ctx, null, 2));
+      console.log(JSON.stringify({ ...ctx, pack: packResult }, null, 2));
+      await trackPackMilestone(savingsPct);
       return;
     }
+    console.log(chalk.cyan(formatPackSavings(packResult)));
+    console.log('');
     console.log(ctx.markdown);
+    await trackPackMilestone(savingsPct);
   });
 
 memoryCmd
@@ -1535,7 +1564,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     const index = await loadEngineIndex(outputDir);
     if (!index) {
       console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
@@ -1571,7 +1600,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     const trust = await engine.getTrustManifest();
     if (options.json) console.log(JSON.stringify(trust, null, 2));
     else console.log(formatTrustMarkdown(trust));
@@ -1584,7 +1613,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (action, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     if (action === 'start') {
       const id = await engine.sessionStart({ source: 'cli' });
       console.log(chalk.green(`Session started: ${id}`));
@@ -1618,8 +1647,8 @@ memoryCmd
       process.exit(1);
     }
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
-    const out = options.output ?? path.join(root, `${path.basename(root)}.mnemos-sync`);
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
+    const out = options.output ?? path.join(root, `${path.basename(root)}.mentis-sync`);
     const manifest = await engine.exportSync(options.password, out);
     console.log(chalk.green(`Exported encrypted bundle → ${out}`));
     console.log(chalk.dim(`  ${manifest.documentCount} docs · ${manifest.episodeCount} episodes · ${manifest.sessionCount} sessions`));
@@ -1637,7 +1666,7 @@ memoryCmd
       process.exit(1);
     }
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     const manifest = await engine.importSync(path.resolve(bundle), options.password, !options.replace);
     console.log(chalk.green(`Imported from ${manifest.repository} (${manifest.exportedAt})`));
   });
@@ -1649,7 +1678,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (question, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const outputDir = path.join(root, '.mnemos');
+    const outputDir = path.join(root, '.mentis');
     if (!(await engineExists(outputDir))) {
       console.log(chalk.yellow(`Memory engine not built. Run ${chalk.cyan('mnestis build .')} first.`));
       process.exit(1);
@@ -1671,7 +1700,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (sessionsPath, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     const result = await engine.chronoshift(path.resolve(sessionsPath), { dryRun: options.dryRun });
     if (options.json) {
       console.log(JSON.stringify(result, null, 2));
@@ -1705,7 +1734,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (action, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     if (action === 'status') {
       const policy = await engine.getVeilPolicy();
       if (options.json) console.log(JSON.stringify(policy, null, 2));
@@ -1744,7 +1773,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (action, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     if (action === 'frozen') {
       const snapshot = await engine.buildFrozenSnapshot();
       if (options.json) {
@@ -1752,7 +1781,7 @@ memoryCmd
         return;
       }
       console.log(chalk.green(`Frozen snapshot · ~${snapshot.estimatedTokens} tokens`));
-      console.log(chalk.dim('  Written to .mnemos/engine/frozen/{soul,user,memory,today}.md'));
+      console.log(chalk.dim('  Written to .mentis/engine/frozen/{soul,user,memory,today}.md'));
       return;
     }
     console.log(chalk.yellow('Use: spindle frozen — or: Mnestis Memory remember "..." for capture'));
@@ -1766,7 +1795,7 @@ memoryCmd
   .option('-t, --tag <tag>', 'Tag (repeatable)', collectTags, [] as string[])
   .action(async (content, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     const episode = await engine.spindleCapture(content, { tags: options.tag });
     if (!episode) {
       console.log(chalk.dim('Spindle: not durable enough to capture (noise filtered)'));
@@ -1782,12 +1811,12 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     const snapshot = await engine.buildFrozenSnapshot();
     if (options.json) console.log(JSON.stringify(snapshot, null, 2));
     else {
       console.log(chalk.green(`Frozen snapshot · ~${snapshot.estimatedTokens} tokens`));
-      console.log(chalk.dim('  .mnemos/engine/frozen/'));
+      console.log(chalk.dim('  .mentis/engine/frozen/'));
     }
   });
 
@@ -1802,7 +1831,7 @@ memoryCmd
   .option('--json', 'Output as JSON')
   .action(async (action, targetPath = '.', options) => {
     const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
-    const engine = new MnemosMemoryEngine(root, path.join(root, '.mnemos'));
+    const engine = new MnemosMemoryEngine(root, path.join(root, '.mentis'));
     if (action === 'start') {
       const budget = await engine.loopStart({
         label: options.label,
@@ -1911,6 +1940,15 @@ exportCmd
     await runExportCommand('wiki', targetPath, options);
   });
 
+exportCmd
+  .command('vault [path]')
+  .description('Export Obsidian-compatible markdown vault (.mentis/vault/) with wikilinks')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-o, --output <dir>', 'Output directory')
+  .action(async (targetPath = '.', options) => {
+    await runExportCommand('vault', targetPath, options);
+  });
+
 program
   .command('pack [path]')
   .description('Print the AI Pack v1 (JSON) for the repository — designed for Claude, Cursor, Trae')
@@ -1969,7 +2007,7 @@ program
   });
 
 async function runExportCommand(
-  format: 'svg' | 'graphml' | 'callflow' | 'wiki',
+  format: 'svg' | 'graphml' | 'callflow' | 'wiki' | 'vault',
   targetPath: string,
   options: { path?: string; output?: string },
 ): Promise<void> {
@@ -2077,7 +2115,7 @@ program
 
       spinner.succeed(chalk.green('Agent artifacts exported'));
       console.log(`  Folder: ${chalk.dim(outputDir)}`);
-      console.log(chalk.dim('  Note: `npx mnemos .` writes project.dna.json to .mnemos/ directly.'));
+      console.log(chalk.dim('  Note: `npx mnestis .` writes project.dna.json to .mentis/ directly.'));
     } catch (err) {
       spinner.fail(chalk.red('Export failed'));
       console.error(err);
@@ -2102,16 +2140,16 @@ program
     if (options.workspace || existsSync(workspaceFile)) {
       console.log(chalk.dim(`Workspace mode: ${workspaceFile}`));
     } else {
-      console.log(chalk.dim(`Serving memory from: ${path.join(root, '.mnemos')}`));
+      console.log(chalk.dim(`Serving memory from: ${path.join(root, '.mentis')}`));
     }
     printDashboardPreviewNote();
     console.log(chalk.dim(`  Stable surfaces: Mnestis report --open · mnemos pack · mnemos serve`));
 
     const env: Record<string, string> = { ...process.env as Record<string, string> };
     if (options.workspace || existsSync(workspaceFile)) {
-      env.MNEMOS_WORKSPACE = workspaceFile;
+      env.mentis_WORKSPACE = workspaceFile;
     } else {
-      env.MNEMOS_ROOT = root;
+      env.mentis_ROOT = root;
     }
 
     const child = spawn('npx', ['vite', '--port', options.port, '--host'], {
@@ -2132,7 +2170,7 @@ async function runDefaultExperience(
   options: { open?: boolean; verbose?: boolean; platform?: string; force?: boolean },
 ): Promise<void> {
   const root = path.resolve(targetPath);
-  const outputDir = path.join(root, '.mnemos');
+  const outputDir = path.join(root, '.mentis');
 
   printMnemosBanner('Analyze · report · AI Pack v1');
 
@@ -2214,7 +2252,7 @@ async function runDefaultExperience(
 program
   .command('sync [path]')
   .description('Keep the knowledge graph in sync on file changes (codegraph-style)')
-  .option('-o, --output <dir>', 'Output directory', '.mnemos')
+  .option('-o, --output <dir>', 'Output directory', '.mentis')
   .option('-v, --verbose', 'Show detailed progress')
   .option('--no-incremental', 'Force full rebuild on each change')
   .action(async (targetPath = '.', options) => {
@@ -2300,7 +2338,7 @@ program
 
     const outPath =
       options.output ??
-      path.join(process.cwd(), '.mnemos', 'wrap-last.txt');
+      path.join(process.cwd(), '.mentis', 'wrap-last.txt');
     await mkdir(path.dirname(outPath), { recursive: true });
     await writeFile(outPath, text, 'utf-8');
     printSuccessLine(`Compressed output → ${outPath}`);
@@ -2373,4 +2411,24 @@ program
     await runDefaultExperience(targetPath, options);
   });
 
-program.parseAsync();
+program
+  .command('star')
+  .description('Open the GitHub repo in your browser')
+  .action(async () => {
+    await openStarRepo();
+  });
+
+program
+  .command('stats')
+  .description('Show local CLI usage stats')
+  .action(async () => {
+    await printLocalStats();
+  });
+
+void (async () => {
+  await maybeFirstRunNudge();
+  await program.parseAsync();
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

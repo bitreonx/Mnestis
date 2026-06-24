@@ -79,7 +79,7 @@ export function buildTrustManifest(manifest?: EngineManifest | null): TrustManif
     {
       id: 'benchmark-scope',
       limitation: 'Benchmarks cover Express and NestJS fixtures only — not proof for all codebases',
-      mitigation: 'Run mnemos build on your repo; use mnemos doctor and trust manifest',
+      mitigation: 'Run mnestis build on your repo; use mnestis doctor and trust manifest',
     },
     {
       id: 'dashboard-preview',

@@ -1,7 +1,7 @@
 {
   "name": "mnestis",
   "version": "0.3.2",
-  "description": "Mnestis — the memory layer for software. One command, instant codebase intelligence.",
+  "description": "Mnestis — persistent memory for AI agents. Hybrid graph+vector recall, token-budget packing, local-first MCP.",
   "type": "module",
   "bin": {
     "mnestis": "bin/mnestis.cjs",
@@ -17,6 +17,9 @@
   ],
   "keywords": [
     "mnestis",
+    "mnemos",
+    "persistent-memory",
+    "ai-agents",
     "codebase-memory",
     "ai-coding",
     "architecture-intelligence",
@@ -25,11 +28,9 @@
     "codex",
     "local-first",
     "dependency-graph",
-    "ai-pack",
-    "repository-dna",
-    "developer-tools",
+    "hybrid-recall",
+    "token-packing",
     "graphify-alternative",
-    "codebase-analysis",
     "mcp-server"
   ],
   "repository": {

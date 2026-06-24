@@ -1,0 +1,23 @@
+[
+  {
+    "id": "service:app",
+    "name": "app",
+    "path": "app",
+    "exports": [],
+    "dependencies": [],
+    "dependents": [
+      "app"
+    ]
+  },
+  {
+    "id": "service:src",
+    "name": "src",
+    "path": "src",
+    "domain": "Source",
+    "exports": [],
+    "dependencies": [],
+    "dependents": [
+      "src"
+    ]
+  }
+]

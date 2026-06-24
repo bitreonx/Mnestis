@@ -1,0 +1,43 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "kind": "dna",
+  "name": "repository.dna",
+  "filename": "repository-dna.memory.json",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "repository": "sample-app",
+  "data": {
+    "repository": "sample-app",
+    "builtAt": "2026-06-24T11:40:03.432Z",
+    "architecture": {
+      "name": "sample-app",
+      "type": "Single Package",
+      "layers": [
+        "Feature Modules"
+      ],
+      "packages": [],
+      "languages": {
+        "typescript": 3
+      },
+      "summary": "Single Package with 3 source files across typescript. 0 packages detected. 2 execution flows; core domains: Source, Pickup."
+    },
+    "stats": {
+      "filesScanned": 3,
+      "nodesCreated": 15,
+      "edgesCreated": 15,
+      "domainsFound": 2,
+      "flowsFound": 2,
+      "durationMs": 132
+    },
+    "domainCount": 2,
+    "flowCount": 2,
+    "apiCount": 1,
+    "serviceCount": 2,
+    "journeyCount": 1,
+    "capabilityCount": 1,
+    "criticalPathCount": 1,
+    "smellCount": 0,
+    "smells": []
+  },
+  "estimatedTokens": 221,
+  "bytes": 777
+}

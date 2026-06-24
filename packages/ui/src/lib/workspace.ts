@@ -107,7 +107,7 @@ export async function triggerBuild(repoId: string): Promise<{ ok: boolean; messa
 export async function fetchBuildHistory(repoId: string): Promise<BuildHistoryEntry[]> {
   if (repoId === 'local') {
     try {
-      const res = await fetch('/.mnemos/build-history.json');
+      const res = await fetch('/.mentis/build-history.json');
       if (!res.ok) return [];
       const data = (await res.json()) as BuildHistoryEntry[] | { history: BuildHistoryEntry[] };
       return Array.isArray(data) ? data : data.history ?? [];
@@ -148,7 +148,7 @@ export async function fetchRepoMemory(repoId: string): Promise<{
   suggestedPrompts: string[];
   searchIndex: Record<string, unknown> | null;
 }> {
-  const base = repoId === 'local' ? '/.mnemos' : `/.mnemos/${repoId}`;
+  const base = repoId === 'local' ? '/.mentis' : `/.mentis/${repoId}`;
   const [memRes, graphRes, healthRes, heatRes, dnaRes, promptsRes, searchRes] = await Promise.all([
     fetch(`${base}/memory.json`),
     fetch(`${base}/graph.json`),
@@ -175,7 +175,7 @@ export async function fetchRepoMemory(repoId: string): Promise<{
 
 export async function fetchContextDoc(repoId: string, doc: string): Promise<string | null> {
   try {
-    const base = repoId === 'local' ? '/.mnemos/context' : `/.mnemos/${repoId}/context`;
+    const base = repoId === 'local' ? '/.mentis/context' : `/.mentis/${repoId}/context`;
     const res = await fetch(`${base}/${doc}`);
     if (!res.ok) return null;
     return res.text();

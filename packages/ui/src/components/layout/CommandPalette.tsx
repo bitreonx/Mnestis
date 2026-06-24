@@ -63,7 +63,7 @@ export function CommandPalette({
         { id: 'view-code', label: 'Open Code Map', group: 'Repo Views', run: () => onNavigate('code') },
         { id: 'view-history', label: 'Open History', group: 'Repo Views', run: () => onNavigate('history') },
         { id: 'view-ai', label: 'Open AI Copilot', group: 'Repo Views', run: () => onNavigate('ai') },
-        { id: 'build', label: 'Run Mnemos Build', group: 'Actions', run: () => onBuild(activeRepoId) },
+        { id: 'build', label: 'Run mnestis build', group: 'Actions', run: () => onBuild(activeRepoId) },
       );
     }
 

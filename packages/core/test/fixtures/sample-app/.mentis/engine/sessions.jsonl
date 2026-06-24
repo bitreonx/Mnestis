@@ -1,0 +1,15 @@
+{"id":"evt:1782184862863:cb3573","sessionId":"session:1782184862862:d199a128","type":"session_start","timestamp":"2026-06-23T03:21:02.864Z","payload":{}}
+{"id":"evt:1782184862865:80eea4","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-23T03:21:02.865Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782184862874:f60d34","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-23T03:21:02.874Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}
+{"id":"evt:1782184889285:340582","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-23T03:21:29.285Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782184889295:958de0","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-23T03:21:29.295Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}
+{"id":"evt:1782299420424:74980c","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-24T11:10:20.426Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782299420446:a5e19b","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-24T11:10:20.446Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}
+{"id":"evt:1782299457716:01df72","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-24T11:10:57.717Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782299457731:de8260","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-24T11:10:57.731Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}
+{"id":"evt:1782299485440:62637c","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-24T11:11:25.442Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782299485475:c5a1cd","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-24T11:11:25.475Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}
+{"id":"evt:1782300279234:f70d4c","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-24T11:24:39.235Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782300279256:80ff17","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-24T11:24:39.256Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}
+{"id":"evt:1782301203619:f26448","sessionId":"session:1782184862862:d199a128","type":"query","timestamp":"2026-06-24T11:40:03.619Z","payload":{"text":"authentication login","limit":5}}
+{"id":"evt:1782301203631:3598ca","sessionId":"session:1782184862862:d199a128","type":"remember","timestamp":"2026-06-24T11:40:03.631Z","payload":{"content":"Test episodic note","tags":["test"],"redactionHits":[]}}

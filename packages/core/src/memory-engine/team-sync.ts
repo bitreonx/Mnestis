@@ -1,6 +1,6 @@
 /**
  * M6 — Encrypted team sync bundle (local file transfer, no cloud).
- * Export/import .mnemos/engine via AES-256-GCM + scrypt passphrase.
+ * Export/import .mentis/engine via AES-256-GCM + scrypt passphrase.
  */
 
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'node:crypto';
@@ -8,8 +8,10 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { gzipSync, gunzipSync } from 'node:zlib';
 
-export const SYNC_BUNDLE_MAGIC = 'MNEMOS-SYNC-v1';
-export const SYNC_BUNDLE_EXT = '.mnemos-sync';
+export const SYNC_BUNDLE_MAGIC = 'MNESTIS-SYNC-v1';
+/** @deprecated Legacy bundle header — still accepted on import */
+export const LEGACY_SYNC_BUNDLE_MAGIC = 'MNEMOS-SYNC-v1';
+export const SYNC_BUNDLE_EXT = '.mentis-sync';
 
 export interface SyncBundleManifest {
   magic: typeof SYNC_BUNDLE_MAGIC;
@@ -123,10 +125,16 @@ export async function exportEncryptedBundle(opts: ExportSyncOptions): Promise<Sy
 export async function importEncryptedBundle(opts: ImportSyncOptions): Promise<SyncBundleManifest> {
   const raw = await readFile(opts.bundlePath);
   const header = SYNC_BUNDLE_MAGIC + '\n';
-  if (!raw.subarray(0, header.length).equals(Buffer.from(header))) {
-    throw new Error('Invalid Mnemos sync bundle');
+  const legacyHeader = LEGACY_SYNC_BUNDLE_MAGIC + '\n';
+  const headerLen = raw.subarray(0, header.length).equals(Buffer.from(header))
+    ? header.length
+    : raw.subarray(0, legacyHeader.length).equals(Buffer.from(legacyHeader))
+      ? legacyHeader.length
+      : 0;
+  if (!headerLen) {
+    throw new Error('Invalid Mnestis sync bundle');
   }
-  const decrypted = decryptPayload(raw.subarray(header.length), opts.password);
+  const decrypted = decryptPayload(raw.subarray(headerLen), opts.password);
   const { manifest, files } = JSON.parse(gunzipSync(decrypted).toString('utf-8')) as {
     manifest: SyncBundleManifest;
     files: Record<string, string>;

@@ -15,7 +15,10 @@ import { buildDomainGraphMermaid } from './graph/mermaid.js';
 import { buildAgentDisciplineRules, buildDisciplineSkillSection } from './discipline/agent-discipline.js';
 
 /** Memory directory written by `mnestis build` / `mnestis .` */
-export const MNESTIS_MEMORY_DIR = '.mnemos';
+export const MNESTIS_MEMORY_DIR = '.mentis';
+
+/** Legacy directory name — auto-migrated to `.mentis` on load/build. */
+export const LEGACY_MEMORY_DIR = '.mnemos';
 
 /** Ultra-short rule — highest signal for Cursor alwaysApply stack. */
 export function buildMandatoryCursorRule(): string {

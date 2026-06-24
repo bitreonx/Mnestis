@@ -10,7 +10,7 @@ const STEPS = [
   {
     title: 'Drop DNA into your AI',
     desc: 'Point Claude, Cursor, or Codex at the compressed memory — not the whole repo.',
-    files: ['.mnemos/project.dna.json', '.mnemos/agent_context.json'],
+    files: ['.mentis/project.dna.json', '.mentis/agent_context.json'],
   },
   {
     title: 'Install Cursor rules',
@@ -51,7 +51,7 @@ export function AISetupView({ memory }: AISetupViewProps) {
     }
   }
 
-  const dnaRef = `@.mnemos/project.dna.json @.mnemos/agent_context.json
+  const dnaRef = `@.mentis/project.dna.json @.mentis/agent_context.json
 
 I'm working on ${memory.repository} (${memory.architecture.type}).
 Before suggesting code, read the Mnemos DNA files above.

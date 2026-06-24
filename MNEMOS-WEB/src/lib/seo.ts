@@ -32,6 +32,12 @@ export const PAGES: Record<string, PageSeo> = {
       "Official Mnestis docs: install with npx mnestis, launch Cursor/Claude steering, MCP server, AI Pack v1, Fable discipline, and memory engine.",
     path: "/docs",
   },
+  achievements: {
+    title: "Mnestis Achievements — Shipped features & benchmarks",
+    description:
+      "Timeline of Mnestis memory layer releases: hybrid recall, token packing, CLI milestones. Reproducible benchmarks. Formerly Mnemos.",
+    path: "/achievements",
+  },
 };
 
 export function pageUrl(path = "/"): string {

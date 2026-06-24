@@ -81,8 +81,8 @@ function identifyGaps(query: string, hits: HybridQueryHit[]): string[] {
   const gaps: string[] = [];
   if (!hits.length) {
     gaps.push('No episodic or structural memory matched this query.');
-    gaps.push('Try importing past sessions: mnemos memory chronoshift <path>');
-    gaps.push('Or store a fact: mnemos memory remember "..."');
+    gaps.push('Try importing past sessions: Mnestis memory chronoshift <path>');
+    gaps.push('Or store a fact: Mnestis memory remember "..."');
     return gaps;
   }
 

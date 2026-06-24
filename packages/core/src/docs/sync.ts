@@ -8,7 +8,7 @@ export interface SyncDocsResult {
   root: string;
 }
 
-/** Write static repo docs from Mnemos generators (docs/LANGUAGES.md, docs/GRAPHS.md, docs/architecture.md). */
+/** Write static repo docs from Mnestis generators (docs/LANGUAGES.md, docs/GRAPHS.md, docs/architecture.md). */
 export async function syncMnemosDocs(repoRoot: string): Promise<SyncDocsResult> {
   const docsDir = path.join(repoRoot, 'docs');
   await mkdir(docsDir, { recursive: true });

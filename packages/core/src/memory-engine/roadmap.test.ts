@@ -39,7 +39,7 @@ describe('team sync M6', () => {
     await writeFile(path.join(engineDir, 'manifest.json'), JSON.stringify({ documentCount: 1 }), 'utf-8');
     await writeFile(path.join(engineDir, 'episodes.jsonl'), '{"id":"e1"}\n', 'utf-8');
 
-    const bundlePath = path.join(tmp, 'test.mnemos-sync');
+    const bundlePath = path.join(tmp, 'test.mentis-sync');
     const password = 'test-passphrase-local';
 
     const exported = await exportEncryptedBundle({
@@ -48,7 +48,7 @@ describe('team sync M6', () => {
       password,
       outPath: bundlePath,
     });
-    assert.equal(exported.magic, 'MNEMOS-SYNC-v1');
+    assert.equal(exported.magic, 'MNESTIS-SYNC-v1');
 
     const importDir = path.join(tmp, 'imported');
     const imported = await importEncryptedBundle({

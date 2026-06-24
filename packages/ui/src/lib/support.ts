@@ -1,6 +1,6 @@
 export const GITHUB_REPO = 'https://github.com/bitreonx/mnemos'
 export const GITHUB_ISSUES = 'https://github.com/bitreonx/mnemos/issues'
-export const MNEMOS_REPORT_PATH = '/.mnemos/report/index.html'
+export const MNEMOS_REPORT_PATH = '/.mentis/report/index.html'
 
 export const reportIssueUrl = (params?: {
   title?: string
@@ -32,6 +32,6 @@ export const reportUiBugUrl = (detail?: string) =>
       `- User agent: ${typeof navigator !== 'undefined' ? navigator.userAgent : ''}`,
       '',
       '## Mnemos output',
-      'Paste relevant `.mnemos/` errors or CLI output if applicable.',
+      'Paste relevant `.mentis/` errors or CLI output if applicable.',
     ].join('\n'),
   })

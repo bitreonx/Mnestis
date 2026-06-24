@@ -8,11 +8,11 @@ alwaysApply: true
 
 Before reading source files or making changes, load repository context from Mnemos:
 
-1. **Read first:** `.mnemos/project.dna.json` and `.mnemos/agent_context.json`
+1. **Read first:** `.mentis/project.dna.json` and `.mentis/agent_context.json`
 2. **Architecture:** Single Package — Single Package with 3 source files across typescript. 0 packages detected. 2 execution flows; core domains: Pickup.
 3. **Capabilities:** Authentication & Identity
 4. **Domains:** Pickup
-5. **Key files:** .mnemos/project.dna.json, .mnemos/agent_context.json, .mnemos/context/architecture.md, .mnemos/context/flows.md, file:app/login/page.tsx, function:app/login/page.tsx:3
+5. **Key files:** .mentis/project.dna.json, .mentis/agent_context.json, .mentis/context/architecture.md, .mentis/context/flows.md, file:app/login/page.tsx, function:app/login/page.tsx:3
 
 ## Rules for AI-assisted coding
 

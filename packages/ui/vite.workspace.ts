@@ -67,7 +67,7 @@ async function readJsonSafe<T>(filePath: string): Promise<T | null> {
 }
 
 async function repoSnapshot(repo: WorkspaceRepo): Promise<Record<string, unknown>> {
-  const mnemosDir = path.join(repo.path, '.mnemos');
+  const mnemosDir = path.join(repo.path, '.mentis');
   const memory = await readJsonSafe<{
     builtAt: string;
     stats: Record<string, number>;
@@ -116,7 +116,7 @@ async function repoSnapshot(repo: WorkspaceRepo): Promise<Record<string, unknown
 }
 
 async function appendBuildHistory(repo: WorkspaceRepo): Promise<void> {
-  const mnemosDir = path.join(repo.path, '.mnemos');
+  const mnemosDir = path.join(repo.path, '.mentis');
   const memory = await readJsonSafe<{ builtAt: string; stats: Record<string, number>; smells?: unknown[]; capabilities?: unknown[] }>(
     path.join(mnemosDir, 'memory.json'),
   );
@@ -222,7 +222,7 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
           }
           const repo = config.repos.find((r) => r.id === jsonMatch[1]);
           if (!repo) return json(res, { error: 'Unknown repo' }, 404);
-          const mnemosDir = path.join(repo.path, '.mnemos');
+          const mnemosDir = path.join(repo.path, '.mentis');
           return serveAiPackJson(res, mnemosDir, repo.id, repo.path, req.url);
         }
 
@@ -291,7 +291,7 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
           }
           const repo = config.repos.find((r) => r.id === historyMatch[1]);
           if (!repo) return json(res, { error: 'Unknown repo' }, 404);
-          const historyPath = path.join(repo.path, '.mnemos', 'build-history.json');
+          const historyPath = path.join(repo.path, '.mentis', 'build-history.json');
           let history = (await readJsonSafe<BuildHistoryEntry[]>(historyPath)) ?? [];
           if (history.length === 0) {
             const snap = await repoSnapshot(repo);
@@ -378,7 +378,7 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
           }
         }
 
-        const contextMatch = req.url.match(/^\/\.mnemos\/([^/]+)\/context\/(.+)$/);
+        const contextMatch = req.url.match(/^\/\.mentis\/([^/]+)\/context\/(.+)$/);
         if (contextMatch) {
           if (!config) {
             try {
@@ -394,7 +394,7 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
             res.end('Repo not found');
             return;
           }
-          const filePath = path.join(repo.path, '.mnemos', 'context', file);
+          const filePath = path.join(repo.path, '.mentis', 'context', file);
           if (!existsSync(filePath)) {
             res.statusCode = 404;
             res.end('Not found');
@@ -412,7 +412,7 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
           return;
         }
 
-        const multiMatch = req.url.match(/^\/\.mnemos\/([^/]+)\/(.+)$/);
+        const multiMatch = req.url.match(/^\/\.mentis\/([^/]+)\/(.+)$/);
         if (multiMatch) {
           if (!config) {
             try {
@@ -428,7 +428,7 @@ export function workspacePlugin(workspaceFile: string, cliPath: string): Plugin 
             res.end('Repo not found');
             return;
           }
-          const filePath = path.join(repo.path, '.mnemos', file);
+          const filePath = path.join(repo.path, '.mentis', file);
           if (!existsSync(filePath)) {
             res.statusCode = 404;
             res.end('Not found');
@@ -458,7 +458,7 @@ export function resolveCliPath(): string {
 }
 
 export function resolveWorkspaceFile(): string | undefined {
-  const env = process.env.MNEMOS_WORKSPACE;
+  const env = process.env.mentis_WORKSPACE;
   if (env && existsSync(env)) return path.resolve(env);
   const here = path.dirname(fileURLToPath(import.meta.url));
   // Resolution order: your own workspace, then a legacy/local file, then the

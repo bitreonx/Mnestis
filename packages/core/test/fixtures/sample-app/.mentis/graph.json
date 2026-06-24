@@ -1,0 +1,287 @@
+{
+  "nodes": [
+    {
+      "id": "repository:F:\\mnemos\\packages\\core\\test\\fixtures\\sample-app",
+      "kind": "repository",
+      "name": "sample-app",
+      "path": "F:\\mnemos\\packages\\core\\test\\fixtures\\sample-app"
+    },
+    {
+      "id": "file:app/login/page.tsx",
+      "kind": "file",
+      "name": "app/login/page.tsx",
+      "path": "app/login/page.tsx",
+      "language": "typescript",
+      "metadata": {
+        "isTest": false,
+        "isRoute": true,
+        "hasUseServer": false,
+        "isEntryPoint": false
+      }
+    },
+    {
+      "id": "service:app",
+      "kind": "service",
+      "name": "app",
+      "path": "app",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "function:app/login/page.tsx:3",
+      "kind": "function",
+      "name": "LoginPage",
+      "path": "app/login/page.tsx:3",
+      "metadata": {
+        "exported": true,
+        "lines": [
+          3,
+          3
+        ]
+      }
+    },
+    {
+      "id": "route:app/login/page.tsx:1",
+      "kind": "route",
+      "name": "/login",
+      "path": "app/login/page.tsx:1",
+      "metadata": {
+        "exported": true,
+        "lines": [
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "api:app/login/page.tsx",
+      "kind": "api",
+      "name": "/login",
+      "path": "app/login/page.tsx",
+      "metadata": {
+        "routePath": "/login"
+      }
+    },
+    {
+      "id": "file:src/auth/service.ts",
+      "kind": "file",
+      "name": "src/auth/service.ts",
+      "path": "src/auth/service.ts",
+      "language": "typescript",
+      "metadata": {
+        "isTest": false,
+        "isRoute": false,
+        "hasUseServer": false,
+        "domainHint": "Source",
+        "isEntryPoint": false
+      }
+    },
+    {
+      "id": "service:src",
+      "kind": "service",
+      "name": "src",
+      "path": "src",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "domain:Source",
+      "kind": "domain",
+      "name": "Source",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "function:src/auth/service.ts:2",
+      "kind": "function",
+      "name": "authenticate",
+      "path": "src/auth/service.ts:2",
+      "metadata": {
+        "exported": true,
+        "lines": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "id": "class:src/auth/service.ts:6",
+      "kind": "class",
+      "name": "UserService",
+      "path": "src/auth/service.ts:6",
+      "metadata": {
+        "exported": true,
+        "lines": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "id": "function:src/auth/service.ts:7",
+      "kind": "function",
+      "name": "login",
+      "path": "src/auth/service.ts:7",
+      "metadata": {
+        "exported": false,
+        "lines": [
+          7,
+          7
+        ]
+      }
+    },
+    {
+      "id": "file:src/features/pickup/validate.ts",
+      "kind": "file",
+      "name": "src/features/pickup/validate.ts",
+      "path": "src/features/pickup/validate.ts",
+      "language": "typescript",
+      "metadata": {
+        "isTest": false,
+        "isRoute": false,
+        "hasUseServer": false,
+        "domainHint": "Pickup",
+        "isEntryPoint": false
+      }
+    },
+    {
+      "id": "domain:Pickup",
+      "kind": "domain",
+      "name": "Pickup",
+      "metadata": {
+        "inferred": true
+      }
+    },
+    {
+      "id": "function:src/features/pickup/validate.ts:1",
+      "kind": "function",
+      "name": "validatePickup",
+      "path": "src/features/pickup/validate.ts:1",
+      "metadata": {
+        "exported": true,
+        "lines": [
+          1,
+          1
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "service:app->file:app/login/page.tsx:OWNS",
+      "source": "service:app",
+      "target": "file:app/login/page.tsx",
+      "kind": "OWNS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:app/login/page.tsx->function:app/login/page.tsx:3:CONTAINS",
+      "source": "file:app/login/page.tsx",
+      "target": "function:app/login/page.tsx:3",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:app/login/page.tsx->route:app/login/page.tsx:1:CONTAINS",
+      "source": "file:app/login/page.tsx",
+      "target": "route:app/login/page.tsx:1",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "api:app/login/page.tsx->route:app/login/page.tsx:1:EXPOSES",
+      "source": "api:app/login/page.tsx",
+      "target": "route:app/login/page.tsx:1",
+      "kind": "EXPOSES",
+      "confidence": 0.93
+    },
+    {
+      "id": "file:app/login/page.tsx->api:app/login/page.tsx:EXPOSES",
+      "source": "file:app/login/page.tsx",
+      "target": "api:app/login/page.tsx",
+      "kind": "EXPOSES",
+      "confidence": 0.93
+    },
+    {
+      "id": "service:src->file:src/auth/service.ts:OWNS",
+      "source": "service:src",
+      "target": "file:src/auth/service.ts",
+      "kind": "OWNS",
+      "confidence": 0.9
+    },
+    {
+      "id": "domain:Source->file:src/auth/service.ts:CONTAINS",
+      "source": "domain:Source",
+      "target": "file:src/auth/service.ts",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:src/auth/service.ts->function:src/auth/service.ts:2:CONTAINS",
+      "source": "file:src/auth/service.ts",
+      "target": "function:src/auth/service.ts:2",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:src/auth/service.ts->class:src/auth/service.ts:6:CONTAINS",
+      "source": "file:src/auth/service.ts",
+      "target": "class:src/auth/service.ts:6",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:src/auth/service.ts->function:src/auth/service.ts:7:CONTAINS",
+      "source": "file:src/auth/service.ts",
+      "target": "function:src/auth/service.ts:7",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "service:src->file:src/features/pickup/validate.ts:OWNS",
+      "source": "service:src",
+      "target": "file:src/features/pickup/validate.ts",
+      "kind": "OWNS",
+      "confidence": 0.9
+    },
+    {
+      "id": "domain:Pickup->file:src/features/pickup/validate.ts:CONTAINS",
+      "source": "domain:Pickup",
+      "target": "file:src/features/pickup/validate.ts",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:src/features/pickup/validate.ts->function:src/features/pickup/validate.ts:1:CONTAINS",
+      "source": "file:src/features/pickup/validate.ts",
+      "target": "function:src/features/pickup/validate.ts:1",
+      "kind": "CONTAINS",
+      "confidence": 0.9
+    },
+    {
+      "id": "file:app/login/page.tsx->function:src/auth/service.ts:7:CALLS",
+      "source": "file:app/login/page.tsx",
+      "target": "function:src/auth/service.ts:7",
+      "kind": "CALLS",
+      "metadata": {
+        "line": 5,
+        "resolved": true
+      },
+      "confidence": 0.88
+    },
+    {
+      "id": "file:src/auth/service.ts->function:src/auth/service.ts:2:CALLS",
+      "source": "file:src/auth/service.ts",
+      "target": "function:src/auth/service.ts:2",
+      "kind": "CALLS",
+      "metadata": {
+        "line": 8,
+        "resolved": true
+      },
+      "confidence": 0.88
+    }
+  ]
+}

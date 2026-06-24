@@ -1,0 +1,52 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "kind": "journey",
+  "name": "Sign-In",
+  "filename": "sign-in.memory.json",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "repository": "sample-app",
+  "data": {
+    "id": "journey:login",
+    "name": "Sign-In",
+    "purpose": "User authenticates and receives a session.",
+    "actors": [
+      "End user",
+      "Auth provider"
+    ],
+    "outcomes": [
+      "Authenticated session established"
+    ],
+    "entryPoint": "app/login/page.tsx",
+    "entryRoute": "/login",
+    "confidence": 0.99,
+    "steps": [
+      {
+        "name": "app/login/page.tsx",
+        "kind": "file",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "name": "LoginPage",
+        "kind": "function",
+        "path": "app/login/page.tsx:3"
+      },
+      {
+        "name": "/login",
+        "kind": "route",
+        "path": "app/login/page.tsx:1"
+      },
+      {
+        "name": "/login",
+        "kind": "api",
+        "path": "app/login/page.tsx"
+      },
+      {
+        "name": "login",
+        "kind": "function",
+        "path": "src/auth/service.ts:7"
+      }
+    ]
+  },
+  "estimatedTokens": 260,
+  "bytes": 770
+}

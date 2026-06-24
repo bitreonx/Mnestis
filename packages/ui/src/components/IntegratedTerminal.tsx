@@ -548,7 +548,7 @@ export function IntegratedTerminal({ repoId, repositoryPath, outputFilter = '', 
 /**
  * Run a command against the live dev server (`/api/terminal`). When that backend
  * isn't present — e.g. the static Vercel deploy — fall back to read-only handlers
- * that serve prebuilt context from the bundled `/.mnemos/` JSON instead of erroring.
+ * that serve prebuilt context from the bundled `/.mentis/` JSON instead of erroring.
  */
 async function runWithFallback(repoId: string, toRun: string): Promise<{ ok: boolean; output: string }> {
   try {
@@ -570,7 +570,7 @@ async function runWithFallback(repoId: string, toRun: string): Promise<{ ok: boo
 }
 
 function mnemosBase(repoId: string): string {
-  return repoId === 'local' ? '/.mnemos' : `/.mnemos/${repoId}`;
+  return repoId === 'local' ? '/.mentis' : `/.mentis/${repoId}`;
 }
 
 async function runOffline(repoId: string, toRun: string): Promise<{ ok: boolean; output: string }> {
@@ -624,9 +624,9 @@ async function runOffline(repoId: string, toRun: string): Promise<{ ok: boolean;
       'Read-only here: dna · pack · score · explain (served from the bundled snapshot).',
       'For the full interactive terminal, run it locally:',
       '',
-      '  npx mnemos .          # analyze your repo',
-      '  npx mnemos ui         # this dashboard, fully live',
-      '  npx mnemos serve      # memory API for agents',
+      '  npx mnestis .          # analyze your repo',
+      '  npx mnestis ui         # this dashboard, fully live',
+      '  npx mnestis serve      # memory API for agents',
     ].join('\n'),
   };
 }

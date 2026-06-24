@@ -1,0 +1,19 @@
+{
+  "name": "Mnestis — Give AI a memory of your codebase",
+  "short_name": "Mnestis",
+  "description": "Local-first codebase memory and architecture intelligence for Cursor, Claude Code, and Codex.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060509",
+  "theme_color": "#863bff",
+  "lang": "en",
+  "categories": ["developer", "productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

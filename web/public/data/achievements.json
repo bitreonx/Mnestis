@@ -1,0 +1,51 @@
+[
+  {
+    "date": "2026-06-24",
+    "title": "Hybrid recall API shipped",
+    "type": "feat",
+    "detail": "hybridRecall: vector cosine + BM25 RRF + graph BFS expansion with dedup",
+    "metric": "<5ms hash-embed latency"
+  },
+  {
+    "date": "2026-06-24",
+    "title": "Token knapsack pack()",
+    "type": "feat",
+    "detail": "Greedy relevance/token packing — CLI prints savings on memory context",
+    "metric": "up to 78% token savings per pack"
+  },
+  {
+    "date": "2026-06-24",
+    "title": "decayScore + summarizeCold",
+    "type": "feat",
+    "detail": "Recency×frequency×relevance scoring; extractive cold compression",
+    "metric": "~60% reduction on stale episodic memories"
+  },
+  {
+    "date": "2026-06-24",
+    "title": "Framework adapters",
+    "type": "feat",
+    "detail": "LangChain, Vercel AI SDK, OpenAI Agents thin wrappers (zero extra deps)",
+    "metric": "3 adapters"
+  },
+  {
+    "date": "2026-06-24",
+    "title": "Competitor teardown complete",
+    "type": "growth",
+    "detail": "ponytail + graphify + codebase-memory-mcp research docs",
+    "metric": "2 teardown files"
+  },
+  {
+    "date": "2026-06-24",
+    "title": "CLI marketing nudges",
+    "type": "growth",
+    "detail": "first-run, star command, recall/pack milestones, --no-nudge opt-out",
+    "metric": "max 1 nudge/session"
+  },
+  {
+    "date": "2026-06-24",
+    "title": "Obsidian vault export",
+    "type": "feat",
+    "detail": "mnestis export vault → .mentis/vault/ with wikilinks for domains and flows",
+    "metric": "Open in Obsidian or query via MCP"
+  },
+]

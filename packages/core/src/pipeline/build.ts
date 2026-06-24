@@ -3,6 +3,8 @@ import path from 'node:path';
 import { readFile, stat } from 'node:fs/promises';
 
 import type { BuildOptions, BuildResult, MemoryModel, ParsedFile } from '../types.js';
+import { MNESTIS_MEMORY_DIR } from '../ai-toolkit.js';
+import { resolveMemoryDir } from '../mentis-path.js';
 
 import { scanRepository } from '../scanner/index.js';
 
@@ -73,7 +75,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 
   const root = path.resolve(options.root);
 
-  const outputDir = options.outputDir ?? path.join(root, '.mnemos');
+  const outputDir = options.outputDir ?? path.join(root, MNESTIS_MEMORY_DIR);
 
   const incremental = options.incremental !== false;
 
@@ -503,7 +505,7 @@ function enrichArchitectureSummary(memory: MemoryModel): void {
 
 export async function loadMemoryModel(root: string): Promise<{ memory: MemoryModel; outputDir: string } | null> {
 
-  const outputDir = path.join(path.resolve(root), '.mnemos');
+  const outputDir = await resolveMemoryDir(path.resolve(root));
 
   try {
 

@@ -210,7 +210,7 @@ export function formatDnaReport(dna: DnaReport): string {
   }
 
   lines.push('━'.repeat(72));
-  lines.push(`  Drag .mnemos/project.dna.json into Claude, Cursor, or Codex.`);
+  lines.push(`  Drag .mentis/project.dna.json into Claude, Cursor, or Codex.`);
   lines.push('━'.repeat(72));
   lines.push('');
 

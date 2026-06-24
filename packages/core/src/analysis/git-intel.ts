@@ -52,7 +52,7 @@ export async function analyzeGitHotspots(
     const counts = new Map<string, number>();
     for (const line of log.split('\n')) {
       const file = line.trim().replace(/\\/g, '/');
-      if (!file || file.startsWith('.mnemos/')) continue;
+      if (!file || file.startsWith('.mentis/')) continue;
       counts.set(file, (counts.get(file) ?? 0) + 1);
     }
 

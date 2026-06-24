@@ -323,8 +323,8 @@ function renderTerminalBuildCard(
     <rect width="800" height="360" rx="24" fill="#0a0a0b"/>
     <rect x="1" y="1" width="798" height="358" rx="23" stroke="#27272a" stroke-width="2"/>
     <circle cx="28" cy="36" r="7" fill="#ef4444"/><circle cx="52" cy="36" r="7" fill="#f59e0b"/><circle cx="76" cy="36" r="7" fill="#22c55e"/>
-    <text x="400" y="40" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#71717a">mnemos build</text>
-    <text class="l" x="40" y="88" font-family="ui-monospace,monospace" font-size="15" fill="#a1a1aa">$ npx mnemos .</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#71717a">mnestis build</text>
+    <text class="l" x="40" y="88" font-family="ui-monospace,monospace" font-size="15" fill="#a1a1aa">$ npx mnestis .</text>
     <text class="l" x="40" y="124" font-family="ui-monospace,monospace" font-size="14" fill="#818cf8">→ ${memory.stats.filesScanned.toLocaleString()} files · ${memory.stats.nodesCreated.toLocaleString()} nodes</text>
     <text class="l" x="40" y="160" font-family="ui-monospace,monospace" font-size="14" fill="#22c55e">✓ ${memory.domains.length} domains · ${memory.flows.length} flows · ${(memory.capabilities ?? []).length} capabilities</text>
     <text class="l" x="40" y="196" font-family="ui-monospace,monospace" font-size="14" fill="#22c55e">✓ project.dna.json · agent_context.json · snapshots/</text>

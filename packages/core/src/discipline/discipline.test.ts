@@ -17,7 +17,7 @@ describe('agent discipline', () => {
     assert.match(rules, /Ground/)
     assert.match(rules, /Re-evaluate/)
     assert.match(rules, /Verify/)
-    assert.match(rules, /\.mnemos\/project\.dna\.json/)
+    assert.match(rules, /\.mentis\/project\.dna\.json/)
   })
 
   it('buildDisciplineCursorRule has alwaysApply frontmatter', () => {

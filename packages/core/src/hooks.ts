@@ -19,9 +19,9 @@ where mnemos >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
   where npx >nul 2>&1
   if %ERRORLEVEL% NEQ 0 exit /b 0
-  npx mnemos build >nul 2>&1
+  npx mnestis build >nul 2>&1
 ) else (
-  mnemos build >nul 2>&1
+  mnestis build >nul 2>&1
 )
 exit /b 0
 `;
@@ -30,9 +30,9 @@ exit /b 0
   return `#!/bin/sh
 ${HOOK_MARKER}
 if command -v mnemos >/dev/null 2>&1; then
-  mnemos build >/dev/null 2>&1
+  mnestis build >/dev/null 2>&1
 elif command -v npx >/dev/null 2>&1; then
-  npx mnemos build >/dev/null 2>&1
+  npx mnestis build >/dev/null 2>&1
 fi
 exit 0
 `;

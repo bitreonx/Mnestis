@@ -1,0 +1,12 @@
+{
+  "name": "sample-app",
+  "type": "Single Package",
+  "layers": [
+    "Feature Modules"
+  ],
+  "packages": [],
+  "languages": {
+    "typescript": 3
+  },
+  "summary": "Single Package with 3 source files across typescript. 0 packages detected. 2 execution flows; core domains: Source, Pickup."
+}

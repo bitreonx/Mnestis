@@ -1,0 +1,23 @@
+{
+  "$schema": "mnemos/shared-memory/constellation",
+  "kind": "capability",
+  "name": "Authentication & Identity",
+  "filename": "authentication-identity.memory.json",
+  "builtAt": "2026-06-24T11:40:03.595Z",
+  "repository": "sample-app",
+  "data": {
+    "id": "capability:authentication",
+    "name": "Authentication & Identity",
+    "purpose": "Manages user identity, sign-in, sign-up, sessions, and access control.",
+    "category": "identity",
+    "confidence": 0.27,
+    "services": [],
+    "apis": [
+      "API app/login/page.tsx",
+      "ROUTE /login"
+    ],
+    "domains": []
+  },
+  "estimatedTokens": 134,
+  "bytes": 481
+}

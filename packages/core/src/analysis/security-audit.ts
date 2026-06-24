@@ -74,7 +74,7 @@ export async function auditRepositorySecurity(root: string): Promise<SecurityAud
       advisories = parseNpmAudit(audit.stdout)
     }
     if (advisories.length > 0) {
-      recommendations.push('Run npm audit fix in the project root, then rebuild Mnemos memory.')
+      recommendations.push('Run npm audit fix in the project root, then rebuild Mnestis memory.')
     }
   } else {
     recommendations.push('No package.json — dependency audit skipped (non-Node repo).')

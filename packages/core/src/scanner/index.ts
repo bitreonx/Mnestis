@@ -16,7 +16,7 @@ const DEFAULT_IGNORE = [
   '**/build/**',
   '**/.next/**',
   '**/coverage/**',
-  '**/.mnemos/**',
+  '**/.mentis/**',
   '**/vendor/**',
   '**/.turbo/**',
   '**/.expo/**',

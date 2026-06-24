@@ -93,7 +93,7 @@ describe('memory-engine decay', () => {
 describe('memory-engine integration', () => {
   it('builds hybrid index on sample fixture', async () => {
     await build({ root: fixturesRoot, verbose: false, incremental: false });
-    const outputDir = path.join(fixturesRoot, '.mnemos');
+    const outputDir = path.join(fixturesRoot, '.mentis');
     assert.ok(await engineExists(outputDir));
     const engine = new MnemosMemoryEngine(fixturesRoot, outputDir);
     const result = await engine.query('authentication login', { limit: 5 });

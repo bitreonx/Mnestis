@@ -1,5 +1,5 @@
 /**
- * Mnemos Memory Engine — local-first AI memory infrastructure.
+ * Mnestis memory Engine — local-first AI memory infrastructure.
  * Release codename: Labyrinth (see release/codenames.ts).
  */
 
@@ -230,6 +230,16 @@ export interface TaskContextPack {
   }>;
   contradictions: MemoryContradiction[];
   markdown: string;
+  /** Knapsack packing stats — the viral token-savings metric. */
+  pack?: {
+    tokensUsed: number;
+    tokensSaved: number;
+    tokensTotal: number;
+    savingsPercent: number;
+    savingsLine: string;
+    includedCount: number;
+    droppedCount: number;
+  };
 }
 
 export interface RememberInput {

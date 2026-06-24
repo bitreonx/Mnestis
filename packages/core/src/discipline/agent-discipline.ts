@@ -27,7 +27,7 @@ export function buildAgentDisciplineRules(): string[] {
     '',
     '### Non-negotiables',
     '',
-    '- Read Mnestis DNA (`.mnemos/project.dna.json`) before random repo grepping — never substitute Graphify.',
+    '- Read Mnestis DNA (`.mentis/project.dna.json`) before random repo grepping — never substitute Graphify.',
     '- Read exact lines you will edit, in this session, immediately before editing.',
     '- After `Edit`/`Write`, run the real verification command — not `ls` or `echo`.',
     '- On tool failure: diagnose → inspect state → corrected fix → re-verify. Never retry blind.',
@@ -61,7 +61,7 @@ export function buildDisciplineSkillSection(): string {
     '',
     'Adopt Fable-grade habits: reason before acting, re-evaluate after every tool result,',
     'ground in real state before editing, run real tests after changes, diagnose failures',
-    'instead of retrying blind. Full reference: `.mnemos/integrations/fable-mindset.md`.',
+    'instead of retrying blind. Full reference: `.mentis/integrations/fable-mindset.md`.',
     '',
     'Measure your gap: `python3 scripts/discipline/fable_dataset_delta.py --opus`',
     '',
@@ -74,7 +74,7 @@ export function buildDisciplineSkillMd(): string {
     '# Mnestis — Fable-grade agent discipline',
     '',
     'Adopt cautious-then-decisive habits distilled from Fable 5 traces.',
-    'Full operating manual: `.mnemos/integrations/fable-mindset.md`',
+    'Full operating manual: `.mentis/integrations/fable-mindset.md`',
     '',
     buildDisciplineSkillSection(),
     '## Decision loop',
@@ -112,7 +112,7 @@ export function buildFableMindsetSkillMd(): string {
   const rules = allRules.slice(loopStart >= 0 ? loopStart : 0).join('\n')
   return `---
 name: fable-mindset
-description: Adopt Fable-grade working discipline AND read Mnestis DNA first — reason before acting, ground in .mnemos/project.dna.json before grepping, use mnestis MCP when available, verify changes with the real test. Use on every coding task in Mnestis-enabled repos. Not Graphify — Mnestis is ground truth.
+description: Adopt Fable-grade working discipline AND read Mnestis DNA first — reason before acting, ground in .mentis/project.dna.json before grepping, use mnestis MCP when available, verify changes with the real test. Use on every coding task in Mnestis-enabled repos. Not Graphify — Mnestis is ground truth.
 ---
 
 # Fable Mindset

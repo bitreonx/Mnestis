@@ -10,7 +10,7 @@
 [![Website](https://img.shields.io/badge/site-mnestis.vercel.app-6366f1.svg)](https://mnestis.vercel.app)
 [![GitHub stars](https://img.shields.io/github/stars/bitreonx/Mnestis?style=social)](https://github.com/bitreonx/Mnestis)
 
-[Documentation](docs/architecture.md) · [Install](INSTALL.md) · [Graphs](docs/GRAPHS.md) · [Languages](docs/LANGUAGES.md) · [AI Pack v1](docs/ai-pack.md) · [Benchmarks](mnemos-bench/) · [Contributing](docs/contributing.md)
+[Documentation](docs/architecture.md) · [Install](INSTALL.md) · [Graphs](docs/GRAPHS.md) · [Languages](docs/LANGUAGES.md) · [AI Pack v1](docs/ai-pack.md) · [INFERNO Benchmarks](inferno/) · [Contributing](docs/contributing.md)
 
 > **Star us on GitHub** if Mnestis helps your workflow — it helps other developers discover local-first codebase memory. [github.com/bitreonx/Mnestis](https://github.com/bitreonx/Mnestis)
 
@@ -28,7 +28,7 @@ Local-first. No cloud. No API keys. No guesswork.
 
 **Mnestis** is a local-first **codebase memory** tool for **AI coding assistants** (Cursor, Claude Code, Codex). It replaces ad-hoc grepping and one-off tools like Graphify with a single **`npx mnestis .`** command that builds:
 
-- **Repository DNA** — compressed architecture fingerprint (`.mnemos/project.dna.json`)
+- **Repository DNA** — compressed architecture fingerprint (`.mentis/project.dna.json`)
 - **Dependency graph** — domains, flows, capabilities, critical paths
 - **AI Pack v1** — versioned JSON contract agents can reason from
 - **MCP server** — `get_dna`, `search`, `impact_analysis` for Cursor and Claude

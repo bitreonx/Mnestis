@@ -103,7 +103,7 @@ export function JourneyMapView({ journeys, flows }: JourneyMapViewProps) {
 
         {displayJourneys.length === 0 && displayFlows.length === 0 && (
           <p className="text-sm text-[var(--color-text-muted)]">
-            No journeys detected. Run mnemos build to discover user journeys.
+            No journeys detected. Run mnestis build to discover user journeys.
           </p>
         )}
       </div>

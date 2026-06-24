@@ -21,7 +21,7 @@ describe('documentation graphs', () => {
   it('buildGraphsReferenceMarkdown catalogs all doc locations', () => {
     const md = buildGraphsReferenceMarkdown();
     assert.match(md, /docs\/GRAPHS\.md/);
-    assert.match(md, /\.mnemos\/context\/graphs\.md/);
+    assert.match(md, /\.mentis\/context\/graphs\.md/);
     assert.match(md, /```mermaid/);
     assert.ok((md.match(/```mermaid/g) ?? []).length >= 4);
   });

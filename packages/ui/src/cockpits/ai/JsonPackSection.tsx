@@ -59,7 +59,7 @@ export const JsonPackSection = () => {
           ) : (
             <EmptyState
               title="AI Pack unavailable"
-              description="Run Mnemos build to generate the AI Pack for this repository."
+              description="Run mnestis build to generate the AI Pack for this repository."
               action={
                 <Button onClick={handleBuild} disabled={building}>
                   {building ? 'Building…' : 'Run Mnemos'}

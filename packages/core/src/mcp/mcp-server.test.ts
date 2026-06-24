@@ -45,7 +45,7 @@ describe('Mnemos MCP server', () => {
       assert.ok(prompts.prompts.some((p) => p.name === 'architecture-overview'));
 
       const resources = await client.listResources();
-      assert.ok(resources.resources.some((r) => r.uri === 'mnemos://repository/dna'));
+      assert.ok(resources.resources.some((r) => r.uri === 'mentis://repository/dna'));
 
       const statusResult = await client.callTool({ name: 'get_status', arguments: {} });
       assert.equal('content' in statusResult, true);
@@ -65,7 +65,7 @@ describe('Mnemos MCP server', () => {
         assert.equal((badQuery.structuredContent as any).data.error.code, 'INVALID_INPUT');
       }
 
-      const dnaResource = await client.readResource({ uri: 'mnemos://repository/dna' });
+      const dnaResource = await client.readResource({ uri: 'mentis://repository/dna' });
       assert.ok(dnaResource.contents.length >= 1);
 
       await clientTransport.close();
