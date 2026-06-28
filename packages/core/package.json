@@ -1,6 +1,6 @@
 {
   "name": "@mnestis/core",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Core library for Mnestis — the memory layer for software intelligence",
   "type": "module",
   "main": "./dist/index.js",

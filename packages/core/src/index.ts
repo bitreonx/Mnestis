@@ -140,8 +140,26 @@ export {
   buildDisciplineCursorRule,
   buildDisciplineSkillSection,
   buildDisciplineSkillMd,
+  buildFableMindsetSkillMd,
   FABLE_DATASET_URL,
 } from './discipline/agent-discipline.js';
+export {
+  buildUiUxCursorRule,
+  buildUiUxSkillMd,
+  buildUiUxDisciplineRules,
+} from './discipline/ui-ux-discipline.js';
+export {
+  buildAdversarialCursorRule,
+  buildAdversarialSkillMd,
+  buildAdversarialDisciplineRules,
+  buildBrainstormTemplate,
+} from './discipline/adversarial-discipline.js';
+export {
+  buildCritiqueReport,
+  formatCritiqueReport,
+  buildUiBrief,
+} from './analysis/critique.js';
+export type { CritiqueReport, CritiqueFinding, CritiqueRemediation } from './analysis/critique.js';
 export { loadFableMindsetMd } from './discipline/fable-mindset.js';
 export type { ServeOptions, ServeHandle } from './serve.js';
 export { startMemoryServer } from './serve.js';

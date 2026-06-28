@@ -33,6 +33,8 @@ export function buildAgentDisciplineRules(): string[] {
     '- On tool failure: diagnose → inspect state → corrected fix → re-verify. Never retry blind.',
     '- Use absolute paths in shell commands instead of chaining `cd`.',
     '- Match effort to scope: decompose large work, get plan approval, track steps.',
+    '- **UI/UX:** follow the user spec and reference images exactly — no generic AI design drift.',
+    '- **Adversarial:** on large changes, run Devil (find threats) then Angel (fix each one).',
     '',
     '### What "done" means',
     '',
@@ -126,6 +128,16 @@ from skipping the thinking. Scale effort to the task — a one-line fix does not
 need a war room.
 
 ${rules}
+
+## UI/UX fidelity
+
+Follow the user's UI description and uploaded mockups/screenshots as the spec — not your
+default aesthetic. Full rules: activate **mnestis-ui-ux** skill or \`.cursor/rules/mnestis-ui-ux.mdc\`.
+
+## Adversarial review (Devil → Angel)
+
+Before shipping non-trivial work: Devil finds concrete threats; Angel proposes fixes.
+\`mnestis critique\` · \`mnestis brainstorm "<topic>"\`
 
 ## Why this works (and what it is not)
 

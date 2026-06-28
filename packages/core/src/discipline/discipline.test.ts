@@ -8,6 +8,15 @@ import {
   buildFableMindsetSkillMd,
   FABLE_DATASET_URL,
 } from './agent-discipline.js'
+import {
+  buildUiUxCursorRule,
+  buildUiUxDisciplineRules,
+} from './ui-ux-discipline.js'
+import {
+  buildAdversarialCursorRule,
+  buildBrainstormTemplate,
+} from './adversarial-discipline.js'
+import { buildUiBrief } from '../analysis/critique.js'
 import { loadFableMindsetMd } from './fable-mindset.js'
 
 describe('agent discipline', () => {
@@ -50,6 +59,40 @@ describe('agent discipline', () => {
 
   it('FABLE_DATASET_URL is the Glint-Research dataset', () => {
     assert.match(FABLE_DATASET_URL, /Glint-Research\/Fable-5-traces/)
+  })
+
+  it('buildAgentDisciplineRules includes UI/UX and adversarial habits', () => {
+    const rules = buildAgentDisciplineRules().join('\n')
+    assert.match(rules, /UI\/UX/)
+    assert.match(rules, /Adversarial/)
+  })
+
+  it('buildUiUxCursorRule targets spec fidelity', () => {
+    const rule = buildUiUxCursorRule()
+    assert.match(rule, /alwaysApply: false/)
+    assert.match(rule, /reference images/)
+    assert.match(buildUiUxDisciplineRules().join('\n'), /Anti-patterns/)
+  })
+
+  it('buildAdversarialCursorRule includes Devil and Angel', () => {
+    const rule = buildAdversarialCursorRule()
+    assert.match(rule, /Devil/)
+    assert.match(rule, /Angel/)
+    const template = buildBrainstormTemplate('auth refactor')
+    assert.match(template, /Devil/)
+    assert.match(template, /Angel/)
+  })
+
+  it('buildUiBrief embeds user spec', () => {
+    const brief = buildUiBrief('Two column layout with blue header', 'demo-app')
+    assert.match(brief, /Two column layout/)
+    assert.match(brief, /demo-app/)
+  })
+
+  it('loadFableMindsetMd includes UI/UX and adversarial sections', async () => {
+    const md = await loadFableMindsetMd()
+    assert.match(md, /UI\/UX fidelity/)
+    assert.match(md, /Adversarial thinking/)
   })
 
   it('loadFableMindsetMd returns the full operating manual', async () => {

@@ -115,6 +115,10 @@ import {
   writeSecurityAuditReport,
   pack as packMemories,
   formatPackSavings,
+  buildCritiqueReport,
+  formatCritiqueReport,
+  buildUiBrief,
+  buildBrainstormTemplate,
   type AiPackSection,
   type Mode as AiPackMode,
 } from '@mnestis/core';
@@ -875,6 +879,76 @@ program
   });
 
 program
+  .command('critique [path]')
+  .description('Devil/Angel scan — find repo weaknesses and proposed fixes (architecture, churn, risk)')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--json', 'Output JSON only')
+  .action(async (targetPath = '.', options) => {
+    const root = path.resolve(options.path && options.path !== '.' ? options.path : targetPath);
+    const loaded = await requireMemoryModel(root);
+    const graph = await loadGraphFromMemory(loaded.outputDir);
+    const report = await buildCritiqueReport(root, loaded.memory, graph);
+
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+
+    console.log('');
+    console.log(formatCritiqueReport(report));
+  });
+
+program
+  .command('brainstorm <topic>')
+  .description('Devil/Angel brainstorm template — stress-test an idea before building')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('--json', 'Output JSON only')
+  .action(async (topic, options) => {
+    const root = path.resolve(options.path);
+    const loaded = await requireMemoryModel(root);
+    const template = buildBrainstormTemplate(topic);
+    const critique = await buildCritiqueReport(root, loaded.memory, await loadGraphFromMemory(loaded.outputDir));
+
+    if (options.json) {
+      console.log(JSON.stringify({ topic, template, repoCritique: critique }, null, 2));
+      return;
+    }
+
+    console.log('');
+    console.log(template);
+    console.log('');
+    console.log(chalk.bold('--- Repo context (from critique) ---'));
+    console.log('');
+    for (const f of critique.devilFindings.slice(0, 5)) {
+      console.log(chalk.red(`  Devil #${f.id}`) + ` [${f.severity}] ${f.threat}`);
+    }
+    console.log('');
+    console.log(chalk.dim('Fill the template above with your agent, or run `mnestis critique` for full scan.'));
+  });
+
+program
+  .command('ui-brief <spec>')
+  .description('Generate a UI implementation brief — agent must follow user spec and reference images')
+  .option('-p, --path <path>', 'Repository path', '.')
+  .option('-o, --output <file>', 'Write brief to file')
+  .action(async (spec, options) => {
+    const root = path.resolve(options.path);
+    const loaded = await requireMemoryModel(root);
+    const brief = buildUiBrief(spec, loaded.memory.repository);
+
+    if (options.output) {
+      const out = path.resolve(options.output);
+      await mkdir(path.dirname(out), { recursive: true });
+      await writeFile(out, brief, 'utf-8');
+      console.log(chalk.green(`UI brief written: ${out}`));
+      return;
+    }
+
+    console.log('');
+    console.log(brief);
+  });
+
+program
   .command('hotspots [path]')
   .description('Git churn hotspots mapped to architecture (local git, no API)')
   .option('-p, --path <path>', 'Repository path', '.')
@@ -931,6 +1005,9 @@ program
     for (const f of result.skipped) {
       console.log(chalk.dim('  · skipped (exists): ') + f);
     }
+    console.log('');
+    console.log(chalk.bold('Cursor (recommended)'));
+    console.log(chalk.cyan('  mnestis setup --platform cursor --force') + chalk.dim('  — mandatory + architecture + discipline + UI/UX + adversarial + loom + MCP'));
     console.log('');
     console.log(chalk.bold('Claude Code'));
     console.log(chalk.cyan('  mnemos setup --platform claude') + chalk.dim('  — skill + CLAUDE.md (recommended)'));

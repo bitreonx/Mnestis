@@ -1,6 +1,6 @@
 {
   "name": "@mnestis/sdk",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "description": "Local-first AI memory SDK for Mnestis — hybrid retrieval, episodic memory, task context",
   "type": "module",
   "main": "./dist/index.js",

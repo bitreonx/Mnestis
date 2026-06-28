@@ -1,6 +1,6 @@
 {
   "name": "mnestis",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "description": "Mnestis — persistent memory for AI agents. Hybrid graph+vector recall, token-budget packing, local-first MCP.",
   "type": "module",
   "bin": {
@@ -52,12 +52,7 @@
     "prepublishOnly": "npm run build --prefix ../core && npm run build && node scripts/prepare-npm-publish.mjs && node scripts/validate-publish.mjs",
     "postpublish": "node scripts/strip-publish-deps.mjs restore"
   },
-  "dependencies": {
-    "@mnestis/core": "*",
-    "chalk": "^5.4.1",
-    "commander": "^13.1.0",
-    "ora": "^8.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.15.21",
     "@yao-pkg/pkg": "^5.16.1",

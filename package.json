@@ -1,6 +1,6 @@
 {
   "name": "mnestis",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "description": "The memory layer for software — transform codebases into structured intelligence",
   "workspaces": [

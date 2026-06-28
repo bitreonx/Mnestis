@@ -268,6 +268,9 @@ export function buildAgentsMd(
     'mnestis mcp                # stdio MCP — prefer over manual grepping',
     'mnestis build --watch      # auto-rebuild on save',
     'mnestis discipline --opus  # measure Fable habit gap',
+    'mnestis critique           # Devil/Angel repo weakness scan',
+    'mnestis brainstorm "topic" # structured adversarial brainstorm',
+    'mnestis ui-brief "spec"    # UI implementation brief from user spec',
     '```',
     '',
   );

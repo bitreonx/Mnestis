@@ -1,6 +1,6 @@
 {
   "name": "getmnemos",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Deprecated — getmnemos was renamed to mnestis. This package only prints a migration notice.",
   "bin": {
     "getmnemos": "bin/legacy.cjs",

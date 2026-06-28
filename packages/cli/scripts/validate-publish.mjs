@@ -11,6 +11,14 @@ const cliDir = path.resolve(__dirname, '..')
 const pkgPath = path.join(cliDir, 'package.json')
 
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+const corePkgPath = path.join(cliDir, '..', 'core', 'package.json')
+const coreVersion = JSON.parse(readFileSync(corePkgPath, 'utf-8')).version
+
+if (pkg.version !== coreVersion) {
+  console.error(`[validate] version mismatch: mnestis ${pkg.version} vs @mnestis/core ${coreVersion}`)
+  console.error('[validate] sync all package.json versions before publishing')
+  process.exit(1)
+}
 
 if (!pkg.bin || typeof pkg.bin !== 'object' || Array.isArray(pkg.bin)) {
   console.error('[validate] package.json "bin" must be a flat object of string paths')

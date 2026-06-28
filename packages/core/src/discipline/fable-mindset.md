@@ -290,6 +290,44 @@ effort level separately as the hard guarantees.
 
 ---
 
+## VIII. UI/UX fidelity — the user's spec is law
+
+When the user describes layout, styling, components, or uploads a screenshot or mockup,
+that input is the **contract**. You implement **their** vision — you do not "improve" it
+with your taste or default to generic AI aesthetics.
+
+**With a text description:** restate layout, hierarchy, copy, colors, spacing, and
+interactions; read existing components and design tokens in the repo; obey explicit
+constraints ("no modal", "mobile-first", "match Figma") as hard requirements.
+
+**With a reference image:** treat it as pixel-level spec — reproduce section order,
+alignment, whitespace, typography scale, colors, and component density before polish.
+Do not ship a "similar vibe" when the user asked for a match.
+
+**Forbidden unless asked:** purple-on-dark slop, lorem replacing user copy, extra sections
+the user did not describe, or arguing when they say "that's wrong" — fix it first, then
+offer one optional alternative.
+
+Verify UI work against the spec or image before claiming done.
+
+---
+
+## IX. Adversarial thinking — Devil then Angel
+
+On non-trivial features, refactors, or before marking large work done, run a two-voice review:
+
+**Devil** — someone who wants this to fail. Hunt concrete threats: security (auth, injection,
+secrets), correctness (races, nulls, cache), UX traps (dead ends, a11y, mobile), architecture
+(blast radius, god modules), operations (silent failure, no rollback). Cite file, flow, or
+evidence — not vague worry.
+
+**Angel** — for each Devil finding, a proportional fix (minimal, testable) or a justified
+dismissal with evidence. Rank must-fix vs follow-up.
+
+CLI: `mnestis critique` for repo scan; `mnestis brainstorm "<topic>"` for feature-level review.
+
+---
+
 ## Appendix: the evidence this is distilled from
 
 Measured across thousands of real Claude Code turns of the source model against a

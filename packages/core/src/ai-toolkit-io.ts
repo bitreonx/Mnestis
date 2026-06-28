@@ -12,6 +12,8 @@ import {
 } from './ai-toolkit.js';
 import { buildDisciplineCursorRule, buildFableMindsetSkillMd } from './discipline/agent-discipline.js';
 import { buildLoomCursorRule, buildLoomSkillMd } from './discipline/loom-skill.js';
+import { buildUiUxCursorRule, buildUiUxSkillMd } from './discipline/ui-ux-discipline.js';
+import { buildAdversarialCursorRule, buildAdversarialSkillMd } from './discipline/adversarial-discipline.js';
 import { loadFableMindsetMd } from './discipline/fable-mindset.js';
 import { buildMcpServerConfig, formatMcpConfigJson, type CursorMcpConfig } from './mcp-config.js';
 import type { MemoryModel } from './types.js';
@@ -37,6 +39,8 @@ export async function writeAiToolkit(
     'AGENTS.md': toolkit.agentsMd,
     'cursor-rule.mdc': toolkit.cursorRule,
     'discipline-rule.mdc': buildDisciplineCursorRule(),
+    'ui-ux-rule.mdc': buildUiUxCursorRule(),
+    'adversarial-rule.mdc': buildAdversarialCursorRule(),
     'mandatory-rule.mdc': buildMandatoryCursorRule(),
     'fable-mindset.md': mindsetMd,
     'ai-prompt.md': toolkit.aiPrompt,
@@ -100,6 +104,8 @@ export const PLATFORM_FILES: Record<Platform, string[]> = {
     '.cursor/rules/mnestis-mandatory.mdc',
     '.cursor/rules/mnestis-architecture.mdc',
     '.cursor/rules/mnestis-discipline.mdc',
+    '.cursor/rules/mnestis-ui-ux.mdc',
+    '.cursor/rules/mnestis-adversarial.mdc',
     '.cursor/rules/mnestis-loom.mdc',
     '.cursor/mcp.json',
     '.cursor/rules/mnemos-architecture.mdc',
@@ -115,6 +121,8 @@ export const PLATFORM_FILES: Record<Platform, string[]> = {
   claude: [
     '.claude/skills/mnestis/SKILL.md',
     '.claude/skills/fable-mindset/SKILL.md',
+    '.claude/skills/mnestis-ui-ux/SKILL.md',
+    '.claude/skills/mnestis-adversarial/SKILL.md',
     '.claude/skills/mnestis-loom/SKILL.md',
     '.claude/skills/mnemos/SKILL.md',
     '.claude/skills/mnemos-loom/SKILL.md',
@@ -184,6 +192,8 @@ async function installPlatform(
       await writeIfMissing(root, '.cursor/rules/mnestis-mandatory.mdc', buildMandatoryCursorRule(), force, written, skipped);
       await writeIfMissing(root, '.cursor/rules/mnestis-architecture.mdc', toolkit.cursorRule, force, written, skipped);
       await writeIfMissing(root, '.cursor/rules/mnestis-discipline.mdc', buildDisciplineCursorRule(), force, written, skipped);
+      await writeIfMissing(root, '.cursor/rules/mnestis-ui-ux.mdc', buildUiUxCursorRule(), force, written, skipped);
+      await writeIfMissing(root, '.cursor/rules/mnestis-adversarial.mdc', buildAdversarialCursorRule(), force, written, skipped);
       await writeIfMissing(root, '.cursor/rules/mnestis-loom.mdc', buildLoomCursorRule(), force, written, skipped);
       await mergeMcpConfig(root, force, written, skipped);
     },
@@ -194,6 +204,8 @@ async function installPlatform(
     claude: async () => {
       await writeIfMissing(root, '.claude/skills/mnestis/SKILL.md', skillMd, force, written, skipped);
       await writeIfMissing(root, '.claude/skills/fable-mindset/SKILL.md', buildFableMindsetSkillMd(), force, written, skipped);
+      await writeIfMissing(root, '.claude/skills/mnestis-ui-ux/SKILL.md', buildUiUxSkillMd(), force, written, skipped);
+      await writeIfMissing(root, '.claude/skills/mnestis-adversarial/SKILL.md', buildAdversarialSkillMd(), force, written, skipped);
       await writeIfMissing(root, '.claude/skills/mnestis-loom/SKILL.md', buildLoomSkillMd(), force, written, skipped);
       await appendOrWriteSection(root, 'CLAUDE.md', buildClaudeMdSection(memory, context), force, written, skipped);
     },

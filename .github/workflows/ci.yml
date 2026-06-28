@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify package versions are synced
+        run: node scripts/sync-versions.mjs
+
       - name: Build packages
         run: npm run build --workspace @mnestis/core
 
